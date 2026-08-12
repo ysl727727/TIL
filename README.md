@@ -12,7 +12,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Machine Learning
-- 현재 주제: baseline, evaluation metrics, data split, threshold policy
+- 현재 주제: model evaluation, tree ensembles, model interpretation
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -34,7 +34,8 @@ TIL/
 ├── README.md
 ├── math-foundations/
 ├── machine-learning/
-│   └── 01-model-evaluation/
+│   ├── 01-model-evaluation/
+│   └── 02-tree-ensembles/
 ├── deep-learning/
 ├── llm/
 ├── rag/
@@ -51,6 +52,8 @@ TIL/
 - Classification metrics for imbalanced and high-cost errors
 - Validation-based threshold selection
 - Preventing data leakage and test-set reuse
+- Bagging, Random Forest, Boosting, and model interpretation
+- First ensemble candidate comparison and coding improvement plan
 
 ## Recording Principles
 

@@ -12,15 +12,15 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Machine Learning
-- 현재 주제: model evaluation, tree ensembles, model interpretation
+- 현재 주제: bias-variance diagnosis and regularization
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
 
 | Area | Topics | Status |
 | --- | --- | --- |
-| Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | Completed |
-| Machine Learning | Baseline, metrics, cross-validation, error analysis | In progress |
+| Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
+| Machine Learning | Evaluation, tree ensembles, bias-variance, regularization | In progress |
 | Deep Learning | PyTorch, training loop, Transformer | Planned |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
@@ -32,15 +32,23 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 ```text
 TIL/
 ├── README.md
-├── math-foundations/
 ├── machine-learning/
 │   ├── 01-model-evaluation/
-│   └── 02-tree-ensembles/
-├── deep-learning/
-├── llm/
-├── rag/
-├── agents/
-└── llmops-serving/
+│   │   ├── README.md
+│   │   ├── model-evaluation-and-thresholding.ipynb
+│   │   └── requirements.txt
+│   ├── 02-tree-ensembles/
+│   │   ├── README.md
+│   │   ├── ensemble-candidate-comparison.ipynb
+│   │   └── requirements.txt
+│   └── 03-bias-variance-regularization/
+│       └── README.md
+├── math-foundations/          # planned
+├── deep-learning/             # planned
+├── llm/                       # planned
+├── rag/                       # planned
+├── agents/                    # planned
+└── llmops-serving/            # planned
 ```
 
 ## Learning Log
@@ -54,6 +62,9 @@ TIL/
 - Preventing data leakage and test-set reuse
 - Bagging, Random Forest, Boosting, and model interpretation
 - First ensemble candidate comparison and coding improvement plan
+- Bias-variance diagnosis with learning and validation curves
+- Ridge, Lasso, and ElasticNet comparison principles
+- Mathematics review and weekend study plan after the AI competency assessment
 
 ## Recording Principles
 

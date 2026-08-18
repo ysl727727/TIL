@@ -1,5 +1,7 @@
 # TIL: Private LLM Engineer Journey
 
+> Repository structure synced through Chapter 5 on 2026-08-18.
+
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 
 강의 내용을 그대로 옮기기보다 다음 세 가지를 중심으로 정리합니다.
@@ -12,7 +14,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Machine Learning
-- 현재 주제: bias-variance diagnosis and regularization
+- 현재 주제: CV-based tuning and end-to-end pipelines
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -20,7 +22,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | Area | Topics | Status |
 | --- | --- | --- |
 | Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
-| Machine Learning | Evaluation, tree ensembles, bias-variance, regularization | In progress |
+| Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
 | Deep Learning | PyTorch, training loop, Transformer | Planned |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
@@ -32,6 +34,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 ```text
 TIL/
 ├── README.md
+├── WEEKEND_PRACTICE_BACKLOG.md
 ├── machine-learning/
 │   ├── 01-model-evaluation/
 │   │   ├── README.md
@@ -41,15 +44,21 @@ TIL/
 │   │   ├── README.md
 │   │   ├── ensemble-candidate-comparison.ipynb
 │   │   └── requirements.txt
-│   └── 03-bias-variance-regularization/
-│       └── README.md
-├── math-foundations/          # planned
-├── deep-learning/             # planned
-├── llm/                       # planned
-├── rag/                       # planned
-├── agents/                    # planned
-└── llmops-serving/            # planned
+│   ├── 03-bias-variance-regularization/
+│   │   └── README.md
+│   ├── 04-class-imbalance-cv-leakage/
+│   │   └── README.md
+│   └── 05-cv-tuning-end-to-end-pipeline/
+│       ├── README.md
+│       ├── cv-search-basic.ipynb
+│       ├── cv-search-advanced.ipynb
+│       ├── end-to-end-pipeline-basic.ipynb
+│       ├── artifact-schema-guard-advanced.ipynb
+│       └── requirements.txt
 ```
+
+아직 생성하지 않은 Math Foundations, Deep Learning, LLM, RAG, Agent와
+LLMOps·Serving 폴더는 위의 실제 파일 구조에 포함하지 않았습니다.
 
 ## Learning Log
 
@@ -65,6 +74,10 @@ TIL/
 - Bias-variance diagnosis with learning and validation curves
 - Ridge, Lasso, and ElasticNet comparison principles
 - Mathematics review and weekend study plan after the AI competency assessment
+- Class imbalance metrics, CV splitters, and leakage prevention principles
+- Fair Grid and Random Search under the same CV budget
+- End-to-end preprocessing, resampling, tuning, persistence, and schema guards
+- Consolidated weekend backlog for unfinished and guided practices
 
 ## Recording Principles
 

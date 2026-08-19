@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Repository structure synced through Chapter 5 on 2026-08-18.
+> Target repository structure through Deep Learning Chapter 2, updated on 2026-08-19.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 
@@ -13,8 +13,8 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 ## Current Status
 
 - 과정: KANT Private LLM 엔지니어 교육과정
-- 현재 단계: Machine Learning
-- 현재 주제: CV-based tuning and end-to-end pipelines
+- 현재 단계: Deep Learning Foundations
+- 현재 주제: PyTorch training flow, tensor dtype, shape, batch, and broadcasting
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -23,7 +23,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
 | Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
-| Deep Learning | PyTorch, training loop, Transformer | Planned |
+| Deep Learning | Training flow, problem I/O, PyTorch tensor, dtype, shape, batch | In progress |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
 | AI Agent | Tool calling, LangGraph, MCP | Planned |
@@ -55,9 +55,20 @@ TIL/
 │       ├── end-to-end-pipeline-basic.ipynb
 │       ├── artifact-schema-guard-advanced.ipynb
 │       └── requirements.txt
+└── deep-learning/
+    └── 01-pytorch-foundations/
+        ├── README.md
+        ├── 01-ml-vs-dl-basic.ipynb
+        ├── 02-ml-vs-dl-advanced.ipynb
+        ├── 03-training-flow-basic.ipynb
+        ├── 04-problem-io-basic.ipynb
+        ├── 05-pytorch-code-reading-basic.ipynb
+        ├── 06-tensor-dtype-shape-basic.ipynb
+        ├── 07-batch-broadcasting-basic.ipynb
+        └── requirements.txt
 ```
 
-아직 생성하지 않은 Math Foundations, Deep Learning, LLM, RAG, Agent와
+아직 생성하지 않은 Math Foundations, LLM, RAG, Agent와
 LLMOps·Serving 폴더는 위의 실제 파일 구조에 포함하지 않았습니다.
 
 ## Learning Log
@@ -78,6 +89,9 @@ LLMOps·Serving 폴더는 위의 실제 파일 구조에 포함하지 않았습�
 - Fair Grid and Random Search under the same CV budget
 - End-to-end preprocessing, resampling, tuning, persistence, and schema guards
 - Consolidated weekend backlog for unfinished and guided practices
+- Rule-based, machine-learning, and deep-learning approach selection
+- PyTorch training flow, problem-output-loss mapping, and code structure reading
+- Tensor dtype conversion, batch dimension, and broadcasting practice
 
 ## Recording Principles
 

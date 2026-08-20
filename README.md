@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Target repository structure through Deep Learning Chapter 2, updated on 2026-08-19.
+> Target repository structure through Deep Learning Chapter 3, updated on 2026-08-20.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 
@@ -14,7 +14,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: PyTorch training flow, tensor dtype, shape, batch, and broadcasting
+- 현재 주제: PyTorch device·오류 디버깅, perceptron, MLP, `nn.Linear`, flatten, `forward`
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -23,7 +23,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
 | Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
-| Deep Learning | Training flow, problem I/O, PyTorch tensor, dtype, shape, batch | In progress |
+| Deep Learning | Tensor, device, shape debugging, perceptron, MLP, flatten, forward | In progress |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
 | AI Agent | Tool calling, LangGraph, MCP | Planned |
@@ -56,20 +56,31 @@ TIL/
 │       ├── artifact-schema-guard-advanced.ipynb
 │       └── requirements.txt
 └── deep-learning/
-    └── 01-pytorch-foundations/
+    ├── 01-pytorch-foundations/
+    │   ├── README.md
+    │   ├── 01-ml-vs-dl-basic.ipynb
+    │   ├── 02-ml-vs-dl-advanced.ipynb
+    │   ├── 03-training-flow-basic.ipynb
+    │   ├── 04-problem-io-basic.ipynb
+    │   ├── 05-pytorch-code-reading-basic.ipynb
+    │   ├── 06-tensor-dtype-shape-basic.ipynb
+    │   ├── 07-batch-broadcasting-basic.ipynb
+    │   ├── 08-device-basic.ipynb
+    │   ├── 09-device-advanced.ipynb
+    │   ├── 10-shape-device-debugging-basic.ipynb
+    │   └── requirements.txt
+    └── 02-mlp-foundations/
         ├── README.md
-        ├── 01-ml-vs-dl-basic.ipynb
-        ├── 02-ml-vs-dl-advanced.ipynb
-        ├── 03-training-flow-basic.ipynb
-        ├── 04-problem-io-basic.ipynb
-        ├── 05-pytorch-code-reading-basic.ipynb
-        ├── 06-tensor-dtype-shape-basic.ipynb
-        ├── 07-batch-broadcasting-basic.ipynb
+        ├── 01-perceptron-linear-boundary-basic.ipynb
+        ├── 02-mlp-layers-basic.ipynb
+        ├── 03-linear-weight-bias-basic.ipynb
+        ├── 04-image-flatten-basic.ipynb
+        ├── 05-mlp-forward-basic.ipynb
         └── requirements.txt
 ```
 
-아직 생성하지 않은 Math Foundations, LLM, RAG, Agent와
-LLMOps·Serving 폴더는 위의 실제 파일 구조에 포함하지 않았습니다.
+아직 생성하지 않은 Math Foundations, LLM, RAG, Agent와 LLMOps·Serving 폴더는
+위의 실제 파일 구조에 포함하지 않았습니다.
 
 ## Learning Log
 
@@ -92,6 +103,10 @@ LLMOps·Serving 폴더는 위의 실제 파일 구조에 포함하지 않았습�
 - Rule-based, machine-learning, and deep-learning approach selection
 - PyTorch training flow, problem-output-loss mapping, and code structure reading
 - Tensor dtype conversion, batch dimension, and broadcasting practice
+- CPU/GPU device placement and shape·dtype·device error debugging
+- Perceptron, linear decision boundary, MLP layers, and `nn.Linear` parameters
+- Image flattening, MLP `forward`, parameter counting, and the motivation for CNNs
+- Python practice with `set()`, `zip()`, `next()`, and `p.numel()`
 
 ## Recording Principles
 

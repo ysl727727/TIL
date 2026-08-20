@@ -1,9 +1,9 @@
-# PyTorch Foundations: Training Flow, Tensor, Dtype, and Shape
+# PyTorch Foundations: Tensor, Device, and Debugging
 
-규칙 기반·머신러닝·딥러닝의 적용 기준에서 시작해,
-PyTorch 학습 흐름과 Tensor의 dtype·shape·batch·broadcasting을 실습했습니다.
+규칙 기반·머신러닝·딥러닝의 적용 기준에서 시작해 PyTorch 학습 흐름과
+Tensor의 dtype·shape·batch·broadcasting·device 및 오류 디버깅을 실습했습니다.
 
-> 진행 상태: 1-2~2-2 기본 실습 모두 완료. 별도 심화 실습은 1-2만 완료했습니다.
+> 진행 상태: 1-2~2-4 기본 실습 완료. 별도 심화 실습은 1-2와 2-3을 완료했습니다.
 
 ## Practice Status
 
@@ -15,46 +15,17 @@ PyTorch 학습 흐름과 Tensor의 dtype·shape·batch·broadcasting을 실습�
 | 1-5 | PyTorch 코드 구조 읽기 | Completed | Pending |
 | 2-1 | Tensor dtype·shape·ndim | Completed | Pending |
 | 2-2 | Batch dimension·broadcasting | Completed | Pending |
+| 2-3 | CPU/GPU device와 `.to(device)` | Completed | Completed |
+| 2-4 | Shape·dtype·device 오류 디버깅 | Completed | Not provided |
 
-강의 원문이나 제공된 정답 셀 대신, 공개 노트북에는 작성하고 실행한 코드와 결과만 남겼습니다.
+기본 노트북 안에 포함된 심화 항목도 직접 작성하고 실행했습니다. 공개 노트북에는
+강의 원문이나 제공 정답 대신 작성한 코드와 실행 결과만 남겼습니다.
 
 ## What I Learned
 
-### Choosing an Approach
+### Tensor and Device Contract
 
-- 공식이 명확하고 자주 바뀌지 않으면 규칙 기반을 먼저 검토합니다.
-- 구조화된 특징과 라벨이 있으면 전통적인 머신러닝 baseline을 만들 수 있습니다.
-- 텍스트·이미지처럼 사람이 특징을 전부 정의하기 어려운 데이터와 충분한 라벨이 있을 때 딥러닝을 후보로 검토합니다.
-- 딥러닝이 가능하다는 사실과 가장 먼저 쓰어야 한다는 판단은 다릅니다.
-
-### Training Flow
-
-```text
-DataLoader에서 batch 꺼내기
-→ model(x) forward
-→ loss 계산
-→ optimizer.zero_grad()
-→ loss.backward()
-→ optimizer.step()
-→ validation 평가
-```
-
-`zero_grad()`는 이전 gradient 누적을 초기화하고, `backward()`는 gradient를 계산하며,
-`step()`은 그 gradient를 사용해 parameter를 업데이트합니다.
-
-### Problem, Output, and Loss
-
-| Problem | Typical output | Loss candidate | Target |
-| --- | --- | --- | --- |
-| 회귀 | `[B, 1]` | `MSELoss` | float 실수 |
-| 이진 분류 | `[B, 1]` logits | `BCEWithLogitsLoss` | 0/1 float |
-| 다중 분류 | `[B, C]` logits | `CrossEntropyLoss` | class index `int64` |
-
-`CrossEntropyLoss`에는 class index를 넘기므로 target의 dtype이 `torch.int64`여야 합니다.
-
-### Tensor Checks
-
-Tensor를 만나면 다음 순서로 확인합니다.
+Tensor를 만나면 다음 네 항목부터 확인합니다.
 
 ```python
 print(tensor.shape)
@@ -63,63 +34,66 @@ print(tensor.ndim)
 print(tensor.device)
 ```
 
+```python
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = model.to(device)
+x = x.to(device)
+y = y.to(device)
+```
+
+모델과 입력 Tensor가 서로 다른 device에 있으면 연산할 수 없습니다. 학습 루프에서는
+모델을 한 번 옮기고, DataLoader에서 꺼낸 각 batch의 입력과 target을 같은 device로 옮깁니다.
+
+### Shape·Dtype·Device Debugging Order
+
+```text
+오류 메시지의 마지막 줄 확인
+→ shape / dtype / device 중 하나로 분류
+→ 오류 직전 Tensor 정보 출력
+→ 모델·loss가 기대하는 조건과 비교
+→ 수정 후 다시 출력하고 검증
+```
+
+- `nn.Linear` 입력의 마지막 차원은 `in_features`와 같아야 합니다.
+- 샘플 하나 `[F]`는 필요할 때 `unsqueeze(0)`으로 `[1, F]` batch로 만듭니다.
+- `CrossEntropyLoss` target은 class index 형태의 `torch.int64`여야 합니다.
+- prediction과 target shape이 다르면 의도하지 않은 broadcasting부터 확인합니다.
+
+### Useful Python and PyTorch Syntax
+
 | Expression | Meaning |
 | --- | --- |
-| `tensor.long()` | Tensor를 `torch.int64` dtype으로 변환 |
-| `torch.int64` | 64-bit 정수 dtype, `torch.long`과 같은 의미 |
+| `tensor.long()` | Tensor를 `torch.int64`로 변환 |
 | `tensor.to(torch.int64)` | 목표 dtype을 지정해 변환 |
-| `tensor.dtype` | 현재 Tensor의 dtype 확인 |
+| `tensor.to(device)` | Tensor를 지정 device로 이동 |
+| `zip(a, b)` | 같은 위치의 항목을 1:1로 묶어 반복 |
+| `set(values)` | 중복 값을 제거한 집합 생성 |
+| `next(iterator)` | iterator의 다음 항목 하나 반환 |
 
-### `zip()` and `*case`
-
-`zip()`은 여러 iterable의 같은 위치 값을 짝으로 묶어 반복합니다.
-
-```python
-for block, stage in zip(code_blocks, stage_names):
-    print(block, stage)
-```
-
-다음 코드에서 `case`는 함수의 매개변수 이름이 아니라 현재 반복에서 꺼낸 tuple 변수입니다.
-`*`가 tuple을 풀어서 함수의 위치 인자로 나누어 전달합니다.
+조건을 만족하는 첫 항목을 찾을 때는 generator expression과 `next()`를 함께 사용할 수 있습니다.
 
 ```python
-cases = [(False, 400, True), (True, 28000, False)]
-
-for case in cases:
-    recommend_start(*case)
-    # recommend_start(case[0], case[1], case[2])와 같은 의미
+first_cuda_run = next(
+    (run for run in runs if run["device"] == "cuda:0"),
+    None,
+)
 ```
 
-반면 함수 정의에서 `def func(*args):`라고 쓰면 여러 위치 인자를 tuple로 모으는 반대 동작입니다.
-
-### Batch and Broadcasting
-
-- `unsqueeze(0)`는 맨 앞에 batch 차원을 추가합니다.
-- `[4, 3] + [3]`에서 `[3]`은 각 batch 행에 반복 적용되어 결과가 `[4, 3]`이 됩니다.
-- `pred=[4, 1]`, `target=[4]`를 그대로 연산하면 의도하지 않은 broadcasting이 발생할 수 있습니다.
-- Loss 계산 전에 `pred.shape == target.shape`를 확인하는 습관이 필요합니다.
+두 번째 인자 `None`은 조건을 만족하는 항목이 없을 때 `StopIteration` 대신 반환할 기본값입니다.
 
 ## Learning Reflection
 
-기본 실습을 통해 학습 코드를 위에서 아래로 읽는 순서와 Tensor의
-shape·dtype을 먼저 확인하는 디버깅 순서를 연결했습니다.
-
-특히 `.long()`, `torch.int64`, `.to(torch.int64)`가 결국 다중 분류 target을
-class index용 64-bit 정수로 맞추는 여러 표현이라는 점을 새로 알게 됐습니다.
-`zip()`과 `recommend_start(*case)`를 통해 여러 값을 짝지어 반복하고
-tuple을 인자로 풀어 전달하는 방법도 학습했습니다.
-
-모든 기본 실습은 완료했지만, 별도 심화 실습은 1-2만 진행했습니다.
-완료한 코드와 참고 없이 재작성할 수 있는 코드를 구분하며 다음 심화 실습을 진행할 계획입니다.
+dtype와 shape뿐 아니라 device도 연산 전에 맞춰야 하는 Tensor의 계약이라는 점을 확인했습니다.
+오류가 길어도 마지막 줄에서 종류를 분류하고, 연산 직전의 shape·dtype·device를 출력하면
+확인 범위를 줄일 수 있었습니다.
 
 ## Next Steps
 
-- [x] 1-2~2-2 기본 실습
-- [x] 1-2 심화 실습
+- [x] 1-2~2-4 기본 실습
+- [x] 1-2·2-3 별도 심화 실습
 - [ ] 1-3~2-2 별도 심화 실습
-- [ ] dtype 변환 코드를 참고 없이 재작성
-- [ ] `zip()`과 tuple unpacking을 작은 함수에 직접 적용
-- [ ] broadcasting 전에 예상 shape을 먼저 적고 실행 결과와 비교
+- [ ] dtype·shape·device 오류를 각각 하나씩 다시 만들고 수정
+- [ ] batch 이동 helper를 참고 없이 재작성
 
 ## Files
 
@@ -133,5 +107,8 @@ tuple을 인자로 풀어 전달하는 방법도 학습했습니다.
 ├── 05-pytorch-code-reading-basic.ipynb
 ├── 06-tensor-dtype-shape-basic.ipynb
 ├── 07-batch-broadcasting-basic.ipynb
+├── 08-device-basic.ipynb
+├── 09-device-advanced.ipynb
+├── 10-shape-device-debugging-basic.ipynb
 └── requirements.txt
 ```

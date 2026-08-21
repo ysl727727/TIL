@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Target repository structure through Deep Learning Chapter 3, updated on 2026-08-20.
+> Target repository structure through Deep Learning Chapter 4, updated on 2026-08-21.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 
@@ -14,7 +14,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: PyTorch device·오류 디버깅, perceptron, MLP, `nn.Linear`, flatten, `forward`
+- 현재 주제: 비선형성, ReLU, Sigmoid, Softmax와 분류 출력층·Loss 계약
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -23,7 +23,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
 | Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
-| Deep Learning | Tensor, device, shape debugging, perceptron, MLP, flatten, forward | In progress |
+| Deep Learning | Tensor, device, MLP, activation functions, binary and multiclass outputs | In progress |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
 | AI Agent | Tool calling, LangGraph, MCP | Planned |
@@ -69,13 +69,24 @@ TIL/
     │   ├── 09-device-advanced.ipynb
     │   ├── 10-shape-device-debugging-basic.ipynb
     │   └── requirements.txt
-    └── 02-mlp-foundations/
+    ├── 02-mlp-foundations/
+    │   ├── README.md
+    │   ├── 01-perceptron-linear-boundary-basic.ipynb
+    │   ├── 02-mlp-layers-basic.ipynb
+    │   ├── 03-linear-weight-bias-basic.ipynb
+    │   ├── 04-image-flatten-basic.ipynb
+    │   ├── 05-mlp-forward-basic.ipynb
+    │   └── requirements.txt
+    └── 03-activation-output-layers/
         ├── README.md
-        ├── 01-perceptron-linear-boundary-basic.ipynb
-        ├── 02-mlp-layers-basic.ipynb
-        ├── 03-linear-weight-bias-basic.ipynb
-        ├── 04-image-flatten-basic.ipynb
-        ├── 05-mlp-forward-basic.ipynb
+        ├── 01-nonlinearity-basic.ipynb
+        ├── 02-nonlinearity-advanced.ipynb
+        ├── 03-relu-basic.ipynb
+        ├── 04-relu-advanced.ipynb
+        ├── 05-sigmoid-binary-basic.ipynb
+        ├── 06-sigmoid-binary-advanced.ipynb
+        ├── 07-softmax-multiclass-basic.ipynb
+        ├── 08-softmax-multiclass-advanced.ipynb
         └── requirements.txt
 ```
 
@@ -107,6 +118,10 @@ TIL/
 - Perceptron, linear decision boundary, MLP layers, and `nn.Linear` parameters
 - Image flattening, MLP `forward`, parameter counting, and the motivation for CNNs
 - Python practice with `set()`, `zip()`, `next()`, and `p.numel()`
+- Non-linearity, ReLU placement, and Dead ReLU diagnostics
+- Binary classification with raw logits, Sigmoid inference, and `BCEWithLogitsLoss`
+- Multiclass classification with class logits, Softmax axes, and `CrossEntropyLoss`
+- Tensor utilities and contracts with `linspace`, `cat`, `dim=-1`, and element-wise `&`
 
 ## Recording Principles
 

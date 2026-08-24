@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Target repository structure through Deep Learning Chapter 4, updated on 2026-08-21.
+> Target repository structure through Deep Learning Chapter 5, updated on 2026-08-24.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 
@@ -14,7 +14,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: 비선형성, ReLU, Sigmoid, Softmax와 분류 출력층·Loss 계약
+- 현재 주제: Loss function, optimizer, learning rate와 parameter update flow
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
@@ -23,7 +23,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
 | Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
-| Deep Learning | Tensor, device, MLP, activation functions, binary and multiclass outputs | In progress |
+| Deep Learning | Tensor, MLP, activation, loss, optimizer, learning rate, training loop | In progress |
 | LLM | Hugging Face, fine-tuning, evaluation | Planned |
 | RAG | Retrieval, reranking, RAG evaluation | Planned |
 | AI Agent | Tool calling, LangGraph, MCP | Planned |
@@ -77,16 +77,27 @@ TIL/
     │   ├── 04-image-flatten-basic.ipynb
     │   ├── 05-mlp-forward-basic.ipynb
     │   └── requirements.txt
-    └── 03-activation-output-layers/
+    ├── 03-activation-output-layers/
+    │   ├── README.md
+    │   ├── 01-nonlinearity-basic.ipynb
+    │   ├── 02-nonlinearity-advanced.ipynb
+    │   ├── 03-relu-basic.ipynb
+    │   ├── 04-relu-advanced.ipynb
+    │   ├── 05-sigmoid-binary-basic.ipynb
+    │   ├── 06-sigmoid-binary-advanced.ipynb
+    │   ├── 07-softmax-multiclass-basic.ipynb
+    │   ├── 08-softmax-multiclass-advanced.ipynb
+    │   └── requirements.txt
+    └── 04-loss-optimization-training-loop/
         ├── README.md
-        ├── 01-nonlinearity-basic.ipynb
-        ├── 02-nonlinearity-advanced.ipynb
-        ├── 03-relu-basic.ipynb
-        ├── 04-relu-advanced.ipynb
-        ├── 05-sigmoid-binary-basic.ipynb
-        ├── 06-sigmoid-binary-advanced.ipynb
-        ├── 07-softmax-multiclass-basic.ipynb
-        ├── 08-softmax-multiclass-advanced.ipynb
+        ├── 01-loss-function-basic.ipynb
+        ├── 02-loss-function-advanced.ipynb
+        ├── 03-task-loss-selection-basic.ipynb
+        ├── 04-task-loss-selection-advanced.ipynb
+        ├── 05-optimizer-learning-rate-basic.ipynb
+        ├── 06-optimizer-learning-rate-advanced.ipynb
+        ├── 07-parameter-update-flow-basic.ipynb
+        ├── 08-parameter-update-flow-advanced.ipynb
         └── requirements.txt
 ```
 
@@ -122,6 +133,11 @@ TIL/
 - Binary classification with raw logits, Sigmoid inference, and `BCEWithLogitsLoss`
 - Multiclass classification with class logits, Softmax axes, and `CrossEntropyLoss`
 - Tensor utilities and contracts with `linspace`, `cat`, `dim=-1`, and element-wise `&`
+- Loss calculation, scalar reduction, and task-specific output-target-loss contracts
+- SGD and Adam behavior, learning-rate experiments, and non-finite loss checks
+- Standard five-step training flow from `zero_grad()` to `optimizer.step()`
+- Training audit logic with `all()`, `zip()`, `next()`, call-order indexes, and unique approval rules
+- Safe metric logging with `loss.item()` to avoid retaining computation graphs
 
 ## Recording Principles
 

@@ -1,35 +1,29 @@
 # TIL: Private LLM Engineer Journey
 
-> Target repository structure through Deep Learning Chapter 5, updated on 2026-08-24.
+> Repository structure through Deep Learning Chapter 7, updated on 2026-08-25.
 
-KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
-
-강의 내용을 그대로 옮기기보다 다음 세 가지를 중심으로 정리합니다.
-
-1. 무엇을 이해했는가
-2. 코드로 무엇을 검증했는가
-3. 실험 결과에서 어떤 결론을 얻었는가
+KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록합니다.
+강의 원문을 옮기기보다 이해한 내용, 코드로 검증한 결과, 다음에 보완할 점을 중심으로 정리합니다.
 
 ## Current Status
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: Loss function, optimizer, learning rate와 parameter update flow
+- 현재 주제: Autograd, 안전한 평가, Dataset과 DataLoader
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Contents
 
 | Area | Topics | Status |
 | --- | --- | --- |
-| Math Foundations | Vector, matrix, cosine similarity, softmax, cross-entropy | In progress (review) |
-| Machine Learning | Evaluation, ensembles, regularization, CV, leakage prevention, pipeline | In progress |
-| Deep Learning | Tensor, MLP, activation, loss, optimizer, learning rate, training loop | In progress |
-| LLM | Hugging Face, fine-tuning, evaluation | Planned |
-| RAG | Retrieval, reranking, RAG evaluation | Planned |
-| AI Agent | Tool calling, LangGraph, MCP | Planned |
-| LLMOps & Serving | Monitoring, vLLM, container and cloud deployment | Planned |
+| Math Foundations | Vector, matrix, similarity, softmax, cross-entropy | Review |
+| Machine Learning | Evaluation, ensembles, regularization, CV, leakage, pipeline | In progress |
+| Deep Learning | Tensor, MLP, loss, optimizer, Autograd, data pipeline | In progress |
+| LLM · RAG · Agent · Serving | Fine-tuning, retrieval, tool use, deployment | Planned |
 
 ## Repository Structure
+
+머신러닝 이전 기록은 폴더 단위로만 간단히 표시하고, 현재 학습 중인 딥러닝은 실제 파일까지 표시합니다.
 
 ```text
 TIL/
@@ -37,24 +31,10 @@ TIL/
 ├── WEEKEND_PRACTICE_BACKLOG.md
 ├── machine-learning/
 │   ├── 01-model-evaluation/
-│   │   ├── README.md
-│   │   ├── model-evaluation-and-thresholding.ipynb
-│   │   └── requirements.txt
 │   ├── 02-tree-ensembles/
-│   │   ├── README.md
-│   │   ├── ensemble-candidate-comparison.ipynb
-│   │   └── requirements.txt
 │   ├── 03-bias-variance-regularization/
-│   │   └── README.md
 │   ├── 04-class-imbalance-cv-leakage/
-│   │   └── README.md
 │   └── 05-cv-tuning-end-to-end-pipeline/
-│       ├── README.md
-│       ├── cv-search-basic.ipynb
-│       ├── cv-search-advanced.ipynb
-│       ├── end-to-end-pipeline-basic.ipynb
-│       ├── artifact-schema-guard-advanced.ipynb
-│       └── requirements.txt
 └── deep-learning/
     ├── 01-pytorch-foundations/
     │   ├── README.md
@@ -88,60 +68,52 @@ TIL/
     │   ├── 07-softmax-multiclass-basic.ipynb
     │   ├── 08-softmax-multiclass-advanced.ipynb
     │   └── requirements.txt
-    └── 04-loss-optimization-training-loop/
+    ├── 04-loss-optimization-training-loop/
+    │   ├── README.md
+    │   ├── 01-loss-function-basic.ipynb
+    │   ├── 02-loss-function-advanced.ipynb
+    │   ├── 03-task-loss-selection-basic.ipynb
+    │   ├── 04-task-loss-selection-advanced.ipynb
+    │   ├── 05-optimizer-learning-rate-basic.ipynb
+    │   ├── 06-optimizer-learning-rate-advanced.ipynb
+    │   ├── 07-parameter-update-flow-basic.ipynb
+    │   ├── 08-parameter-update-flow-advanced.ipynb
+    │   └── requirements.txt
+    └── 05-autograd-data-pipeline/
         ├── README.md
-        ├── 01-loss-function-basic.ipynb
-        ├── 02-loss-function-advanced.ipynb
-        ├── 03-task-loss-selection-basic.ipynb
-        ├── 04-task-loss-selection-advanced.ipynb
-        ├── 05-optimizer-learning-rate-basic.ipynb
-        ├── 06-optimizer-learning-rate-advanced.ipynb
-        ├── 07-parameter-update-flow-basic.ipynb
-        ├── 08-parameter-update-flow-advanced.ipynb
+        ├── 01-computation-graph-chain-rule-basic.ipynb
+        ├── 02-computation-graph-chain-rule-advanced.ipynb
+        ├── 03-requires-grad-basic.ipynb
+        ├── 04-requires-grad-advanced.ipynb
+        ├── 05-backward-grad-basic.ipynb
+        ├── 06-backward-grad-advanced.ipynb
+        ├── 07-training-step-order-basic.ipynb
+        ├── 08-training-step-order-advanced.ipynb
+        ├── 09-autograd-debugging-basic.ipynb
+        ├── 10-autograd-debugging-advanced.ipynb
         └── requirements.txt
 ```
 
-아직 생성하지 않은 Math Foundations, LLM, RAG, Agent와 LLMOps·Serving 폴더는
-위의 실제 파일 구조에 포함하지 않았습니다.
+## Recent Learning Log
 
-## Learning Log
+### 2026-08-25
 
-### 2026-08
+- 계산 그래프와 Chain Rule, leaf·non-leaf Tensor와 gradient 저장 위치
+- `requires_grad`, `backward()`, gradient 누적과 표준 step 순서
+- `grad is None`과 값이 0인 gradient의 의미 구분
+- `model.eval()`과 `torch.no_grad()`, 학습 Loss 경로와 metric용 `detach()` 구분
+- 입력 scale과 gradient norm, `isfinite` 기반 Autograd 점검
+- `Dataset → DataLoader → batch`와 `TensorDataset`·Custom Dataset 역할
 
-- Linear algebra fundamentals and cosine similarity
-- Regression baseline comparison
-- Classification metrics for imbalanced and high-cost errors
-- Validation-based threshold selection
-- Preventing data leakage and test-set reuse
-- Bagging, Random Forest, Boosting, and model interpretation
-- First ensemble candidate comparison and coding improvement plan
-- Bias-variance diagnosis with learning and validation curves
-- Ridge, Lasso, and ElasticNet comparison principles
-- Mathematics review and weekend study plan after the AI competency assessment
-- Class imbalance metrics, CV splitters, and leakage prevention principles
-- Fair Grid and Random Search under the same CV budget
-- End-to-end preprocessing, resampling, tuning, persistence, and schema guards
-- Consolidated weekend backlog for unfinished and guided practices
-- Rule-based, machine-learning, and deep-learning approach selection
-- PyTorch training flow, problem-output-loss mapping, and code structure reading
-- Tensor dtype conversion, batch dimension, and broadcasting practice
-- CPU/GPU device placement and shape·dtype·device error debugging
-- Perceptron, linear decision boundary, MLP layers, and `nn.Linear` parameters
-- Image flattening, MLP `forward`, parameter counting, and the motivation for CNNs
-- Python practice with `set()`, `zip()`, `next()`, and `p.numel()`
-- Non-linearity, ReLU placement, and Dead ReLU diagnostics
-- Binary classification with raw logits, Sigmoid inference, and `BCEWithLogitsLoss`
-- Multiclass classification with class logits, Softmax axes, and `CrossEntropyLoss`
-- Tensor utilities and contracts with `linspace`, `cat`, `dim=-1`, and element-wise `&`
-- Loss calculation, scalar reduction, and task-specific output-target-loss contracts
-- SGD and Adam behavior, learning-rate experiments, and non-finite loss checks
-- Standard five-step training flow from `zero_grad()` to `optimizer.step()`
-- Training audit logic with `all()`, `zip()`, `next()`, call-order indexes, and unique approval rules
-- Safe metric logging with `loss.item()` to avoid retaining computation graphs
+### Earlier in 2026-08
+
+- 머신러닝: 평가·ensemble·regularization·CV·leakage·end-to-end pipeline
+- 딥러닝: Tensor·device·MLP·activation·분류 출력층·Loss·optimizer·training loop
+- Python: `set()`, `zip()`, `next()`, `all()`, `p.numel()`, class와 `forward`
 
 ## Recording Principles
 
-- 교육자료 원본 대신 직접 작성한 코드와 해석만 공개합니다.
-- 실행 환경, 데이터, random seed와 평가 지표를 기록합니다.
-- 성공한 결과뿐 아니라 오류와 개선 방향도 남깁니다.
+- 교육자료 원본 대신 직접 작성한 코드와 해석을 공개합니다.
+- 실행 환경, seed, shape·dtype·device와 평가 기준을 기록합니다.
+- 성공한 결과뿐 아니라 미실행 셀, 오류 원인과 다음 검증 계획도 남깁니다.
 - API key, 개인정보 및 사용 권한이 불분명한 데이터는 올리지 않습니다.

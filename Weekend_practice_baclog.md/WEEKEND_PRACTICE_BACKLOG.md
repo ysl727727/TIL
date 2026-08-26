@@ -1,12 +1,23 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-08-25 after Deep Learning lessons 6-1~7-2.
+> Updated on 2026-08-26 after Deep Learning lessons 7-3~7-5 and 8-1~8-8.
 
-다음 주말인 2026-08-29~30에는 오늘 미실행으로 확인된 6-1·6-4 심화와
-이전 5-2 심화를 먼저 마칩니다. 체크박스는 코드를 작성했다는 뜻이 아니라
-**직접 실행하고 결과를 설명할 수 있는지**를 기준으로 갱신합니다.
+다음 주말인 2026-08-29~30에는 8-1~8-7의 개별 흐름을 눈으로 다시 확인하고,
+8-8 종합 코드에서 각 단계가 어디에 연결되는지 대응시키는 것을 먼저 진행합니다.
+
+체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
+**직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
 
 ## 1. Latest Deep Learning Progress
+
+### Completed on 2026-08-26
+
+- [x] 7-3 심화: train 통계 정규화, `SubsetWithTransform`, transform 순서 승인
+- [x] 7-4 심화: 재현 가능한 split, 목적별 DataLoader, 평가 sample 누락 검사
+- [x] 7-5 심화: shape·dtype 계약 수정, batch audit, pipeline 후보 승인
+- [x] 8-8 종합 심화: train·validation 분리, 3 epoch baseline, validation 기반 report
+- [x] Validation 전후 parameter가 변하지 않는지 검사
+- [x] Test를 모델 선택에 쓰지 않고 최종 한 번만 확인하는 원칙 정리
 
 ### Completed on 2026-08-25
 
@@ -15,114 +26,176 @@
 - [x] 6-3 기본·심화: scalar Loss, `.grad` shape·finite·norm 감사
 - [x] 6-4 기본: gradient 누적과 표준 mini-batch step 확인
 - [x] 6-5 기본·심화: 안전한 validation, metric 분리와 Autograd 디버깅
-- [x] 7-1·7-2 이론 및 코드 흐름 확인: `Dataset`, `DataLoader`, `TensorDataset`, Custom Dataset
+- [x] 7-1·7-2 이론 및 코드 흐름 확인: `Dataset`, `DataLoader`, Custom Dataset
 
-### Partially Completed
+### Earlier Partial Practice Still Pending
 
-- [ ] 6-1 심화 2번 셀 재실행: 현재 문법 오류 수정 후 실행 확인 필요
-- [ ] 6-4 심화 2·3번: parameter update 검증과 잘못된 누적 흐름 비교
+- [ ] 6-1 심화 2번 셀 재실행: 문법 오류 수정 후 결과 확인
+- [ ] 6-4 심화 2·3번: parameter update 검증과 잘못된 gradient 누적 비교
 - [ ] 5-2 심화 `compute_loss` 셀: 회귀·이진·다중 분류 입력으로 최종 실행
 
-7-1·7-2는 이론과 실습 코드를 눈으로 진행했으므로 미완료 주말 과제로 추가하지 않습니다.
+### Not Completed Individually
+
+- [ ] 8-1 `nn.Module` 구조와 `forward` 설계 개별 실습
+- [ ] 8-2 MLP 모델 클래스 완성 개별 실습
+- [ ] 8-3 Loss와 optimizer 연결 개별 실습
+- [ ] 8-4 Train loop 작성 개별 실습
+- [ ] 8-5 Validation loop 작성 개별 실습
+- [ ] 8-6 Accuracy와 metric 누적 개별 실습
+- [ ] 8-7 Epoch 로그와 시각화 개별 실습
+
+미완료 이유: **8-8이 8-1~8-7을 하나의 MLP 파이프라인으로 모은 종합 실습이라,
+시간이 부족한 상황에서 8-8 실행을 우선했습니다.** 종합 실습 완료만으로 개별 단계를 모두
+설명할 수 있다고 보지 않으므로 8-1~8-7은 완료 처리하지 않습니다.
+
+주말에는 개별 노트북을 처음부터 모두 다시 풀기보다 먼저 눈으로 살펴보면서,
+각 내용이 8-8의 어느 코드에 해당하는지 표시합니다. 시간이 남으면 `run_epoch()`를 재작성합니다.
 
 ## 2. Questions and Newly Learned Points
 
-- [x] `nn.Linear(2, 1)`의 weight는 scalar가 아니라 `[1, 2]`이며 두 feature에 각각 곱해짐
-- [x] `.reshape(-1, 1)`로 `[N]`을 `[N, 1]`로 바꿔 Linear·Loss의 2차원 계약을 맞춤
-- [x] `torch.zeros_like(x)`는 `x`와 shape·dtype이 같고 값만 0인 Tensor를 생성
-- [x] `param.grad is None`은 그래프 단절 가능성, `grad.norm()==0`은 계산된 gradient가 0인 상태
-- [x] MSE에서 입력 scale 증가가 gradient를 크게 키울 수 있어 clipping 전에 전처리를 점검
-- [x] `.backward()`가 gradient를 누적하므로 각 일반 mini-batch 전에 `zero_grad()` 필요
-- [x] `model.eval()`은 layer 모드, `torch.no_grad()`는 graph 기록을 제어하며 평가에는 둘 다 필요
-- [x] 학습 Loss 이전의 `.detach()`는 역전파를 끊으므로 metric·로그 경로에만 사용
-- [x] `argmax(dim=1)`은 batch 각 행에서 가장 큰 class index를 반환
-- [x] `loss.item()`은 graph가 없는 기록용 Python 숫자를 반환
+### Python and PyTorch Syntax
 
-## 3. Highest Priority: Autograd Reinforcement
+- [x] `total_loss = seen = 0`: 두 변수를 동시에 0으로 초기화하는 다중 할당
+- [x] `context = torch.enable_grad() if training else torch.no_grad()`: mode별 context 선택
+- [x] `valid_unchanged &= condition`: 논리 AND 결과를 epoch마다 누적
+- [x] `min(range(len(valid_loss)), key=valid_loss.__getitem__)`: 최소 Loss의 index 찾기
+- [x] `y.shape[0]`: 현재 batch에 포함된 실제 sample 수
+- [x] `x.shape`은 전체 shape이고 `x.shape[0]`은 첫 번째 축의 크기라는 차이
 
-### Graph and Gradient State
+### Data Pipeline
 
-- [ ] 6-1 심화 미실행 셀을 실행하고 수기 gradient와 Autograd 결과 비교
-- [ ] 같은 parameter가 두 경로에 쓰일 때 gradient 기여를 경로별로 설명
-- [ ] `grad is None` 사례와 값이 0인 gradient 사례를 각각 재현
-- [ ] leaf와 non-leaf Tensor의 `.grad` 저장 차이를 `retain_grad()` 전후로 확인
-- [ ] 같은 graph에 backward를 두 번 호출한 오류와 재-forward 해결 비교
+- [x] Dataset은 sample 하나, DataLoader는 batch·shuffle을 담당
+- [x] Transform은 전체 전처리이고 augmentation은 transform의 일부
+- [x] Train·validation·test의 학습·선택·최종 확인 역할 구분
+- [x] `random_split(..., generator=torch.Generator().manual_seed(42))`로 split 재현
+- [x] `SubsetWithTransform`으로 train과 evaluation transform 분리
+- [x] Wrapper의 목적은 learning rate 최적화가 아니라 transform 격리와 평가 무결성 유지
+- [x] `unbiased=False`는 표준편차 계산에서 `N`으로 나누는 설정
+- [x] epsilon은 표준화 분모가 0이 되는 문제를 방지
 
-### Scale, Accumulation, and Step
+### Autograd Carry-over
 
-- [ ] 입력 scale 1배·10배에서 MSE gradient norm 비교
-- [ ] `zero_grad()`를 생략한 두 번째 batch의 누적 gradient 확인
-- [ ] 6-4 심화 2번: update 전·예상·실제 weight 비교
-- [ ] 6-4 심화 3번: 올바른 후보와 누적 오류 후보를 같은 초기값에서 비교
-- [ ] `zero_grad(set_to_none=True)`와 `False`의 `.grad` 상태 비교
+- [x] `nn.Linear(2, 1)`의 weight shape가 `[1, 2]`인 이유
+- [x] `.reshape(-1, 1)`로 `[N]`을 `[N, 1]` 계약에 맞추는 방법
+- [x] `torch.zeros_like(x)`가 shape·dtype을 유지하는 이유
+- [x] `param.grad is None`과 값이 0인 gradient의 차이
+- [x] 입력 scale이 MSE gradient norm을 크게 만들 수 있다는 점
+- [x] `model.eval()`과 `torch.no_grad()`의 서로 다른 역할
+- [x] `.detach()`는 학습 Loss 경로가 아니라 metric·로그 경로에 사용
 
-### Safe Evaluation
+### Weekend Recall Check
 
-- [ ] `eval()`만 사용한 출력과 `eval()+no_grad()` 출력의 `grad_fn` 비교
-- [ ] 학습 prediction을 Loss 전에 detach해 오류를 재현하고 수정
-- [ ] metric용 `logits.detach().argmax(dim=1)`을 다시 작성
-- [ ] validation 후 `model.train()` 복귀 여부를 확인하는 작은 검사 추가
-- [ ] Loss·gradient에 `torch.isfinite()` 검사 추가
+- [ ] 위 표현을 보지 않고 한 줄씩 다시 작성
+- [ ] 각 표현이 필요한 이유를 코드 실행 흐름과 함께 설명
+- [ ] `loss.item() * y.shape[0]`이 batch 합계를 복원하는 이유 설명
+- [ ] validation에서 gradient와 parameter update를 모두 막아야 하는 이유 설명
 
-완료 기록 형식:
+## 3. Highest Priority: 8-1~8-7 Visual Review
+
+### First Pass: Match Each Lesson to 8-8
+
+- [ ] 8-1: `nn.Module`, `__init__`, `forward`, `model(x)` 위치 찾기
+- [ ] 8-2: input·hidden·output dimension과 parameter 수 확인
+- [ ] 8-3: `criterion`과 `optimizer`가 model parameter에 연결되는 위치 찾기
+- [ ] 8-4: `zero_grad → forward → loss → backward → step` 표시
+- [ ] 8-5: `model.eval()`과 `torch.no_grad()` 및 update 금지 확인
+- [ ] 8-6: `total_loss`, `correct`, `seen` 누적식 확인
+- [ ] 8-7: history, epoch 로그, validation curve와 best epoch 선택 확인
+
+완료 기준:
 
 ```text
-graph 연결:
-grad 상태(None / zero / non-zero):
-입력 scale:
-parameter update 전·후:
-train/eval mode:
-검증 결과:
+개별 강의:
+8-8에서 대응하는 코드:
+입력과 출력:
+학습 때만 실행되는 부분:
+검증 때만 실행되는 부분:
+내 말로 설명:
 ```
 
-## 4. Carry-over Practice
+### Second Pass: Rebuild if Time Allows
 
-### Chapter 5 Contract
+- [ ] `TinyMLP` 또는 `nn.Sequential` 모델을 보지 않고 작성
+- [ ] 공통 `run_epoch(training, loader)` 뼈대 재작성
+- [ ] 마지막 작은 batch를 포함해 sample 수 기준 Loss·accuracy 계산
+- [ ] Validation 전후 parameter clone을 비교해 불변성 확인
+- [ ] Validation Loss의 최소 index로 best epoch 선택
+- [ ] Test 평가 횟수가 1회인지 report에 기록
 
-- [ ] `compute_loss(task, output, target)` 셀 실행
-- [ ] 회귀 `[B,1]` float + `MSELoss` 검증
-- [ ] 이진 `[B,1]` logits·float target + `BCEWithLogitsLoss` 검증
-- [ ] 다중 `[B,C]` logits·`[B]` long target + `CrossEntropyLoss` 검증
-- [ ] shape·dtype 오류를 하나씩 넣고 assertion 실패 확인
+## 4. Data Pipeline Reinforcement
+
+- [ ] Train 통계와 validation 자체 통계로 정규화한 결과 비교
+- [ ] `unbiased=True`와 `False`의 표준편차 차이 확인
+- [ ] 상수 feature를 epsilon 없이 표준화해 오류를 확인하고 수정
+- [ ] Train·validation·test index의 교집합이 0인지 검사
+- [ ] Split 전체 합집합이 원본 index를 모두 포함하는지 검사
+- [ ] Train에는 random transform, validation에는 deterministic transform 적용
+- [ ] Evaluation loader에서 `drop_last=True`가 sample을 버리는 예제 재현
+- [ ] 첫 batch의 shape·dtype·device·finite 값을 출력하는 audit 함수 작성
+
+## 5. Carried Backlog
+
+### Autograd Reinforcement
+
+- [ ] 6-1 심화 미실행 셀을 실행하고 수기 gradient와 비교
+- [ ] 같은 parameter가 두 경로에 쓰일 때 gradient 기여 설명
+- [ ] `grad is None`과 0 gradient를 각각 재현
+- [ ] 입력 scale 1배·10배에서 MSE gradient norm 비교
+- [ ] 6-4 심화 2·3번의 예상·실제 weight와 누적 오류 비교
+- [ ] `zero_grad(set_to_none=True/False)`의 `.grad` 상태 비교
+- [ ] `eval()`만 쓴 경우와 `eval()+no_grad()`의 `grad_fn` 비교
+
+### Chapter 5 Partial Practice
+
+- [ ] 5-2 별도 심화 `compute_loss(task, output, target)` 셀 실행
+- [ ] 회귀 `[B,1]` float output·target과 `MSELoss` 확인
+- [ ] 이진 `[B,1]` logits·float target과 `BCEWithLogitsLoss` 확인
+- [ ] 다중 `[B,C]` logits·`[B]` long target과 `CrossEntropyLoss` 확인
+- [ ] 잘못된 shape·dtype 입력으로 assertion 실패 확인
 
 ### Earlier Deep Learning
 
-- [ ] `TinyMLP`의 `__init__`과 `forward`를 보지 않고 작성
-- [ ] 이미지 flatten과 CNN의 공간 정보 처리 차이 설명
+- [ ] `TinyMLP`의 `__init__`과 `forward`를 보지 않고 다시 작성
+- [ ] `nn.Linear(5, 10)`의 weight·bias shape와 parameter 수 손계산
+- [ ] 이미지 `[12, 3, 32, 32]`를 flatten해 `[12, 10]` logits 생성
+- [ ] MLP flatten과 CNN의 공간 정보 처리 차이 설명
 - [ ] ReLU·LeakyReLU·Tanh·GELU 출력과 gradient 비교
 - [ ] 이진·다중 분류의 Sigmoid·Softmax 중복 적용 오류 수정
-- [ ] shape·dtype·device 오류를 각각 하나씩 만들고 수정
+- [ ] 모델·입력·target을 같은 device로 옮기는 helper 재작성
 - [ ] 1-3·1-4·1-5·2-1·2-2 별도 심화 실습
 
 ### Math and Machine Learning
 
-- [ ] 기초수학 미완료 문제를 수식·shape·문법·문제 분해 기준으로 재시도
-- [ ] Tree ensemble 비교, OOB·validation, permutation importance 복습
-- [ ] learning·validation curve와 Ridge·Lasso·ElasticNet 비교
-- [ ] class weight·sampling·SMOTE를 같은 CV와 Pipeline 안에서 비교
-- [ ] end-to-end schema guard의 열·dtype·null·finite 검사 재작성
+- [ ] 미완료 기초수학 실습을 한 문제씩 작은 단계로 분해
+- [ ] Tree·Random Forest·Boosting을 같은 기준으로 비교
+- [ ] Learning·validation curve로 bias와 variance 진단
+- [ ] Class weight·undersampling·SMOTE를 같은 CV에서 비교
+- [ ] Sampler와 preprocessing을 CV train fold 안에 두어 leakage 방지
+- [ ] End-to-end artifact schema guard를 참고 없이 재작성
 
-## 5. Next Weekend Order
+## 6. Next Weekend Order
 
 ### Saturday, 2026-08-29
 
-1. 6-1 심화 미실행 셀 재실행과 Chain Rule 손계산
-2. `grad is None`과 0 gradient 재현
-3. 입력 scale별 gradient norm 비교
-4. 6-4 심화 2·3번 실행과 weight update 검증
-5. `zero_grad(set_to_none=True/False)` 비교
-6. 시간이 남으면 5-2 `compute_loss` 실행
+1. 8-1~8-3 자료를 눈으로 살펴보고 8-8 대응 코드 표시
+2. 8-4~8-5의 train·validation 차이를 표로 정리
+3. 8-6의 sample 수 기준 Loss·accuracy 누적식 손으로 작성
+4. 8-7 history와 best validation epoch 선택 흐름 확인
+5. `total_loss = seen = 0`, 가변 context, `&=` 표현 재작성
+6. 6-1 심화 미실행 셀과 6-4 심화 2·3번 상태 확인
+7. 시간이 남으면 `run_epoch()` 뼈대 재작성
 
 ### Sunday, 2026-08-30
 
-1. 5-2 문제 유형별 output·target·dtype·Loss 계약 완료
-2. `eval()`과 `no_grad()` 역할을 분리한 validation 함수 작성
-3. 잘못된 `.detach()` 위치를 찾아 수정
-4. `isfinite`, gradient norm, mode 복귀 검사를 train/valid 함수에 추가
-5. 이전 딥러닝 별도 심화 중 가능한 만큼 진행
-6. 시간이 남으면 기초수학 또는 머신러닝 미완료 실습 1개
+1. 7-3 train 통계 정규화와 `SubsetWithTransform` 복습
+2. 7-4 split 재현성·교집합·전체 커버 검사
+3. 7-5 첫 batch audit 함수 재작성
+4. 8-8 전체 흐름을 자료 없이 말로 설명
+5. Chapter 5 `compute_loss` 미실행 셀 처리
+6. Autograd의 `grad is None`과 0 gradient 재현
+7. 시간이 남으면 이전 별도 심화 또는 기초수학 한 문제
 
-## 6. Working Rule
+## 7. Working Rule
 
 각 문제는 정답을 보기 전에 다음 네 줄을 먼저 작성합니다.
 
@@ -133,5 +206,5 @@ train/eval mode:
 첫 번째로 작성할 코드:
 ```
 
-막히면 전체 정답 대신 첫 단계 힌트만 확인합니다. 완료한 문제는 다음 날 코드 없이
-핵심 함수나 학습 흐름을 다시 작성해 실제로 기억에 남았는지 점검합니다.
+막히면 전체 정답 대신 첫 단계 힌트만 확인합니다. 눈으로 복습할 때도 단순히 넘기지 않고
+8-8의 대응 코드와 역할을 한 줄씩 적어 실제 연결을 확인합니다.

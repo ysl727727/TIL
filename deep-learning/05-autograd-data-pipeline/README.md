@@ -5,7 +5,8 @@
 `TensorDataset`과 Custom Dataset의 차이를 눈으로 따라가며 데이터 입력 흐름을 확인했습니다.
 
 > 진행 상태: 6-1~6-5 기본 완료. 6-2·6-3·6-5 심화 완료. 6-1 심화는 2/3,
-> 6-4 심화는 1/3 실행 확인. 7-1·7-2는 이론 학습과 코드 흐름 확인 완료.
+> 6-4 심화는 1/3 실행 확인. 7-1·7-2는 이론·코드 흐름 확인,
+> 7-3·7-4·7-5는 심화 실습을 모두 실행했습니다.
 
 ## Practice Status
 
@@ -18,9 +19,15 @@
 | 6-5 | Autograd 디버깅과 안전한 평가 | Completed | Completed |
 | 7-1 | `Dataset`과 `DataLoader` | Visual walkthrough | 별도 실습 없음 |
 | 7-2 | `TensorDataset`과 Custom Dataset | Visual walkthrough | 별도 실습 없음 |
+| 7-3 | Transform과 전처리 흐름 | 이론 확인 | Completed |
+| 7-4 | Batch, shuffle, train/valid/test split | 이론 확인 | Completed |
+| 7-5 | 데이터 파이프라인 디버깅 | 이론 확인 | Completed |
 
 7-1·7-2는 코드를 눈으로 따라가며 sample과 batch의 shape·dtype 흐름을 확인했습니다.
 따라서 미완료 과제로 분류하지 않았습니다.
+
+7-3~7-5 심화는 각 노트북의 코드 셀 3개를 모두 실행해 transform 격리,
+재현 가능한 split과 첫 batch 계약 검사를 확인했습니다.
 
 ## 6-1. Computation Graph and Chain Rule
 
@@ -122,6 +129,83 @@ Tensor가 이미 준비된 경우 `TensorDataset`이 간단합니다. 파일 읽
 tokenization처럼 sample별 로직이 필요하면 `__len__()`과 `__getitem__()`을 구현한
 Custom Dataset을 사용합니다. 분류 label의 dtype은 일반적으로 `torch.long`인지 확인합니다.
 
+## 7-3. Transform and Preprocessing Flow
+
+기본 흐름은 `원본 sample → transform → Dataset 반환 → DataLoader가 batch 구성`입니다.
+transform은 resize·tensor 변환·normalize를 포함하는 전체 전처리이고,
+augmentation은 random crop·flip처럼 train 데이터를 다양하게 만드는 transform의 일부입니다.
+Validation과 test에는 무작위 augmentation을 적용하지 않습니다.
+
+정규화의 평균과 표준편차는 train에서 한 번 계산하고 모든 split에 동일하게 적용합니다.
+Validation 자체 통계를 사용하면 평가 데이터의 분포 정보를 미리 사용하고 분포 이동도 숨길 수 있습니다.
+실습에서는 train `[1, 2, 3]`의 통계를 validation `[9, 10, 11]`에 적용해 이 차이를 확인했습니다.
+
+```python
+mean = train.mean(dim=0)
+std = train.std(dim=0, unbiased=False)
+normalized = (x - mean) / (std + 1e-7)
+```
+
+- `unbiased=False`는 분산 계산에서 `N-1` 대신 `N`으로 나눕니다.
+- epsilon은 표준편차가 0일 때 0으로 나누는 오류를 막습니다.
+
+### Why use `SubsetWithTransform`?
+
+`random_split()`의 `Subset`들은 같은 원본 Dataset을 공유합니다. 원본 transform을 train용으로
+바꾸면 validation·test에도 무작위 augmentation이 섞일 수 있으므로 index와 transform을
+따로 가진 wrapper로 분리합니다.
+
+```python
+class SubsetWithTransform(Dataset):
+    def __init__(self, base_dataset, indices, transform=None):
+        self.base_dataset = base_dataset
+        self.indices = list(indices)
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        x, y = self.base_dataset[self.indices[idx]]
+        if self.transform is not None:
+            x = self.transform(x)
+        return x, y
+```
+
+이 wrapper의 목적은 learning rate 최적화가 아니라 **split별 transform 격리와 평가 무결성 유지**입니다.
+
+## 7-4. Reproducible Split and DataLoader
+
+| Split | Purpose | Update weights? | Shuffle |
+| --- | --- | --- | --- |
+| Train | 모델 parameter 학습 | Yes | Usually `True` |
+| Validation | 설정·best epoch 선택 | No | `False` |
+| Test | 최종 모델을 한 번 확인 | No | `False` |
+
+분할 generator와 train shuffle generator를 분리하면 데이터 소속과 epoch 순서를 독립적으로
+재현할 수 있습니다. 실습에서는 같은 seed의 split이 같고, split 간 교집합이 없으며,
+합집합이 원본 index 전체를 덮는지 확인했습니다.
+
+Validation·test에서 `drop_last=True`를 쓰면 마지막 sample이 평가에서 빠집니다.
+10개 중 8개만 본 후보는 거부하고 10개 전체를 본 후보를 승인했습니다.
+
+## 7-5. Data Pipeline Debugging
+
+학습을 오래 돌리기 전에 첫 batch와 한 번의 forward로 다음 계약을 확인합니다.
+
+```text
+input shape·dtype·finite 값
+target shape·dtype·class 범위
+model·input·target device 일치
+logits shape
+scalar loss 생성 여부
+```
+
+다중 분류 실습에서는 입력을 `[2, 2, 2] → [2, 4]`로 flatten하고,
+target을 `[2, 1] float32 → [2] int64`로 고쳐 `CrossEntropyLoss` 계약을 맞췄습니다.
+Batch audit에서는 평가 전 mode를 저장하고 `finally`에서 복원해 검사 함수가 호출자의
+train/eval 상태를 바꾸지 않도록 했습니다.
+
 ## Questions I Asked and What I Learned
 
 ### Why is `nn.Linear(2, 1).weight` not a scalar?
@@ -173,7 +257,8 @@ metric_pred = logits.detach().argmax(dim=1)
 이번에는 학습이 안 될 때 단순히 `backward()`를 다시 호출하는 것이 아니라 계산 그래프의
 연결, `.grad`의 상태, 입력 scale, 학습·평가 모드를 순서대로 확인하는 기준을 세웠습니다.
 또한 모델 학습 흐름 뒤에 `Dataset → DataLoader → batch`가 연결된다는 점을 확인하면서,
-다음에는 한 batch의 shape·dtype부터 train step까지 한 번에 추적해 볼 계획입니다.
+train 통계와 split별 transform을 분리하고 첫 batch의 shape·dtype부터 train step까지
+추적하는 기준으로 확장했습니다.
 
 ## Next Steps
 
@@ -183,6 +268,8 @@ metric_pred = logits.detach().argmax(dim=1)
 - [ ] 입력 scale을 1배·10배로 바꿔 MSE gradient norm 비교
 - [ ] `eval()`만 사용한 경우와 `eval()+no_grad()`의 graph 생성 차이 확인
 - [ ] 이전 5-2 심화 `compute_loss`의 문제별 계약 검증 마무리
+- [x] 7-3~7-5 심화 실습 실행
+- [ ] Train 전용 augmentation과 evaluation transform을 실제 이미지 Dataset에 적용
 
 7-1·7-2는 오늘 이론과 코드 흐름 확인을 마쳤으므로 주말 미완료 목록에 추가하지 않습니다.
 
@@ -201,5 +288,8 @@ metric_pred = logits.detach().argmax(dim=1)
 ├── 08-training-step-order-advanced.ipynb
 ├── 09-autograd-debugging-basic.ipynb
 ├── 10-autograd-debugging-advanced.ipynb
+├── 11-transform-advanced.ipynb
+├── 12-dataloader-split-advanced.ipynb
+├── 13-data-pipeline-debugging-advanced.ipynb
 └── requirements.txt
 ```

@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Chapter 8까지의 실제 파일 구조와 학습 상태를 2026-08-26 기준으로 갱신했습니다.
+> Deep Learning Chapter 9까지의 실제 파일 구조와 학습 상태를 2026-08-27 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: Autograd, 데이터 파이프라인과 end-to-end MLP 학습·검증 흐름
-- 최근 완료: 7-3~7-5 심화, 8-8 종합 심화
-- 복습 예정: 8-1~8-7 개별 실습 흐름 확인
+- 현재 주제: 실험 재현성, logging, `state_dict`, checkpoint와 학습 재개
+- 최근 진행: 9-1~9-5 이론·기본 실습 정리, 수정 셀 2개 재실행 예정
+- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Contents
@@ -27,6 +27,8 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 6 | Computation graph, Autograd, gradient와 안전한 평가 | Partial advanced practice pending |
 | 7 | Transform, DataLoader, split과 pipeline debugging | Advanced practice completed |
 | 8 | MLP train·validation·metric·history 종합 흐름 | 8-8 completed; 8-1~8-7 review pending |
+| 9 | Seed, logging, `state_dict`, checkpoint, resume와 실험 폴더 | Basic reviewed; two corrected cells need rerun; advanced deferred |
+| 10 | 학습 곡선과 Overfitting·Underfitting 진단 | Not started due to health issue |
 
 ## Repository Structure
 
@@ -96,13 +98,47 @@ TIL/
     │   ├── 12-dataloader-split-advanced.ipynb
     │   ├── 13-data-pipeline-debugging-advanced.ipynb
     │   └── requirements.txt
-    └── 06-mlp-training-validation/
+    ├── 06-mlp-training-validation/
+    │   ├── README.md
+    │   ├── 01-mlp-end-to-end-advanced.ipynb
+    │   └── requirements.txt
+    └── 07-experiment-reproducibility/
         ├── README.md
-        ├── 01-mlp-end-to-end-advanced.ipynb
+        ├── 01-seed-reproducibility-basic.ipynb
+        ├── 02-logging-design-basic.ipynb
+        ├── 03-state-dict-checkpoint-basic.ipynb
+        ├── 04-resume-training-basic.ipynb
+        ├── 05-experiment-directory-basic.ipynb
         └── requirements.txt
 ```
 
 ## Latest Learning Log
+
+### Experiment Reproducibility and Result Management
+
+- Python·NumPy·PyTorch·CUDA seed와 split·DataLoader generator를 함께 관리
+- seed 고정은 재현성을 높이지만 버전·장치·연산이 다르면 완전히 같은 결과를 보장하지 않음
+- `config.json`과 epoch metric log로 실험 조건과 결과를 분리해 기록
+- model·optimizer의 `state_dict`와 완료 epoch·history를 checkpoint로 구성
+- `torch.load()`는 파일을 읽고 `load_state_dict()`는 읽은 값을 객체에 실제로 주입
+- `last.pt`는 재개용, `best.pt`는 validation 기준 평가·추론용으로 구분
+- 정확한 재개 범위를 완료 epoch 다음 경계로 한정하고 난수·loader generator 상태까지 복원
+- 한 번의 실험에서 생긴 config·metrics·checkpoint·plot을 하나의 run directory로 연결
+
+### Questions from 2026-08-27
+
+- `json.dump()`는 파일 저장, `json.dumps()`는 JSON 문자열 반환
+- `indent`는 가독성, `ensure_ascii=False`와 UTF-8은 한글 저장을 위한 설정
+- 파일 모드 `w`는 덮어쓰기, `a`는 이어쓰기, `r`은 읽기
+- `json_text[:80]`은 저장 전 JSON 문자열의 앞부분만 확인하는 slicing
+- `map_location="cpu"`로 GPU checkpoint를 CPU 환경에서 읽는 방법
+- `Path.unlink()`와 `shutil.rmtree()`의 파일·폴더 삭제 범위 차이
+- `make_exp_dir()`에서 만든 상세 경로를 상위 `Path(root)`로 다시 덮어쓰지 않아야 함
+
+### Deferred for Health and Time
+
+- 10-1·10-2는 건강 문제로 진행하지 못해 완료 처리하지 않음
+- 9장 별도 심화는 기본 흐름과 10장 복습 뒤 시간이 남을 때 진행
 
 ### Autograd and Safe Evaluation
 

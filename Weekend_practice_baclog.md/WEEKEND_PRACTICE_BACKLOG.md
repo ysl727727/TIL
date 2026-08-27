@@ -1,12 +1,53 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-08-26 after Deep Learning lessons 7-3~7-5 and 8-1~8-8.
+> Updated on 2026-08-27 after Deep Learning lessons 9-1~9-5 and the Chapter 10 health break.
 
-다음 주말인 2026-08-29~30에는 8-1~8-7의 개별 흐름을 눈으로 다시 확인하고,
-8-8 종합 코드에서 각 단계가 어디에 연결되는지 대응시키는 것을 먼저 진행합니다.
+다음 주말인 2026-08-29~30에는 컨디션 회복을 우선합니다. 학습이 가능하면 10-1·10-2를
+짧게 확인하고, 9장 심화는 시간이 충분히 남을 때만 진행합니다.
 
 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
 **직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
+
+## 0. Latest Update: Chapter 9 and 10
+
+### Completed on 2026-08-27
+
+- [x] 9-1 기본: Python·NumPy·PyTorch seed와 모델 초기화 재현 확인
+- [x] 9-2 기본: epoch log dictionary와 log list 누적
+- [x] 9-3 기본: model `state_dict` key·shape와 checkpoint 구성
+- [x] 9-4 기본: model·optimizer checkpoint 저장과 복원
+- [x] 9-5 기본: 실험 폴더·config·metrics 저장 흐름 확인
+- [x] `json.dump()`와 `json.dumps()`의 파일·문자열 반환 차이 정리
+- [x] JSON의 `indent`, `ensure_ascii=False`, UTF-8 encoding 역할 정리
+- [x] `w`·`a`·`r` 파일 모드와 log 누적 방식 구분
+- [x] `torch.load()`와 `load_state_dict()`의 읽기·주입 역할 구분
+- [x] `map_location="cpu"`, `Path.unlink()`, `shutil.rmtree()` 용도 정리
+- [x] `make_exp_dir()`가 생성한 상세 경로를 다시 덮어쓰는 버그 확인 및 수정
+
+9-3의 checkpoint key 표기와 9-5의 경로 반환 코드는 공개용 노트북에서 바로잡았습니다.
+현재 환경에서는 PyTorch를 실행할 수 없어 수정 셀의 출력 재확인은 추후 진행합니다.
+
+### Not Completed Due to Health Issue
+
+- [ ] 10-1 학습 곡선 해석: train·validation loss와 accuracy curve 읽기
+- [ ] 10-2 Overfitting·Underfitting 진단: 곡선의 높이·방향·gap 구분
+
+오늘 진행하지 못한 이유는 건강 문제입니다. 밀린 분량을 한 번에 따라잡는 일정으로 잡지 않고,
+컨디션이 회복되면 10-1 이론과 예시 곡선을 먼저 본 뒤 10-2로 넘어갑니다.
+
+### Optional Only: Chapter 9 Advanced
+
+- [ ] 9-1~9-5 별도 심화 문제
+
+9장 심화는 필수 주말 과제가 아닙니다. 10장 기본 흐름과 기존 미완료 항목을 무리 없이 확인한 뒤
+시간이 남을 때만 진행합니다.
+
+### Minimum Recovery-Friendly Plan
+
+1. 10-1에서 train loss와 validation loss가 각각 무엇인지 눈으로 확인
+2. 함께 감소·validation 반등·둘 다 높은 세 패턴만 구분
+3. 여유가 있으면 10-2에서 Overfitting과 Underfitting 대응 방법을 한 줄씩 정리
+4. 컨디션이 좋지 않으면 추가 실습 없이 종료
 
 ## 1. Latest Deep Learning Progress
 
@@ -177,23 +218,19 @@
 
 ### Saturday, 2026-08-29
 
-1. 8-1~8-3 자료를 눈으로 살펴보고 8-8 대응 코드 표시
-2. 8-4~8-5의 train·validation 차이를 표로 정리
-3. 8-6의 sample 수 기준 Loss·accuracy 누적식 손으로 작성
-4. 8-7 history와 best validation epoch 선택 흐름 확인
-5. `total_loss = seen = 0`, 가변 context, `&=` 표현 재작성
-6. 6-1 심화 미실행 셀과 6-4 심화 2·3번 상태 확인
-7. 시간이 남으면 `run_epoch()` 뼈대 재작성
+1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
+2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인
+3. 좋은 학습·과적합 가능성·과소적합 가능성의 대표 패턴 구분
+4. 여유가 있으면 예시 `history`에서 loss curve만 그려보기
+5. 몸 상태가 좋지 않으면 여기서 종료
 
 ### Sunday, 2026-08-30
 
-1. 7-3 train 통계 정규화와 `SubsetWithTransform` 복습
-2. 7-4 split 재현성·교집합·전체 커버 검사
-3. 7-5 첫 batch audit 함수 재작성
-4. 8-8 전체 흐름을 자료 없이 말로 설명
-5. Chapter 5 `compute_loss` 미실행 셀 처리
-6. Autograd의 `grad is None`과 0 gradient 재현
-7. 시간이 남으면 이전 별도 심화 또는 기초수학 한 문제
+1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인
+2. gap만 보고 과적합을 확정하지 않고 split·distribution shift·leakage를 먼저 점검하는 이유 정리
+3. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
+4. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
+5. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
 
 ## 7. Working Rule
 

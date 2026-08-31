@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Chapter 9까지의 실제 파일 구조와 학습 상태를 2026-08-27 기준으로 갱신했습니다.
+> Deep Learning Chapter 9, 12, 13까지의 실제 파일 구조와 학습 상태를 2026-08-31 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: 실험 재현성, logging, `state_dict`, checkpoint와 학습 재개
-- 최근 진행: 9-1~9-5 이론·기본 실습 정리, 수정 셀 2개 재실행 예정
-- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단
+- 현재 주제: CNN 설계·학습·리포팅, RNN sequence 모델링과 경사 소실·gradient clipping
+- 최근 진행: 12-1~12-8, 13-1~13-3 이론·기본 실습 정리, 12-4 `loss_value` 미정의 셀 수정 예정
+- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지)
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Contents
@@ -29,6 +29,8 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 8 | MLP train·validation·metric·history 종합 흐름 | 8-8 completed; 8-1~8-7 review pending |
 | 9 | Seed, logging, `state_dict`, checkpoint, resume와 실험 폴더 | Basic reviewed; two corrected cells need rerun; advanced deferred |
 | 10 | 학습 곡선과 Overfitting·Underfitting 진단 | Not started due to health issue |
+| 12 | CNN 설계 기준, 학습 파이프라인, GPU 메모리, 필터/커널 실험, MLP-CNN 비교, 실험 리포팅, 종합 실습 | Basic completed; 12-4 `loss_value` 수정 필요 |
+| 13 | Sequence data, RNN forward shape, 장기 의존성과 경사 소실·clipping | Basic completed |
 
 ## Repository Structure
 
@@ -102,17 +104,68 @@ TIL/
     │   ├── README.md
     │   ├── 01-mlp-end-to-end-advanced.ipynb
     │   └── requirements.txt
-    └── 07-experiment-reproducibility/
+    ├── 07-experiment-reproducibility/
+    │   ├── README.md
+    │   ├── 01-seed-reproducibility-basic.ipynb
+    │   ├── 02-logging-design-basic.ipynb
+    │   ├── 03-state-dict-checkpoint-basic.ipynb
+    │   ├── 04-resume-training-basic.ipynb
+    │   ├── 05-experiment-directory-basic.ipynb
+    │   └── requirements.txt
+    ├── 08-cnn-foundations/
+    │   ├── README.md
+    │   ├── 01-cnn-input-channel-basic.ipynb
+    │   ├── 02-training-pipeline-basic.ipynb
+    │   ├── 03-gpu-memory-basic.ipynb
+    │   ├── 04-filter-kernel-experiment-basic.ipynb
+    │   ├── 05-mlp-baseline-basic.ipynb
+    │   ├── 06-mlp-vs-cnn-basic.ipynb
+    │   ├── 07-experiment-reporting-basic.ipynb
+    │   ├── 08-cnn-submission-basic.ipynb
+    │   └── requirements.txt
+    └── 09-rnn-foundations/
         ├── README.md
-        ├── 01-seed-reproducibility-basic.ipynb
-        ├── 02-logging-design-basic.ipynb
-        ├── 03-state-dict-checkpoint-basic.ipynb
-        ├── 04-resume-training-basic.ipynb
-        ├── 05-experiment-directory-basic.ipynb
+        ├── 01-sequence-hidden-state-basic.ipynb
+        ├── 02-rnn-forward-shape-basic.ipynb
+        ├── 03-vanishing-gradient-clipping-basic.ipynb
         └── requirements.txt
 ```
 
 ## Latest Learning Log
+
+### CNN Design, Training, and Reporting
+
+- grayscale/RGB에 맞춘 `in_channels` 선택과 filter progression으로 Conv block 구성
+- dummy 입력을 통과시켜 classifier `in_features`를 자동 계산 → 이미지 크기 변화에 안전
+- Tensor 메모리를 `numel() * element_size()`로 계산하고 batch size·CPU/GPU 환경별 변화 확인
+- filter 수·kernel size를 바꾼 CNN variant를 같은 batch로 비교하되 one-step loss는 참고용으로만 사용
+- MLP baseline과 CNN을 같은 seed·DataLoader generator로 공정 비교 → validation loss 기준 CNN이 우세
+- `{**config, **metric}`으로 실험 row 생성, best epoch·loss gap 계산, 리포트 문장 자동 생성
+- `nn.Module` 상속 CNN 클래스 작성, `eval()`+`no_grad()`+`softmax`+`argmax`로 사람이 읽을 수 있는 추론 결과 정리
+
+### RNN Sequence Modeling and Gradient Stability
+
+- sequence 데이터를 `[batch, seq_len, input_size]`로 구성하고 `nn.RNN`의 `output`/`h_n` shape 해석
+- `batch_first=False`일 때 `[seq_len, batch, input_size]`로 permute 필요, 단층 RNN에서 `output[:, -1, :]`와 `h_n[-1]` 값 일치 확인
+- `num_layers=2`로 쌓으면 `h_n` 첫 차원이 층 수가 되고 마지막 층(`h_n[-1]`)을 분류기에 사용
+- 반복 `tanh` 연산으로 step이 늘어날수록 gradient가 작아지는 경사 소실을 직접 확인
+- 전체 파라미터 gradient의 global L2 norm(`sqrt(sum(grad**2))`)으로 학습 신호 크기 모니터링
+- `clip_grad_norm_`으로 gradient clipping 적용, clipping 전후 norm 비교로 안정화 효과 확인
+
+### Questions from 2026-08-31
+
+- `requires_grad`, `ones_like`, `atol`, `/` vs `//` 등 PyTorch 기초 표기 재정리
+- `Conv2d` 출력 shape 계산식과 `padding = kernel_size // 2`("same padding") 공식
+- MLP는 완전연결이라 파라미터가 입력 크기에 비례해 폭증하지만, CNN은 지역 연결+가중치 공유로 파라미터 수가 고정된다는 차이
+- sigmoid/tanh의 기울기 소실 원인과 ReLU의 장단점(Dying ReLU 포함)
+- RNN의 `output`/`h_n` shape 차이, `seq_len`과 `hidden_size`가 서로 독립적인 값이라는 점
+- 딕셔너리 언패킹 `{**config, **metric}`과 `tensor_mb` 메모리 계산 공식
+
+### Deferred for Health and Time
+
+- 10-1·10-2는 건강 문제로 진행하지 못해 완료 처리하지 않음
+- 9장 별도 심화는 기본 흐름과 10장 복습 뒤 시간이 남을 때 진행
+- 12-4의 `loss_value` 미정의 버그 수정 및 재실행 예정
 
 ### Experiment Reproducibility and Result Management
 
@@ -134,11 +187,6 @@ TIL/
 - `map_location="cpu"`로 GPU checkpoint를 CPU 환경에서 읽는 방법
 - `Path.unlink()`와 `shutil.rmtree()`의 파일·폴더 삭제 범위 차이
 - `make_exp_dir()`에서 만든 상세 경로를 상위 `Path(root)`로 다시 덮어쓰지 않아야 함
-
-### Deferred for Health and Time
-
-- 10-1·10-2는 건강 문제로 진행하지 못해 완료 처리하지 않음
-- 9장 별도 심화는 기본 흐름과 10장 복습 뒤 시간이 남을 때 진행
 
 ### Autograd and Safe Evaluation
 

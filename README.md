@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Chapter 9, 12, 13까지의 실제 파일 구조와 학습 상태를 2026-08-31 기준으로 갱신했습니다.
+> Deep Learning Chapter 9, 12, 13과 Transformer Foundations Chapter 1~2까지의 실제 파일 구조와 학습 상태를 2026-09-01 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: CNN 설계·학습·리포팅, RNN sequence 모델링과 경사 소실·gradient clipping
-- 최근 진행: 12-1~12-8, 13-1~13-3 이론·기본 실습 정리, 12-4 `loss_value` 미정의 셀 수정 예정
-- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지)
+- 현재 주제: RNN/LSTM 한계와 Transformer 필요성, NLP task 실행 계약, 데이터 schema 감사와 tokenization
+- 최근 진행: Transformer Foundations 1-1~1-2, 2-1 기본 실습 정리, 2-2·2-3은 미완료로 주말 backlog 이월
+- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Contents
@@ -32,9 +32,16 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 12 | CNN 설계 기준, 학습 파이프라인, GPU 메모리, 필터/커널 실험, MLP-CNN 비교, 실험 리포팅, 종합 실습 | Basic completed; 12-4 `loss_value` 수정 필요 |
 | 13 | Sequence data, RNN forward shape, 장기 의존성과 경사 소실·clipping | Basic completed |
 
+## Transformer Foundations Contents
+
+| Chapter | Topics | Status |
+| --- | --- | --- |
+| 1 | 수동 RNN hidden state, RNN vs Self-Attention 경로·비용 비교, NLP task workflow 검증과 실행 계약 | Basic completed |
+| 2 | 뉴스 샘플 schema 감사, greedy longest-match toy subword tokenizer | 2-1 completed; 2-2·2-3 pending |
+
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning`과 `transformer-foundations` 영역만 표시합니다.
 
 ```text
 TIL/
@@ -129,9 +136,36 @@ TIL/
         ├── 02-rnn-forward-shape-basic.ipynb
         ├── 03-vanishing-gradient-clipping-basic.ipynb
         └── requirements.txt
+
+transformer-foundations/
+├── 01-transformer-motivation/
+│   ├── README.md
+│   ├── 01-hidden-state-and-attention-cost-basic.ipynb
+│   ├── 02-nlp-task-workflow-and-contract-basic.ipynb
+│   └── requirements.txt
+└── 02-data-schema-and-tokenization/
+    ├── README.md
+    ├── 01-schema-audit-and-tokenizer-basic.ipynb
+    └── requirements.txt
 ```
 
 ## Latest Learning Log
+
+### RNN/LSTM Limits and Transformer Motivation
+
+- 수동 RNN hidden state 구현(`tanh(token @ W_x + hidden @ W_h)`)으로 순차 의존성을 직접 확인 → 첫 token만 바꿔도 마지막 상태가 달라짐
+- RNN 경로 길이(`length-1`)와 Self-Attention 경로 길이(`1`), attention score 원소 수(`length²`)를 나란히 비교 → 길이가 32배가 되면 score 수는 1,024배
+- "경로가 짧다"가 "계산량이 항상 작다"를 의미하지 않는다는 점을 수치로 확인
+- workflow 체크리스트에서 `Counter`로 누락·중복을 함께 계산하고, 필수 단계 집합에 투영해 순서 오류까지 검증
+- classification(`AutoModelForSequenceClassification`, `[B,C]`)과 generation(`AutoModelForCausalLM`, `[B,L,V]`)의 model head·loss·metric·후처리 계약을 분기로 정리
+
+### Data Schema Auditing and Tokenization (Partial)
+
+- 뉴스 샘플에서 필수 key 누락·공백 텍스트·중복 ID·허용되지 않은 label을 한 번에 감사하는 함수 작성, 오류가 있어도 모든 행을 검사해 하나의 report로 반환
+- `Counter`로 ID 중복과 label 분포를 함께 집계, 허용된 label만 분포에 포함
+- greedy longest-match 방식의 toy subword tokenizer 구현 → 시작 위치마다 가장 긴 등록 조각을 우선 선택, 중간 조각에는 `##` prefix, 분해 실패 시 단어 전체를 `[UNK]`로 처리
+- `[CLS]`/`[SEP]`를 포함한 전체 token·ID 왕복 확인
+- 2-2·2-3은 오늘 완료하지 못해 `WEEKEND_PRACTICE_BACKLOG.md`로 이월
 
 ### CNN Design, Training, and Reporting
 

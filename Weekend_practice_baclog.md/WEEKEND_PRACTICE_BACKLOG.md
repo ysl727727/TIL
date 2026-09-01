@@ -1,14 +1,38 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-08-27 after Deep Learning lessons 9-1~9-5 and the Chapter 10 health break.
+> Updated on 2026-09-01 after Transformer Foundations Chapter 1 and partial Chapter 2 (2-1).
 
-다음 주말인 2026-08-29~30에는 컨디션 회복을 우선합니다. 학습이 가능하면 10-1·10-2를
-짧게 확인하고, 9장 심화는 시간이 충분히 남을 때만 진행합니다.
-
-체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
+다음 주말인 2026-09-05~06에는 10-1·10-2 복습과 Transformer Foundations 2-2·2-3을 함께
+이어갑니다. 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
 **직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
 
-## 0. Latest Update: Chapter 9 and 10
+## 0. Latest Update: Transformer Foundations Chapter 1–2
+
+### Completed on 2026-09-01
+
+- [x] 1-1 기본: 수동 RNN hidden state 구현과 순차 의존성 검증
+- [x] 1-1 기본: RNN vs Self-Attention 경로 길이·attention score 원소 수(`length²`) 비교
+- [x] 1-2 기본: workflow 누락/중복/순서 검증기(`validate_workflow`) 작성
+- [x] 1-2 기본: classification·generation task별 실행 계약(`build_task_plan`) 생성기 작성
+- [x] 2-1 기본: 뉴스 샘플 schema 감사기(누락 key·공백 텍스트·중복 ID·허용 label) 작성
+- [x] 2-1 기본: greedy longest-match toy subword tokenizer와 `[CLS]/[SEP]/[UNK]` 처리, ID 왕복 확인
+
+### Not Completed Today
+
+- [ ] 2-2 기본 실습
+- [ ] 2-3 기본 실습
+
+오늘 목표는 1-1·1-2와 2-3까지였지만 2-1까지만 마쳤습니다. 밀린 2-2·2-3은 다음 학습
+세션이나 가까운 주말에 이어서 진행합니다.
+
+### Minimum Catch-Up Plan
+
+1. 2-1의 schema 감사기·tokenizer 코드를 먼저 눈으로 복습해 2-2 문제 배경과 이어지는 흐름인지 확인
+2. 2-2 기본 문제부터 순서대로 진행
+3. 시간이 남으면 2-3까지 이어서 완료
+4. 하루에 다 끝내지 못하면 2-2까지만 완료하고 2-3은 다시 이월
+
+## 1. Chapter 9 and 10
 
 ### Completed on 2026-08-27
 
@@ -42,14 +66,7 @@
 9장 심화는 필수 주말 과제가 아닙니다. 10장 기본 흐름과 기존 미완료 항목을 무리 없이 확인한 뒤
 시간이 남을 때만 진행합니다.
 
-### Minimum Recovery-Friendly Plan
-
-1. 10-1에서 train loss와 validation loss가 각각 무엇인지 눈으로 확인
-2. 함께 감소·validation 반등·둘 다 높은 세 패턴만 구분
-3. 여유가 있으면 10-2에서 Overfitting과 Underfitting 대응 방법을 한 줄씩 정리
-4. 컨디션이 좋지 않으면 추가 실습 없이 종료
-
-## 1. Latest Deep Learning Progress
+## 2. Latest Deep Learning Progress
 
 ### Completed on 2026-08-26
 
@@ -92,7 +109,7 @@
 주말에는 개별 노트북을 처음부터 모두 다시 풀기보다 먼저 눈으로 살펴보면서,
 각 내용이 8-8의 어느 코드에 해당하는지 표시합니다. 시간이 남으면 `run_epoch()`를 재작성합니다.
 
-## 2. Questions and Newly Learned Points
+## 3. Questions and Newly Learned Points
 
 ### Python and PyTorch Syntax
 
@@ -131,7 +148,7 @@
 - [ ] `loss.item() * y.shape[0]`이 batch 합계를 복원하는 이유 설명
 - [ ] validation에서 gradient와 parameter update를 모두 막아야 하는 이유 설명
 
-## 3. Highest Priority: 8-1~8-7 Visual Review
+## 4. Highest Priority: 8-1~8-7 Visual Review
 
 ### First Pass: Match Each Lesson to 8-8
 
@@ -163,7 +180,7 @@
 - [ ] Validation Loss의 최소 index로 best epoch 선택
 - [ ] Test 평가 횟수가 1회인지 report에 기록
 
-## 4. Data Pipeline Reinforcement
+## 5. Data Pipeline Reinforcement
 
 - [ ] Train 통계와 validation 자체 통계로 정규화한 결과 비교
 - [ ] `unbiased=True`와 `False`의 표준편차 차이 확인
@@ -174,7 +191,7 @@
 - [ ] Evaluation loader에서 `drop_last=True`가 sample을 버리는 예제 재현
 - [ ] 첫 batch의 shape·dtype·device·finite 값을 출력하는 audit 함수 작성
 
-## 5. Carried Backlog
+## 6. Carried Backlog
 
 ### Autograd Reinforcement
 
@@ -214,25 +231,31 @@
 - [ ] Sampler와 preprocessing을 CV train fold 안에 두어 leakage 방지
 - [ ] End-to-end artifact schema guard를 참고 없이 재작성
 
-## 6. Next Weekend Order
+### Transformer Foundations
 
-### Saturday, 2026-08-29
+- [ ] 2-2 기본 실습
+- [ ] 2-3 기본 실습
+
+## 7. Next Weekend Order
+
+### Saturday, 2026-09-05
 
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
 2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인
 3. 좋은 학습·과적합 가능성·과소적합 가능성의 대표 패턴 구분
-4. 여유가 있으면 예시 `history`에서 loss curve만 그려보기
+4. 여유가 있으면 Transformer Foundations 2-2 기본 문제 진행
 5. 몸 상태가 좋지 않으면 여기서 종료
 
-### Sunday, 2026-08-30
+### Sunday, 2026-09-06
 
 1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인
 2. gap만 보고 과적합을 확정하지 않고 split·distribution shift·leakage를 먼저 점검하는 이유 정리
-3. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
-4. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
-5. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
+3. Transformer Foundations 2-3 기본 문제 진행
+4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
+5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
+6. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
 
-## 7. Working Rule
+## 8. Working Rule
 
 각 문제는 정답을 보기 전에 다음 네 줄을 먼저 작성합니다.
 

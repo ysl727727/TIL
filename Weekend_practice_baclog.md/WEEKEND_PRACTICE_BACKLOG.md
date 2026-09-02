@@ -1,36 +1,33 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-09-01 after Transformer Foundations Chapter 1 and partial Chapter 2 (2-1).
+> Updated on 2026-09-02 after Deep Learning Advanced Chapter 1–2 (basic + advanced) completion and Chapter 3 theory review.
 
-다음 주말인 2026-09-05~06에는 10-1·10-2 복습과 Transformer Foundations 2-2·2-3을 함께
-이어갑니다. 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
-**직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
+오늘은 계획한 분량을 모두 끝내 주말로 넘길 항목이 없습니다. 다음 주말인 2026-09-05~06에는
+10-1·10-2 복습과 Chapter 3(Attention/Multi-Head) 실습 착수를 이어갑니다. 체크박스는 강의를
+들었거나 자료를 받았다는 뜻이 아니라, **직접 실행하고 결과를 설명할 수 있는지**를 기준으로
+표시합니다.
 
-## 0. Latest Update: Transformer Foundations Chapter 1–2
+## 0. Latest Update: Deep Learning Advanced Chapter 1–2 Complete
 
-### Completed on 2026-09-01
+### Completed on 2026-09-02
 
-- [x] 1-1 기본: 수동 RNN hidden state 구현과 순차 의존성 검증
-- [x] 1-1 기본: RNN vs Self-Attention 경로 길이·attention score 원소 수(`length²`) 비교
-- [x] 1-2 기본: workflow 누락/중복/순서 검증기(`validate_workflow`) 작성
-- [x] 1-2 기본: classification·generation task별 실행 계약(`build_task_plan`) 생성기 작성
-- [x] 2-1 기본: 뉴스 샘플 schema 감사기(누락 key·공백 텍스트·중복 ID·허용 label) 작성
-- [x] 2-1 기본: greedy longest-match toy subword tokenizer와 `[CLS]/[SEP]/[UNK]` 처리, ID 왕복 확인
+- [x] 2-2 기본: `AutoTokenizer` 특수 토큰 인코딩, 즉석 동적 padding, `BatchEncoding` field·shape·PAD-mask 일치 검증
+- [x] 2-3 기본: `DataCollatorWithPadding` 나중 패딩, `Dataset`/`DatasetDict.map()` 전처리, split id disjoint 검증
+- [x] 1-1 심화: 조건 기반 RNN/LSTM vs Transformer baseline 추천기, 한계 설명
+- [x] 1-2 심화: canonical JSON + SHA-256 config hash, key 순서 무관·seed 변경 시 hash 변경 검증
+- [x] 2-1 심화: 작은/큰 vocabulary 정책의 token 수·UNK 수·embedding parameter 비교
+- [x] 2-2 심화: fast tokenizer `offset_mapping`으로 subword-원문 문자 범위 매핑
+- [x] 2-3 심화: token 길이 분포 기반 `max_length` 후보 절단 감사
+- [x] Chapter 3(Attention, Scaled Dot-Product, Multi-Head) 이론 정리 — Q/K/V, mask 적용 순서, split_heads/merge_heads, W_O 역할
 
 ### Not Completed Today
 
-- [ ] 2-2 기본 실습
-- [ ] 2-3 기본 실습
+없음 — 오늘 목표(어제 이월된 2-2·2-3 포함)를 모두 완료했습니다.
 
-오늘 목표는 1-1·1-2와 2-3까지였지만 2-1까지만 마쳤습니다. 밀린 2-2·2-3은 다음 학습
-세션이나 가까운 주말에 이어서 진행합니다.
+### Next Up
 
-### Minimum Catch-Up Plan
-
-1. 2-1의 schema 감사기·tokenizer 코드를 먼저 눈으로 복습해 2-2 문제 배경과 이어지는 흐름인지 확인
-2. 2-2 기본 문제부터 순서대로 진행
-3. 시간이 남으면 2-3까지 이어서 완료
-4. 하루에 다 끝내지 못하면 2-2까지만 완료하고 2-3은 다시 이월
+- [ ] Chapter 3 기본·심화 실습 노트북 착수 (현재는 이론 정리만 있음)
+- [ ] 10-1·10-2 복습 (건강 문제로 계속 이월 중)
 
 ## 1. Chapter 9 and 10
 
@@ -231,11 +228,6 @@
 - [ ] Sampler와 preprocessing을 CV train fold 안에 두어 leakage 방지
 - [ ] End-to-end artifact schema guard를 참고 없이 재작성
 
-### Transformer Foundations
-
-- [ ] 2-2 기본 실습
-- [ ] 2-3 기본 실습
-
 ## 7. Next Weekend Order
 
 ### Saturday, 2026-09-05
@@ -243,14 +235,14 @@
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
 2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인
 3. 좋은 학습·과적합 가능성·과소적합 가능성의 대표 패턴 구분
-4. 여유가 있으면 Transformer Foundations 2-2 기본 문제 진행
+4. 여유가 있으면 Chapter 3(Attention) 기본 문제 착수
 5. 몸 상태가 좋지 않으면 여기서 종료
 
 ### Sunday, 2026-09-06
 
 1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인
 2. gap만 보고 과적합을 확정하지 않고 split·distribution shift·leakage를 먼저 점검하는 이유 정리
-3. Transformer Foundations 2-3 기본 문제 진행
+3. Chapter 3 기본·심화 문제 이어서 진행
 4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
 5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
 6. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행

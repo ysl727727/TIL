@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Chapter 9, 12, 13과 Transformer Foundations Chapter 1~2까지의 실제 파일 구조와 학습 상태를 2026-09-01 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-02 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,12 +10,12 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: RNN/LSTM 한계와 Transformer 필요성, NLP task 실행 계약, 데이터 schema 감사와 tokenization
-- 최근 진행: Transformer Foundations 1-1~1-2, 2-1 기본 실습 정리, 2-2·2-3은 미완료로 주말 backlog 이월
+- 현재 주제: Multi-Head Attention 구조(Q/K/V, scaled dot-product, mask, split/merge heads), tokenizer 배치 처리와 재현성
+- 최근 진행: Deep Learning Advanced 1장·2장 기본·심화 실습 전부 완료, 3장(Attention/Transformer) 이론 정리 완료(실습 예정)
 - 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
-## Deep Learning Contents
+## Deep Learning Basics Contents
 
 | Chapter | Topics | Status |
 | --- | --- | --- |
@@ -32,124 +32,158 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 12 | CNN 설계 기준, 학습 파이프라인, GPU 메모리, 필터/커널 실험, MLP-CNN 비교, 실험 리포팅, 종합 실습 | Basic completed; 12-4 `loss_value` 수정 필요 |
 | 13 | Sequence data, RNN forward shape, 장기 의존성과 경사 소실·clipping | Basic completed |
 
-## Transformer Foundations Contents
+## Deep Learning Advanced Contents
 
 | Chapter | Topics | Status |
 | --- | --- | --- |
-| 1 | 수동 RNN hidden state, RNN vs Self-Attention 경로·비용 비교, NLP task workflow 검증과 실행 계약 | Basic completed |
-| 2 | 뉴스 샘플 schema 감사, greedy longest-match toy subword tokenizer | 2-1 completed; 2-2·2-3 pending |
+| 1 | 수동 RNN hidden state, RNN vs Self-Attention 경로·비용 비교, NLP task workflow 검증과 실행 계약, baseline 추천, config hash 재현성 | Basic and advanced completed |
+| 2 | 뉴스 샘플 schema 감사, subword tokenizer, 동적 padding, BatchEncoding 계약, DatasetDict 파이프라인, vocabulary 비교, offset mapping, max_length 감사 | Basic and advanced completed |
+| 3 | Query·Key·Value, Scaled Dot-Product Attention, mask, Multi-Head split/merge heads | Theory reviewed; practice not started |
 
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning`과 `transformer-foundations` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning-basics`와 `deep-learning-advanced` 영역만 표시합니다.
 
 ```text
 TIL/
 ├── README.md
 ├── WEEKEND_PRACTICE_BACKLOG.md
-└── deep-learning/
-    ├── 01-pytorch-foundations/
+├── deep-learning-basics/
+│   ├── 01-pytorch-foundations/
+│   │   ├── README.md
+│   │   ├── 01-ml-vs-dl-basic.ipynb
+│   │   ├── 02-ml-vs-dl-advanced.ipynb
+│   │   ├── 03-training-flow-basic.ipynb
+│   │   ├── 04-problem-io-basic.ipynb
+│   │   ├── 05-pytorch-code-reading-basic.ipynb
+│   │   ├── 06-tensor-dtype-shape-basic.ipynb
+│   │   ├── 07-batch-broadcasting-basic.ipynb
+│   │   ├── 08-device-basic.ipynb
+│   │   ├── 09-device-advanced.ipynb
+│   │   ├── 10-shape-device-debugging-basic.ipynb
+│   │   └── requirements.txt
+│   ├── 02-mlp-foundations/
+│   │   ├── README.md
+│   │   ├── 01-perceptron-linear-boundary-basic.ipynb
+│   │   ├── 02-mlp-layers-basic.ipynb
+│   │   ├── 03-linear-weight-bias-basic.ipynb
+│   │   ├── 04-image-flatten-basic.ipynb
+│   │   ├── 05-mlp-forward-basic.ipynb
+│   │   └── requirements.txt
+│   ├── 03-activation-output-layers/
+│   │   ├── README.md
+│   │   ├── 01-nonlinearity-basic.ipynb
+│   │   ├── 02-nonlinearity-advanced.ipynb
+│   │   ├── 03-relu-basic.ipynb
+│   │   ├── 04-relu-advanced.ipynb
+│   │   ├── 05-sigmoid-binary-basic.ipynb
+│   │   ├── 06-sigmoid-binary-advanced.ipynb
+│   │   ├── 07-softmax-multiclass-basic.ipynb
+│   │   ├── 08-softmax-multiclass-advanced.ipynb
+│   │   └── requirements.txt
+│   ├── 04-loss-optimization-training-loop/
+│   │   ├── README.md
+│   │   ├── 01-loss-function-basic.ipynb
+│   │   ├── 02-loss-function-advanced.ipynb
+│   │   ├── 03-task-loss-selection-basic.ipynb
+│   │   ├── 04-task-loss-selection-advanced.ipynb
+│   │   ├── 05-optimizer-learning-rate-basic.ipynb
+│   │   ├── 06-optimizer-learning-rate-advanced.ipynb
+│   │   ├── 07-parameter-update-flow-basic.ipynb
+│   │   ├── 08-parameter-update-flow-advanced.ipynb
+│   │   └── requirements.txt
+│   ├── 05-autograd-data-pipeline/
+│   │   ├── README.md
+│   │   ├── 01-computation-graph-chain-rule-basic.ipynb
+│   │   ├── 02-computation-graph-chain-rule-advanced.ipynb
+│   │   ├── 03-requires-grad-basic.ipynb
+│   │   ├── 04-requires-grad-advanced.ipynb
+│   │   ├── 05-backward-grad-basic.ipynb
+│   │   ├── 06-backward-grad-advanced.ipynb
+│   │   ├── 07-training-step-order-basic.ipynb
+│   │   ├── 08-training-step-order-advanced.ipynb
+│   │   ├── 09-autograd-debugging-basic.ipynb
+│   │   ├── 10-autograd-debugging-advanced.ipynb
+│   │   ├── 11-transform-advanced.ipynb
+│   │   ├── 12-dataloader-split-advanced.ipynb
+│   │   ├── 13-data-pipeline-debugging-advanced.ipynb
+│   │   └── requirements.txt
+│   ├── 06-mlp-training-validation/
+│   │   ├── README.md
+│   │   ├── 01-mlp-end-to-end-advanced.ipynb
+│   │   └── requirements.txt
+│   ├── 07-experiment-reproducibility/
+│   │   ├── README.md
+│   │   ├── 01-seed-reproducibility-basic.ipynb
+│   │   ├── 02-logging-design-basic.ipynb
+│   │   ├── 03-state-dict-checkpoint-basic.ipynb
+│   │   ├── 04-resume-training-basic.ipynb
+│   │   ├── 05-experiment-directory-basic.ipynb
+│   │   └── requirements.txt
+│   ├── 08-cnn-foundations/
+│   │   ├── README.md
+│   │   ├── 01-cnn-input-channel-basic.ipynb
+│   │   ├── 02-training-pipeline-basic.ipynb
+│   │   ├── 03-gpu-memory-basic.ipynb
+│   │   ├── 04-filter-kernel-experiment-basic.ipynb
+│   │   ├── 05-mlp-baseline-basic.ipynb
+│   │   ├── 06-mlp-vs-cnn-basic.ipynb
+│   │   ├── 07-experiment-reporting-basic.ipynb
+│   │   ├── 08-cnn-submission-basic.ipynb
+│   │   └── requirements.txt
+│   └── 09-rnn-foundations/
+│       ├── README.md
+│       ├── 01-sequence-hidden-state-basic.ipynb
+│       ├── 02-rnn-forward-shape-basic.ipynb
+│       ├── 03-vanishing-gradient-clipping-basic.ipynb
+│       └── requirements.txt
+└── deep-learning-advanced/
+    ├── 01-transformer-motivation/
     │   ├── README.md
-    │   ├── 01-ml-vs-dl-basic.ipynb
-    │   ├── 02-ml-vs-dl-advanced.ipynb
-    │   ├── 03-training-flow-basic.ipynb
-    │   ├── 04-problem-io-basic.ipynb
-    │   ├── 05-pytorch-code-reading-basic.ipynb
-    │   ├── 06-tensor-dtype-shape-basic.ipynb
-    │   ├── 07-batch-broadcasting-basic.ipynb
-    │   ├── 08-device-basic.ipynb
-    │   ├── 09-device-advanced.ipynb
-    │   ├── 10-shape-device-debugging-basic.ipynb
+    │   ├── 01-hidden-state-and-attention-cost-basic.ipynb
+    │   ├── 02-nlp-task-workflow-and-contract-basic.ipynb
+    │   ├── 03-baseline-recommender-advanced.ipynb
+    │   ├── 04-config-manifest-hash-advanced.ipynb
     │   └── requirements.txt
-    ├── 02-mlp-foundations/
+    ├── 02-data-schema-and-tokenization/
     │   ├── README.md
-    │   ├── 01-perceptron-linear-boundary-basic.ipynb
-    │   ├── 02-mlp-layers-basic.ipynb
-    │   ├── 03-linear-weight-bias-basic.ipynb
-    │   ├── 04-image-flatten-basic.ipynb
-    │   ├── 05-mlp-forward-basic.ipynb
+    │   ├── 01-schema-audit-and-tokenizer-basic.ipynb
+    │   ├── 02-vocabulary-comparison-advanced.ipynb
+    │   ├── 03-dynamic-padding-and-batch-encoding-basic.ipynb
+    │   ├── 04-offset-mapping-advanced.ipynb
+    │   ├── 05-data-collator-and-dataset-pipeline-basic.ipynb
+    │   ├── 06-max-length-audit-advanced.ipynb
     │   └── requirements.txt
-    ├── 03-activation-output-layers/
-    │   ├── README.md
-    │   ├── 01-nonlinearity-basic.ipynb
-    │   ├── 02-nonlinearity-advanced.ipynb
-    │   ├── 03-relu-basic.ipynb
-    │   ├── 04-relu-advanced.ipynb
-    │   ├── 05-sigmoid-binary-basic.ipynb
-    │   ├── 06-sigmoid-binary-advanced.ipynb
-    │   ├── 07-softmax-multiclass-basic.ipynb
-    │   ├── 08-softmax-multiclass-advanced.ipynb
-    │   └── requirements.txt
-    ├── 04-loss-optimization-training-loop/
-    │   ├── README.md
-    │   ├── 01-loss-function-basic.ipynb
-    │   ├── 02-loss-function-advanced.ipynb
-    │   ├── 03-task-loss-selection-basic.ipynb
-    │   ├── 04-task-loss-selection-advanced.ipynb
-    │   ├── 05-optimizer-learning-rate-basic.ipynb
-    │   ├── 06-optimizer-learning-rate-advanced.ipynb
-    │   ├── 07-parameter-update-flow-basic.ipynb
-    │   ├── 08-parameter-update-flow-advanced.ipynb
-    │   └── requirements.txt
-    ├── 05-autograd-data-pipeline/
-    │   ├── README.md
-    │   ├── 01-computation-graph-chain-rule-basic.ipynb
-    │   ├── 02-computation-graph-chain-rule-advanced.ipynb
-    │   ├── 03-requires-grad-basic.ipynb
-    │   ├── 04-requires-grad-advanced.ipynb
-    │   ├── 05-backward-grad-basic.ipynb
-    │   ├── 06-backward-grad-advanced.ipynb
-    │   ├── 07-training-step-order-basic.ipynb
-    │   ├── 08-training-step-order-advanced.ipynb
-    │   ├── 09-autograd-debugging-basic.ipynb
-    │   ├── 10-autograd-debugging-advanced.ipynb
-    │   ├── 11-transform-advanced.ipynb
-    │   ├── 12-dataloader-split-advanced.ipynb
-    │   ├── 13-data-pipeline-debugging-advanced.ipynb
-    │   └── requirements.txt
-    ├── 06-mlp-training-validation/
-    │   ├── README.md
-    │   ├── 01-mlp-end-to-end-advanced.ipynb
-    │   └── requirements.txt
-    ├── 07-experiment-reproducibility/
-    │   ├── README.md
-    │   ├── 01-seed-reproducibility-basic.ipynb
-    │   ├── 02-logging-design-basic.ipynb
-    │   ├── 03-state-dict-checkpoint-basic.ipynb
-    │   ├── 04-resume-training-basic.ipynb
-    │   ├── 05-experiment-directory-basic.ipynb
-    │   └── requirements.txt
-    ├── 08-cnn-foundations/
-    │   ├── README.md
-    │   ├── 01-cnn-input-channel-basic.ipynb
-    │   ├── 02-training-pipeline-basic.ipynb
-    │   ├── 03-gpu-memory-basic.ipynb
-    │   ├── 04-filter-kernel-experiment-basic.ipynb
-    │   ├── 05-mlp-baseline-basic.ipynb
-    │   ├── 06-mlp-vs-cnn-basic.ipynb
-    │   ├── 07-experiment-reporting-basic.ipynb
-    │   ├── 08-cnn-submission-basic.ipynb
-    │   └── requirements.txt
-    └── 09-rnn-foundations/
-        ├── README.md
-        ├── 01-sequence-hidden-state-basic.ipynb
-        ├── 02-rnn-forward-shape-basic.ipynb
-        ├── 03-vanishing-gradient-clipping-basic.ipynb
-        └── requirements.txt
-
-transformer-foundations/
-├── 01-transformer-motivation/
-│   ├── README.md
-│   ├── 01-hidden-state-and-attention-cost-basic.ipynb
-│   ├── 02-nlp-task-workflow-and-contract-basic.ipynb
-│   └── requirements.txt
-└── 02-data-schema-and-tokenization/
-    ├── README.md
-    ├── 01-schema-audit-and-tokenizer-basic.ipynb
-    └── requirements.txt
+    └── 03-attention-and-multihead/
+        └── README.md
 ```
 
 ## Latest Learning Log
+
+### Attention and Multi-Head Attention Theory
+
+- Q/K/V는 입력에 서로 다른 학습된 projection을 곱한 결과이며, `Q=K=V=X`는 값이 아니라 입력 출처가 같다는 뜻
+- `softmax(QKᵀ/√d_k + M)V` 연산 순서(scale → mask → softmax → weighted sum)를 고정 순서로 확인
+- mask는 반드시 softmax 이전에 적용해야 확률 행 합이 정확히 1로 유지됨(사후 적용 시 합이 깨짐)
+- Padding mask(`[B,L_k]`, 샘플마다 다름)와 Causal mask(`[L_q,L_k]`, `torch.tril()`)의 목적·shape 차이, 라이브러리마다 반대인 boolean 의미 주의
+- Multi-Head의 `split_heads`(view+transpose)/`merge_heads`(transpose+contiguous+reshape) 축 변환과, `transpose` 뒤 `contiguous()`가 필요한 이유(메모리 재정렬 없이는 reshape가 불안전)
+- `W_O`가 head별 결과를 실제로 섞어주는 유일한 지점이라는 것, Multi-Head일 때만 merge 직후 한 번 사용
+- 아직 실습 코드는 작성하지 않아 이론 정리만 완료
+
+### Data Schema Auditing and Tokenization (Complete)
+
+- 2-2: `AutoTokenizer` 특수 토큰 인코딩, 즉석 동적 padding(`padding=True`), `BatchEncoding` field·shape·PAD-mask 일치 검증
+- 2-3: `DataCollatorWithPadding`으로 나중에 패딩하는 방식, `Dataset`/`DatasetDict.map()`으로 train/validation/test 동일 전처리, split id disjoint(누수 없음) 검증
+- 2-1 심화: 작은/큰 vocabulary의 평균 token 수·UNK 수·embedding parameter 수 비교 → 큰 vocabulary가 무조건 좋지 않은 이유
+- 2-2 심화: fast tokenizer `offset_mapping`으로 subword-원문 문자 범위 매핑
+- 2-3 심화: 원본 token 길이 분포 기반 `max_length` 후보별 절단률 비교, 최소 절단 후보 선택
+- 어제 미완료였던 2-2·2-3 기본을 포함해 Chapter 2 전체(기본+심화) 완료, 주말로 이월할 항목 없음
+
+### RNN/LSTM Limits and Transformer Motivation (Advanced)
+
+- 1-1 심화: 긴 문맥·병렬 학습·streaming 조건으로 RNN/LSTM vs Transformer 첫 baseline을 추천하는 규칙 기반 함수, 실제 benchmark를 대체하지 못하는 한계 정리
+- 1-2 심화: `sort_keys=True` + `separators=(",", ":")` canonical JSON과 SHA-256 hash로 실험 설정 식별자 생성 → key 순서 무관 동일 hash, `seed` 변경 시 hash 변경 검증
+- Chapter 1 전체(기본+심화) 완료
 
 ### RNN/LSTM Limits and Transformer Motivation
 

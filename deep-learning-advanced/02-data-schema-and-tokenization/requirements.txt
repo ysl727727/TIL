@@ -1,1 +1,3 @@
-# 표준 라이브러리만 사용 (외부 패키지 불필요)
+torch
+transformers
+datasets

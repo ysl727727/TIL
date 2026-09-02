@@ -1,6 +1,6 @@
 # Chapter 1: RNN/LSTM Limits and Transformer Motivation
 
-> 2026-09-01 학습 기록. 1-1~1-2 이론과 기본 실습을 정리했습니다.
+> 2026-09-02 학습 기록. 1-1~1-2 기본·심화 실습을 모두 정리했습니다.
 
 ## Learning Goals
 
@@ -9,15 +9,19 @@
 - 정보 경로 길이와 `L²` 비용이라는 두 성질을 동시에 보고 한쪽 구조만 일방적으로 우월하다고 단정하지 않는다.
 - 프로젝트 workflow 체크리스트에서 누락·중복·순서 오류를 함께 검증하는 감사 함수를 만든다.
 - 분류(classification)와 생성(generation) task별로 model head·logits shape·loss·metric이 다름을 반영한 실행 계약(task plan)을 생성한다.
+- 긴 문맥·병렬 학습·streaming 조건을 근거로 RNN/LSTM과 Transformer 중 첫 baseline 후보를 추천한다.
+- 실험 설정을 순서·공백에 무관한 canonical JSON과 SHA-256 hash로 식별해 재현성을 보장한다.
 
 ## Practice Files
 
-| Lesson | File | Basic practice status |
+| Lesson | File | Practice status |
 | --- | --- | --- |
-| 1-1 | `01-hidden-state-and-attention-cost-basic.ipynb` | 수동 RNN hidden state 구현, 첫 token 변경 시 마지막 상태 변화 검증, RNN vs Self-Attention 경로 길이·score 수 비교 확인 |
-| 1-2 | `02-nlp-task-workflow-and-contract-basic.ipynb` | workflow 누락/중복/순서 검증기, classification·generation task별 실행 계약 생성기 확인 |
+| 1-1 기본 | `01-hidden-state-and-attention-cost-basic.ipynb` | 수동 RNN hidden state 구현, 첫 token 변경 시 마지막 상태 변화 검증, RNN vs Self-Attention 경로 길이·score 수 비교 확인 |
+| 1-2 기본 | `02-nlp-task-workflow-and-contract-basic.ipynb` | workflow 누락/중복/순서 검증기, classification·generation task별 실행 계약 생성기 확인 |
+| 1-1 심화 | `03-baseline-recommender-advanced.ipynb` | 긴 문맥·병렬 학습·streaming 조건 기반 RNN/LSTM vs Transformer 추천기, 근거·한계 정리 확인 |
+| 1-2 심화 | `04-config-manifest-hash-advanced.ipynb` | canonical JSON·SHA-256 config hash 생성, key 순서 불변·seed 변경 시 hash 변경 검증 확인 |
 
-두 파일 모두 첫 실행에서 자동 검증(`PASS`)을 통과했고 별도 수정 셀은 없었습니다.
+네 파일 모두 첫 실행에서 자동 검증(`PASS`)을 통과했고 별도 수정 셀은 없었습니다.
 
 ## Core Theory
 
@@ -49,6 +53,26 @@
 | 완료 확인 | validation으로 선택 후 test 1회 | prompt 제거 후 새 token만 decode·검토 |
 
 같은 tokenizer API를 쓴다고 model head까지 대체할 수 있는 것은 아니다 — head, loss, 후처리, 평가 지표가 모두 task에 따라 달라진다.
+
+### 5. 요구조건 기반 Baseline 추천
+
+- 긴 문맥(long context)이거나 병렬 학습(parallel training)이 중요하면 Transformer를 우선 추천한다.
+- 위 조건이 없고 streaming(입력이 순차적으로 도착)이면 RNN/LSTM이 단순한 baseline이 된다.
+- 어느 조건도 없으면 "baseline 비교 필요"로 결론을 유보한다.
+- 이 추천기는 실제 benchmark를 대체하지 못한다 — 데이터 규모, latency 제약, 서빙 환경 같은 조건은 반영하지 못한 단순 규칙 기반 판단이다.
+
+### 6. Canonical Manifest와 Config Hash
+
+```python
+canonical = json.dumps(config, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
+config_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:12]
+```
+
+- `sort_keys=True`: 딕셔너리 key 입력 순서를 정규화해 같은 내용이면 항상 같은 문자열을 만든다.
+- `separators=(",", ":")`: 공백을 제거해 완전히 압축된 canonical 형태를 만든다.
+- hash 계산 전에 필수 key(`seed`, `model_id`, `dataset_version`, `metric` 등)가 모두 있는지 먼저 검사한다.
+- 반환값에는 원본이 아니라 `dict(config)`, `dict(environment)`처럼 복사본을 담아 호출로 인한 원본 오염(side effect)을 막는다.
+- 검증 결과: key 순서만 바꾼 설정은 원본과 hash가 같고(`same order-independent`), `seed`만 바꾼 설정은 hash가 다르다(`seed changes hash`) — 같은 설정이면 항상 같은 실험 식별자가 나오고, 설정이 실제로 바뀌면 반드시 다른 식별자가 나온다는 뜻이다.
 
 ## Environment
 

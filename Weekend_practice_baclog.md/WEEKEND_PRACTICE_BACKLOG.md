@@ -1,33 +1,32 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-09-02 after Deep Learning Advanced Chapter 1–2 (basic + advanced) completion and Chapter 3 theory review.
+> Updated on 2026-09-03 after Deep Learning Advanced Chapter 3 (Attention/Multi-Head) practice completion.
 
-오늘은 계획한 분량을 모두 끝내 주말로 넘길 항목이 없습니다. 다음 주말인 2026-09-05~06에는
-10-1·10-2 복습과 Chapter 3(Attention/Multi-Head) 실습 착수를 이어갑니다. 체크박스는 강의를
+오늘도 계획한 분량(3-1~3-5)을 모두 끝내 주말로 넘길 항목이 없습니다. Deep Learning Advanced
+1~3장이 모두 완료된 상태입니다. 다음 주말인 2026-09-05~06에는 10-1·10-2 복습을 우선하고,
+Chapter 4(있다면 다음 강의)나 9장 심화 중 시간이 남는 만큼 진행합니다. 체크박스는 강의를
 들었거나 자료를 받았다는 뜻이 아니라, **직접 실행하고 결과를 설명할 수 있는지**를 기준으로
 표시합니다.
 
-## 0. Latest Update: Deep Learning Advanced Chapter 1–2 Complete
+## 0. Latest Update: Deep Learning Advanced Chapter 3 Complete
 
-### Completed on 2026-09-02
+### Completed on 2026-09-03
 
-- [x] 2-2 기본: `AutoTokenizer` 특수 토큰 인코딩, 즉석 동적 padding, `BatchEncoding` field·shape·PAD-mask 일치 검증
-- [x] 2-3 기본: `DataCollatorWithPadding` 나중 패딩, `Dataset`/`DatasetDict.map()` 전처리, split id disjoint 검증
-- [x] 1-1 심화: 조건 기반 RNN/LSTM vs Transformer baseline 추천기, 한계 설명
-- [x] 1-2 심화: canonical JSON + SHA-256 config hash, key 순서 무관·seed 변경 시 hash 변경 검증
-- [x] 2-1 심화: 작은/큰 vocabulary 정책의 token 수·UNK 수·embedding parameter 비교
-- [x] 2-2 심화: fast tokenizer `offset_mapping`으로 subword-원문 문자 범위 매핑
-- [x] 2-3 심화: token 길이 분포 기반 `max_length` 후보 절단 감사
-- [x] Chapter 3(Attention, Scaled Dot-Product, Multi-Head) 이론 정리 — Q/K/V, mask 적용 순서, split_heads/merge_heads, W_O 역할
+- [x] 3-1: Q·K·V projection 함수, Query별 최상위 Key 찾기(`find_top_keys`), softmax+threshold 관계 리포트
+- [x] 3-2: Scaled Dot-Product Attention 구현, padding mask 적용, `[B,T,D]` batch attention 확장
+- [x] 3-3: Context vector 기여도 분해(`decompose_context`), attention entropy 계산, 여러 head 관계 일치 확인(`summarize_heads`)
+- [x] 3-4: Tensor 기반 `self_attention` 함수, `nn.Module` 기반 `SelfAttention`, padding mask를 지원하는 `MaskedSelfAttention`
+- [x] 3-5: `split_heads`/`merge_heads`, `MultiHeadSelfAttention` 전체 구현, GQA KV Cache 절감 배수 계산, shape trace 디버거
+- [x] 오늘의 Q&A 30여 개 항목을 `03-attention-and-multihead/README.md`에 정리 (softmax dim, 스케일링 시점, unsqueeze broadcasting, MHA/MQA/GQA 등)
 
 ### Not Completed Today
 
-없음 — 오늘 목표(어제 이월된 2-2·2-3 포함)를 모두 완료했습니다.
+없음 — 오늘 목표(3-1~3-5)를 모두 완료했습니다.
 
 ### Next Up
 
-- [ ] Chapter 3 기본·심화 실습 노트북 착수 (현재는 이론 정리만 있음)
 - [ ] 10-1·10-2 복습 (건강 문제로 계속 이월 중)
+- [ ] Chapter 4 이후 강의 실습 (공개되는 대로 진행)
 
 ## 1. Chapter 9 and 10
 
@@ -235,14 +234,14 @@
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
 2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인
 3. 좋은 학습·과적합 가능성·과소적합 가능성의 대표 패턴 구분
-4. 여유가 있으면 Chapter 3(Attention) 기본 문제 착수
+4. 여유가 있으면 Chapter 3 복습(entropy·GQA·shape trace 위주) 또는 다음 강의 예습
 5. 몸 상태가 좋지 않으면 여기서 종료
 
 ### Sunday, 2026-09-06
 
 1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인
 2. gap만 보고 과적합을 확정하지 않고 split·distribution shift·leakage를 먼저 점검하는 이유 정리
-3. Chapter 3 기본·심화 문제 이어서 진행
+3. 다음 공개되는 강의(4장) 실습 착수
 4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
 5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
 6. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행

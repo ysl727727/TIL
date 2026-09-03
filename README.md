@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-02 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-03 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,8 +10,8 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: Multi-Head Attention 구조(Q/K/V, scaled dot-product, mask, split/merge heads), tokenizer 배치 처리와 재현성
-- 최근 진행: Deep Learning Advanced 1장·2장 기본·심화 실습 전부 완료, 3장(Attention/Transformer) 이론 정리 완료(실습 예정)
+- 현재 주제: Multi-Head Attention 구조(Q/K/V, scaled dot-product, mask, split/merge heads) 실습 완료, 다음 주제 예정
+- 최근 진행: Deep Learning Advanced 3장(Attention/Multi-Head) 실습 3-1~3-5 전부 완료, 1~3장 모두 완료 상태
 - 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
@@ -38,7 +38,7 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | 1 | 수동 RNN hidden state, RNN vs Self-Attention 경로·비용 비교, NLP task workflow 검증과 실행 계약, baseline 추천, config hash 재현성 | Basic and advanced completed |
 | 2 | 뉴스 샘플 schema 감사, subword tokenizer, 동적 padding, BatchEncoding 계약, DatasetDict 파이프라인, vocabulary 비교, offset mapping, max_length 감사 | Basic and advanced completed |
-| 3 | Query·Key·Value, Scaled Dot-Product Attention, mask, Multi-Head split/merge heads | Theory reviewed; practice not started |
+| 3 | Query·Key·Value, Scaled Dot-Product Attention, mask, Context vector 해석, SelfAttention 모듈, Multi-Head split/merge heads, GQA KV Cache | Practice completed |
 
 ## Repository Structure
 
@@ -155,10 +155,26 @@ TIL/
     │   ├── 06-max-length-audit-advanced.ipynb
     │   └── requirements.txt
     └── 03-attention-and-multihead/
-        └── README.md
+        ├── README.md
+        ├── 01-qkv-projection-and-relevance.ipynb
+        ├── 02-scaled-dot-product-attention.ipynb
+        ├── 03-attention-weight-and-context-interpretation.ipynb
+        ├── 04-self-attention-module.ipynb
+        ├── 05-multihead-attention-and-debugging.ipynb
+        └── requirements.txt
 ```
 
 ## Latest Learning Log
+
+### Attention and Multi-Head Attention Practice (Complete)
+
+- Q·K·V projection 함수와 Query별 최상위 Key 찾기, softmax+threshold 기반 관계 리포트 구현
+- Scaled Dot-Product Attention 전체 구현(scale → mask → softmax → weighted sum), padding mask와 `[B,T,D]` batch attention까지 확장
+- Attention weight를 Value 가중합으로 분해해 context vector 기여도 계산, Shannon entropy로 attention 집중도 측정, 여러 head의 최상위 관계 일치(unanimous) 확인
+- `nn.Module` 기반 학습 가능한 `SelfAttention`과 padding mask를 지원하는 `MaskedSelfAttention` 작성 (parameter 수 계산까지 검증)
+- `split_heads`/`merge_heads` shape 변환과 `MultiHeadSelfAttention` 전체 구현, GQA의 KV Cache 절감 배수 계산, shape trace 디버거로 첫 번째 계약 위반 지점 탐지
+- softmax의 `dim=-1` 이유, 스케일링을 head 분리 전/후 `hidden_size`/`head_dim` 중 무엇으로 하는지, `unsqueeze`가 선택이 아니라 차원 추가라는 점 등 Q&A로 정리
+- 오늘 목표(3-1~3-5)를 모두 완료해 주말로 이월할 항목 없음
 
 ### Attention and Multi-Head Attention Theory
 

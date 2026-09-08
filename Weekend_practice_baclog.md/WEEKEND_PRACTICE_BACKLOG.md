@@ -1,32 +1,46 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-09-03 after Deep Learning Advanced Chapter 3 (Attention/Multi-Head) practice completion.
+> Updated on 2026-09-08 after Chapter 5-7 lecture notes and the basic-math / deep-learning graded
+> assignments. Chapter 3 (Attention/Multi-Head) below is now historical — it was fully completed
+> on 2026-09-03.
 
-오늘도 계획한 분량(3-1~3-5)을 모두 끝내 주말로 넘길 항목이 없습니다. Deep Learning Advanced
-1~3장이 모두 완료된 상태입니다. 다음 주말인 2026-09-05~06에는 10-1·10-2 복습을 우선하고,
-Chapter 4(있다면 다음 강의)나 9장 심화 중 시간이 남는 만큼 진행합니다. 체크박스는 강의를
+이번 주(주말+월+화)는 지난주에 나온 기초수학·딥러닝 기초 채점 과제 마감에 집중하느라 5장·6장
+실습을 전혀 진행하지 못했고, 오늘(7장)도 이론 정리와 7-1 실습만 겨우 마쳤습니다. 다음
+주말(2026-09-12~13)에는 5·6장 실습과 7-2~7-8 실습을 이어서 진행합니다. 체크박스는 강의를
 들었거나 자료를 받았다는 뜻이 아니라, **직접 실행하고 결과를 설명할 수 있는지**를 기준으로
 표시합니다.
 
-## 0. Latest Update: Deep Learning Advanced Chapter 3 Complete
+## 0. Latest Update: Chapters 5-7 and Graded Assignments
 
-### Completed on 2026-09-03
+### Completed this week (2026-09-06 ~ 09-08)
 
-- [x] 3-1: Q·K·V projection 함수, Query별 최상위 Key 찾기(`find_top_keys`), softmax+threshold 관계 리포트
-- [x] 3-2: Scaled Dot-Product Attention 구현, padding mask 적용, `[B,T,D]` batch attention 확장
-- [x] 3-3: Context vector 기여도 분해(`decompose_context`), attention entropy 계산, 여러 head 관계 일치 확인(`summarize_heads`)
-- [x] 3-4: Tensor 기반 `self_attention` 함수, `nn.Module` 기반 `SelfAttention`, padding mask를 지원하는 `MaskedSelfAttention`
-- [x] 3-5: `split_heads`/`merge_heads`, `MultiHeadSelfAttention` 전체 구현, GQA KV Cache 절감 배수 계산, shape trace 디버거
-- [x] 오늘의 Q&A 30여 개 항목을 `03-attention-and-multihead/README.md`에 정리 (softmax dim, 스케일링 시점, unsqueeze broadcasting, MHA/MQA/GQA 등)
+- [x] 기초 수학 종합 과제 제출 (문서 임베딩/Cosine 검색, PCA, SVD, Causal Attention+autograd SGD)
+- [x] 딥러닝 기초 종합 과제 제출 (DataLoader 검사, MLP/CNN, 학습·검증 루프 비교, checkpoint 저장·복원·재개)
+- [x] 5장(5-1,5-2,5-4강) 이론 정리 — 사전학습, LM Objective, BERT(Masked LM), GPT(Causal LM)
+- [x] 6장(6-1,6-3,6-4,6-5강) 이론 정리 — HF Hub/Model Card, AutoClass, Base/Task-specific 출력, 저장/재로드
+- [x] 7장(7-1,7-2,7-3,7-5,7-6,7-7,7-8강) 이론 정리 — 문제 정의부터 Error Analysis/리포트까지 Fine-tuning 전체 파이프라인
+- [x] 7-1 실습: 텍스트 분류 데이터 품질 감사(결측·중복·label 불균형), split leakage(정확 중복+Jaccard) 탐지
 
-### Not Completed Today
+### Not Completed This Week
 
-없음 — 오늘 목표(3-1~3-5)를 모두 완료했습니다.
+- [ ] 5장 실습 (5-1, 5-2, 5-4강에 대응하는 실습 노트북 전체)
+- [ ] 6장 실습 (6-1, 6-3, 6-4, 6-5강에 대응하는 실습 노트북 전체)
+- [ ] 7-2 실습: DatasetDict, Label Encoding, Stratified Split
+- [ ] 7-3 실습: Tokenization Mapping, DataCollatorWithPadding
+- [ ] 7-5 실습: compute_metrics, Accuracy/Macro-F1
+- [ ] 7-6 실습: TrainingArguments, Trainer 설정
+- [ ] 7-7 실습: Fine-tuning 실행·평가·Checkpoint 관리
+- [ ] 7-8 실습: Error Analysis, Fine-tuning 리포트
 
-### Next Up
+과제 마감이 이유입니다 — 5·6장은 실습을 아예 시작 못 했고, 7장도 이론만 정리한 채 실습은
+7-1 하나만 진행했습니다.
 
-- [ ] 10-1·10-2 복습 (건강 문제로 계속 이월 중)
-- [ ] Chapter 4 이후 강의 실습 (공개되는 대로 진행)
+### Minimum Catch-Up Plan (2026-09-12~13)
+
+1. 5장 실습부터 순서대로: Masked LM/Causal LM 관련 실습이 있다면 이론 요약(README Core Theory)을 먼저 훑고 시작
+2. 6장 실습: AutoModel/AutoTokenizer 기본 동작, 저장/재로드 재현성 확인 위주로 진행
+3. 7-2 → 7-3 → 7-5 → 7-6 → 7-7 → 7-8 순서대로 이어서 진행 (Trainer 파이프라인이 순차적으로 쌓이는 구조라 순서를 지키는 게 유리함)
+4. 이틀 안에 다 못 끝내면 7-2~7-3(데이터 파이프라인)까지만이라도 완료해 다음 주 실습과 이어지게 함
 
 ## 1. Chapter 9 and 10
 
@@ -229,22 +243,22 @@ Chapter 4(있다면 다음 강의)나 9장 심화 중 시간이 남는 만큼 �
 
 ## 7. Next Weekend Order
 
-### Saturday, 2026-09-05
+### Saturday, 2026-09-12
 
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
-2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인
-3. 좋은 학습·과적합 가능성·과소적합 가능성의 대표 패턴 구분
-4. 여유가 있으면 Chapter 3 복습(entropy·GQA·shape trace 위주) 또는 다음 강의 예습
+2. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인 (계속 이월 중)
+3. 5장 실습(Masked LM/Causal LM 관련) 착수
+4. 여유가 있으면 6장 실습(AutoModel/AutoTokenizer, 저장·재로드)까지 진행
 5. 몸 상태가 좋지 않으면 여기서 종료
 
-### Sunday, 2026-09-06
+### Sunday, 2026-09-13
 
-1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인
-2. gap만 보고 과적합을 확정하지 않고 split·distribution shift·leakage를 먼저 점검하는 이유 정리
-3. 다음 공개되는 강의(4장) 실습 착수
-4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인
+1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인 (계속 이월 중)
+2. 7-2 → 7-3 → 7-5 순서로 실습 진행 (DatasetDict/Split → Tokenization/Collator → compute_metrics)
+3. 시간이 남으면 7-6 → 7-7까지 이어서 진행 (Trainer 설정·실행)
+4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인 (계속 이월 중)
 5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
-6. 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
+6. 7-8(Error Analysis)과 9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
 
 ## 8. Working Rule
 

@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-03 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~6까지의 실제 파일 구조와 학습 상태를 2026-09-08 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: Multi-Head Attention 구조(Q/K/V, scaled dot-product, mask, split/merge heads) 실습 완료, 다음 주제 예정
-- 최근 진행: Deep Learning Advanced 3장(Attention/Multi-Head) 실습 3-1~3-5 전부 완료, 1~3장 모두 완료 상태
-- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정
+- 현재 주제: 사전학습 언어모델(BERT/GPT), HuggingFace Hub·AutoModel, 텍스트 분류 Fine-tuning(Trainer)
+- 최근 진행: 5·6장(사전학습 LM, HF Hub/AutoModel) 이론 정리(실습 미착수), 7장 이론 정리+7-1 데이터 품질 감사 실습 완료, 기초수학·딥러닝기초 과제 제출 완료
+- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정, 5·6장 실습 및 7-2~7-8 실습은 주말(2026-09-12~13) 예정
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Basics Contents
@@ -39,10 +39,13 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 1 | 수동 RNN hidden state, RNN vs Self-Attention 경로·비용 비교, NLP task workflow 검증과 실행 계약, baseline 추천, config hash 재현성 | Basic and advanced completed |
 | 2 | 뉴스 샘플 schema 감사, subword tokenizer, 동적 padding, BatchEncoding 계약, DatasetDict 파이프라인, vocabulary 비교, offset mapping, max_length 감사 | Basic and advanced completed |
 | 3 | Query·Key·Value, Scaled Dot-Product Attention, mask, Context vector 해석, SelfAttention 모듈, Multi-Head split/merge heads, GQA KV Cache | Practice completed |
+| 4 | 사전학습 LM Objective, Masked LM(BERT) vs Causal LM(GPT), Special Token, Autoregressive Generation | Theory reviewed; practice not started |
+| 5 | Hugging Face Hub/Model Card, AutoClass, Base vs Task-specific Model 출력, 저장/재로드 재현성 | Theory reviewed; practice not started |
+| 6 | 텍스트 분류 문제 정의, 데이터 품질/leakage 감사, DatasetDict, Tokenization Mapping, compute_metrics, Trainer, Error Analysis | Theory reviewed (7-1,7-2,7-3,7-5,7-6,7-7,7-8); 7-1 practice completed, 7-2~7-8 pending |
 
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning-basics`와 `deep-learning-advanced` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`와 채점용 `assignments` 영역만 표시합니다.
 
 ```text
 TIL/
@@ -154,17 +157,52 @@ TIL/
     │   ├── 05-data-collator-and-dataset-pipeline-basic.ipynb
     │   ├── 06-max-length-audit-advanced.ipynb
     │   └── requirements.txt
-    └── 03-attention-and-multihead/
+    ├── 03-attention-and-multihead/
+    │   ├── README.md
+    │   ├── 01-qkv-projection-and-relevance.ipynb
+    │   ├── 02-scaled-dot-product-attention.ipynb
+    │   ├── 03-attention-weight-and-context-interpretation.ipynb
+    │   ├── 04-self-attention-module.ipynb
+    │   ├── 05-multihead-attention-and-debugging.ipynb
+    │   └── requirements.txt
+    ├── 04-pretrained-language-models/
+    │   └── README.md
+    ├── 05-huggingface-hub-and-automodel/
+    │   └── README.md
+    └── 06-text-classification-finetuning/
         ├── README.md
-        ├── 01-qkv-projection-and-relevance.ipynb
-        ├── 02-scaled-dot-product-attention.ipynb
-        ├── 03-attention-weight-and-context-interpretation.ipynb
-        ├── 04-self-attention-module.ipynb
-        ├── 05-multihead-attention-and-debugging.ipynb
+        ├── 01-data-quality-and-leakage-audit.ipynb
         └── requirements.txt
+
+assignments/
+├── basic-math-assignment/
+│   ├── README.md
+│   └── basic_math_assignment_이용석.ipynb
+└── deep-learning-basic-assignment/
+    ├── README.md
+    └── deep_learning_basic_assignment_이용석.ipynb
 ```
 
 ## Latest Learning Log
+
+### Assignments: Basic Math and Deep Learning Fundamentals
+
+- 기초 수학 종합 과제: 문서 임베딩·Cosine Vector Search, 고유값 분해 기반 PCA, SVD 저랭크 압축, Causal Attention forward+vocabulary softmax/loss+autograd 1-step SGD까지 4문제(공식 20점) 제출 완료
+- 딥러닝 기초 종합 과제: 데이터 분할·DataLoader 검사, ImageMLP/CNN 완성, 학습·검증 루프 공정 비교, best checkpoint 저장·복원·재개까지 4단계 + 최종 test·자동 검증 제출 완료
+- 지난주 부여, 마감 기한에 맞춰 이번 주(주말+월+화)에 집중 작업 — 이 기간 동안 5·6장 실습을 진행하지 못함
+- 정규 강의 실습과 분리해 `assignments/` 폴더에 별도 보관
+
+### Text Classification Fine-tuning Theory + Practice (7-1)
+
+- 7장(7-1,7-2,7-3,7-5,7-6,7-7,7-8강) 이론 정리: 문제 정의 5요소 → DatasetDict/Stratified Split → Tokenization Mapping/DataCollator → compute_metrics(Accuracy vs Macro-F1) → TrainingArguments/Trainer 6대 부품 → Fine-tuning 실행/Checkpoint 관리 → Error Analysis/리포트까지 전체 파이프라인 흐름
+- 7-1 실습만 완료: 텍스트 정규화 후 빈 문장·허용 안 된 label·중복 감사, label 분포/imbalance ratio 계산, train-validation 간 정확 중복+Jaccard 기반 near-duplicate leakage 탐지
+- 7-2~7-8 실습은 과제 마감으로 시간이 부족해 주말(2026-09-12~13)로 이월
+
+### Pretrained Language Models and Hugging Face Hub Theory
+
+- 5장(5-1,5-2,5-4강): 사전학습·LM Objective의 큰 그림, Masked LM(BERT, 양방향 문맥)과 Causal LM(GPT, 왼쪽 문맥) 비교, BERT의 special token·입력 표현 3요소, GPT의 Causal Self-Attention·한 칸 shift·Autoregressive Generation
+- 6장(6-1,6-3,6-4,6-5강): Hugging Face Hub 구조와 Model Card 체크리스트, AutoClass의 config 기반 자동 클래스 선택과 Base/Task-specific 출력 차이, Masked Mean Pooling, 모델+tokenizer 저장/재로드 재현성 검증 흐름
+- 두 챕터 모두 실습 노트북 없이 이론만 정리, 실습은 주말(2026-09-12~13)로 이월
 
 ### Attention and Multi-Head Attention Practice (Complete)
 

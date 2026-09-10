@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~6까지의 실제 파일 구조와 학습 상태를 2026-09-08 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~8, LLM Practical Foundations Chapter 1까지의 실제 파일 구조와 학습 상태를 2026-09-10 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: 사전학습 언어모델(BERT/GPT), HuggingFace Hub·AutoModel, 텍스트 분류 Fine-tuning(Trainer)
-- 최근 진행: 5·6장(사전학습 LM, HF Hub/AutoModel) 이론 정리(실습 미착수), 7장 이론 정리+7-1 데이터 품질 감사 실습 완료, 기초수학·딥러닝기초 과제 제출 완료
-- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정, 5·6장 실습 및 7-2~7-8 실습은 주말(2026-09-12~13) 예정
+- 현재 주제: Prompt Engineering→PEFT(LoRA), generate()·Chat Template, logits/손실함수/optimizer 기본기
+- 최근 진행: 8·9강(Prompt-PEFT, Generation/Chat Template) 이론 정리(실습 미착수, 어제), 딥러닝 실전 1·2장(Logits→Optimizer) 이론 정리 및 통합 실습 착수(오늘, 아직 TODO 미완료)
+- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정, 5·6장·7-2~7-8·8·9강 실습, logits/optimizer 통합 실습 TODO 완성은 주말(2026-09-12~13) 예정
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Basics Contents
@@ -42,10 +42,18 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 4 | 사전학습 LM Objective, Masked LM(BERT) vs Causal LM(GPT), Special Token, Autoregressive Generation | Theory reviewed; practice not started |
 | 5 | Hugging Face Hub/Model Card, AutoClass, Base vs Task-specific Model 출력, 저장/재로드 재현성 | Theory reviewed; practice not started |
 | 6 | 텍스트 분류 문제 정의, 데이터 품질/leakage 감사, DatasetDict, Tokenization Mapping, compute_metrics, Trainer, Error Analysis | Theory reviewed (7-1,7-2,7-3,7-5,7-6,7-7,7-8); 7-1 practice completed, 7-2~7-8 pending |
+| 7 | Prompt Engineering vs Prompt-tuning vs PEFT vs Full Fine-tuning, Prompt-only Baseline 설계, LoRA, 공정 비교와 Regression 확인 | Theory reviewed; practice not started |
+| 8 | Forward pass vs generate(), Greedy/Sampling/Beam, Temperature/Top-k/Top-p, Chat Message Role, apply_chat_template 디버깅 | Theory reviewed; practice not started |
+
+## LLM Practical Foundations Contents
+
+| Chapter | Topics | Status |
+| --- | --- | --- |
+| 1 | Logit/Softmax 수치 안정성, MSE/BCE/Cross Entropy, Gradient Descent, SGD/Momentum/Adam | Theory reviewed; practice notebook uploaded but TODOs unfilled (starter state) |
 
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`와 채점용 `assignments` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`, `llm-practical-foundations`와 채점용 `assignments` 영역만 표시합니다.
 
 ```text
 TIL/
@@ -169,10 +177,20 @@ TIL/
     │   └── README.md
     ├── 05-huggingface-hub-and-automodel/
     │   └── README.md
-    └── 06-text-classification-finetuning/
-        ├── README.md
-        ├── 01-data-quality-and-leakage-audit.ipynb
-        └── requirements.txt
+    ├── 06-text-classification-finetuning/
+    │   ├── README.md
+    │   ├── 01-data-quality-and-leakage-audit.ipynb
+    │   └── requirements.txt
+    ├── 07-prompt-engineering-and-peft/
+    │   └── README.md
+    └── 08-generation-and-chat-template/
+        └── README.md
+
+llm-practical-foundations/
+└── 01-logits-softmax-and-optimizers/
+    ├── README.md
+    ├── 01-logits-loss-diagnosis-starter.ipynb
+    └── requirements.txt
 
 assignments/
 ├── basic-math-assignment/
@@ -184,6 +202,20 @@ assignments/
 ```
 
 ## Latest Learning Log
+
+### Logits, Loss Functions, and Optimizers (Practice Pending)
+
+- 1-1강: logit vs probability 구분, softmax의 max trick(수치 안정성), `axis=-1` 배치 계산, stable log-softmax
+- 1-2강: 문제 유형(회귀/이진/다중 분류)별 MSE/BCE/Cross Entropy 선택 기준과 NumPy 구현, `np.clip`으로 BCE의 `log(0)` 방지
+- 2-1강: Gradient Descent 갱신식(`θ ← θ − η∇L`)과 선형 모델(`y=wx+b`) 직접 학습, learning rate가 너무 작거나 클 때의 현상 비교
+- 2-2강: SGD(현재 gradient만)·Momentum(velocity 누적)·Adam(1차+2차 모멘트) 차이와 같은 문제에서 loss curve 비교
+- `chapter01_starter.ipynb`(사내 LLM 출력 채점 통합 실습)를 오늘 시작했으나 TODO 1~3이 아직 `NotImplementedError` 상태로 미완료 — 주말로 이월
+
+### Prompt Engineering to PEFT, and Generation/Chat Template Theory
+
+- 8강(8-1,8-2,8-4,8-5강): Prompt-only→Prompt-tuning→PEFT→Full Fine-tuning 스펙트럼, Prompt-only baseline 4요소(평가셋/template/schema/metric), LoRA 저랭크 근사(`h=Wx+BAx`)와 `r`/`lora_alpha`/`target_modules`, Prompt-only vs Fine-tuned 공정 비교와 Regression 확인
+- 9강(9-1~9-5강): Forward pass vs `generate()` autoregressive loop, `max_length` vs `max_new_tokens`, Greedy vs Sampling vs Beam, Temperature/Top-k/Top-p, Chat message role(system/user/assistant)과 `apply_chat_template()`/`add_generation_prompt` 디버깅 흐름
+- 어제(8·9강) 이론만 정리, 실습 노트북은 아직 없음 — 주말로 이월
 
 ### Assignments: Basic Math and Deep Learning Fundamentals
 

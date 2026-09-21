@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Basics Chapter 9, 12, 13과 Deep Learning Advanced Chapter 1~8, LLM Practical Foundations Chapter 1까지의 실제 파일 구조와 학습 상태를 2026-09-10 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13, Deep Learning Advanced Chapter 1~8, LLM Practical Foundations Chapter 1, Data Engineering Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-21 기준으로 갱신했습니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -10,9 +10,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 
 - 과정: KANT Private LLM 엔지니어 교육과정
 - 현재 단계: Deep Learning Foundations
-- 현재 주제: Prompt Engineering→PEFT(LoRA), generate()·Chat Template, logits/손실함수/optimizer 기본기
-- 최근 진행: 8·9강(Prompt-PEFT, Generation/Chat Template) 이론 정리(실습 미착수, 어제), 딥러닝 실전 1·2장(Logits→Optimizer) 이론 정리 및 통합 실습 착수(오늘, 아직 TODO 미완료)
-- 복습 예정: 10-1 학습 곡선과 10-2 Overfitting·Underfitting 진단 (건강 문제로 미완료 상태 유지), 12-4 `loss_value` 미정의 셀 수정 예정, 5·6장·7-2~7-8·8·9강 실습, logits/optimizer 통합 실습 TODO 완성은 주말(2026-09-12~13) 예정
+- 현재 주제: 데이터 수집 방식 선택과 리스크 게이트, HTTP/API 호출과 인증, Pagination·Rate Limit과 원천 데이터 저장
+- 최근 진행: 데이터 엔지니어링 입문 1~3장 이론 정리, 1장·2장 통합 실습 완료(수집 계획 판단, 공개 API 요청·응답 검증)
+- 복습 예정: 데이터 엔지니어링 3장 실습(페이지네이션·저장), 10-1·10-2 학습 곡선과 과적합 진단, 12-4 `loss_value` 미정의 셀 수정, Deep Learning Advanced 5·6장·7-2~7-8·8·9강 실습, logits/optimizer 통합 실습 TODO 완성
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Basics Contents
@@ -51,9 +51,17 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | --- | --- | --- |
 | 1 | Logit/Softmax 수치 안정성, MSE/BCE/Cross Entropy, Gradient Descent, SGD/Momentum/Adam | Theory reviewed; practice notebook uploaded but TODOs unfilled (starter state) |
 
+## Data Engineering Contents
+
+| Chapter | Topics | Status |
+| --- | --- | --- |
+| 1 | 수집 경로 vs 데이터 형식, RAG/질문 시점 API/스냅샷 선택, 5단계 리스크 게이트, 가능·주의·제외 판단과 출처 기록 | Theory reviewed; practice completed |
+| 2 | HTTP 요청/응답 계약, URL·endpoint·method·header·query·body, 상태 코드, 환경 변수 인증, HTTPX Client, 실패 위치 5단계 | Theory reviewed; practice completed |
+| 3 | page/page_size, has_next 종료 신호, 429 재시도, 원본·가공 파일 분리, JSON/CSV 저장 옵션, 최소 수집 로그 | Theory reviewed; practice pending |
+
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`, `llm-practical-foundations`와 채점용 `assignments` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`, `llm-practical-foundations`, `data-engineering`과 채점용 `assignments` 영역만 표시합니다.
 
 ```text
 TIL/
@@ -192,6 +200,20 @@ llm-practical-foundations/
     ├── 01-logits-loss-diagnosis-starter.ipynb
     └── requirements.txt
 
+data-engineering/
+├── 01-collection-strategy-and-risk/
+│   ├── README.md
+│   ├── 01-collection-plan-and-risk-gate.ipynb
+│   └── requirements.txt
+├── 02-http-and-python-api-calls/
+│   ├── README.md
+│   ├── 01-public-api-request-and-validation.ipynb
+│   └── requirements.txt
+└── 03-pagination-and-raw-storage/
+    ├── README.md
+    ├── 01-pagination-and-collection-bundle.ipynb
+    └── requirements.txt
+
 assignments/
 ├── basic-math-assignment/
 │   ├── README.md
@@ -202,6 +224,15 @@ assignments/
 ```
 
 ## Latest Learning Log
+
+### Data Collection: Strategy, API Calls, and Raw Storage
+
+- 1장: 수집 경로(어디서 받는가)와 데이터 형식(어떤 구조인가)을 다른 축으로 구분, 갱신 주기·비용 기준으로 RAG/질문 시점 API/스냅샷 선택, 이용약관→robots.txt→개인정보→저작권→접근·부하 5단계 리스크 게이트
+- 1장 실습: 후보 4건을 `choose_route`/`judge_source`/`make_record`로 판단해 경로·상태·근거·확인일을 담은 `collection_plan.json` 생성 — 가능 2건, robots 미확인으로 주의 1건, 개인정보로 제외 1건
+- 2장: HTTP 요청·응답 계약, base URL과 endpoint 구분, header/query/body의 역할 차이, 상태 코드별 다음 행동, API 키를 환경 변수로 분리, HTTPX Client에 headers·params·timeout 지정
+- 2장 실습: 공개 API(JSONPlaceholder)에 `live` GET 요청으로 상태 200·글 2건 확인, `raise_for_status()` → Content-Type → 리스트/필수 키 순서로 응답 검증, `MockTransport`로 로컬 인증 헤더 연습(공개 클라이언트에는 키 미전달)
+- 3장: `has_next` 종료 신호로 page 반복, 429에서 page를 올리지 않고 같은 page 재시도, `append` 대신 `extend`로 전체 목록 병합, 원본(`raw_response.json`)과 가공(`items.json`/`items.csv`) 분리 보존, 로그에는 출처·시각·건수·상태만 남기고 키·개인정보 제외
+- 3장 실습은 solution 파일만 확보하고 아직 실행하지 못해 주말로 이월
 
 ### Logits, Loss Functions, and Optimizers (Practice Pending)
 

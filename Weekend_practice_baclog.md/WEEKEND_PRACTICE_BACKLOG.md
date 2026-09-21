@@ -1,16 +1,40 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-09-10 after Chapter 7-8 (8/9강) lecture notes and the start of the
-> Logits-to-Optimizer (LLM Practical Foundations) material.
+> Updated on 2026-09-21 after the Data Engineering (데이터 수집의 정석) Chapter 1-3 lectures
+> and practice.
 
-이번 주는 실습이 계속 밀리고 있습니다 — 5·6장은 아직 시작도 못 했고, 7-2~7-8도 그대로이며,
-어제(8·9강)와 오늘(logits/optimizer 1~2장) 이론만 정리한 채 실습은 손대지 못했습니다.
-`chapter01_starter.ipynb`는 오늘 열어봤지만 TODO 1~3이 전부 미완료 상태입니다. 다음
-주말(2026-09-12~13)에는 밀린 실습을 종류별로 나눠 순서대로 처리합니다. 체크박스는 강의를
-들었거나 자료를 받았다는 뜻이 아니라, **직접 실행하고 결과를 설명할 수 있는지**를 기준으로
-표시합니다.
+오늘은 데이터 엔지니어링 입문 1~3장 이론을 정리하고 1장·2장 통합 실습을 완료했습니다. 3장
+실습은 solution 파일을 받아 두었지만 아직 실행하지 못했습니다. 아래 1번 이후 항목(딥러닝
+심화 5·6장, 7-2~7-8, 8·9강 실습과 `chapter01_starter.ipynb` TODO)은 이번 자료에 포함되지
+않아 상태를 그대로 유지했습니다. 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
+**직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
 
-## 0. Latest Update: Chapter 7-8 (8/9강) and Logits-to-Optimizer Notes
+## 0. Latest Update: Data Engineering Chapters 1-3
+
+### Completed on 2026-09-21
+
+- [x] 1-1강 이론: 수집 경로 vs 데이터 형식, 다섯 가지 수집 후보 비교, 갱신 주기·비용 판단, RAG/질문 시점 API/스냅샷 선택
+- [x] 1-2강 이론: 기술적 접근과 이용 가능성 구분, 5단계 리스크 게이트, robots.txt·개인정보·저작권 확인, 가능/주의/제외 판단과 출처 기록
+- [x] 1장 실습: `choose_route`/`judge_source`/`make_record` 구현, 후보 4건 판단과 `collection_plan.json` 저장
+- [x] 2-1강 이론: HTTP 요청·응답 계약, URL·endpoint·method, header/query/body 구분, 상태 코드와 다음 행동, API 문서 여섯 가지 확인
+- [x] 2-2강 이론: API 키 환경 변수 분리, HTTPX Client와 headers·params·timeout, `raise_for_status()`, 실패 위치 5단계, MockTransport 재현
+- [x] 2장 실습: 공개 API `live` GET 요청(상태 200·글 2건), 응답 검증 3단계, 로컬 인증 헤더 연습
+- [x] 3-1강 이론: page/page_size, 마지막 페이지 신호 세 가지, page 반복 알고리즘, 429 대기 후 같은 page 재시도, 빈출 실수 5가지
+- [x] 3-2강 이론: 원본·가공 파일 분리, 필드 추출, JSON/CSV 저장 옵션, 파일·폴더 구조, 최소 수집 로그, 재현성 확인
+
+### Not Completed Today
+
+- [ ] 3장 통합 실습 실행 (`01-pagination-and-collection-bundle.ipynb`) — solution 파일은 확보, 셀 실행 기록 없음
+- [ ] 1~3장 확인문제 20문항(객관식 14 · 주관식 6) 풀이
+
+### Minimum Catch-Up Plan (2026-09-26~27)
+
+1. 3장 실습을 `sample` 모드로 먼저 실행해 정해진 결과(글 3건, ID 순서 `[101, 101, 102]`, 상태 `complete`, 429 재요청 메시지 1회)와 비교
+2. `live` 모드로 한 번 실행해 `complete`/`limited` 차이를 로그로 확인
+3. 저장된 네 파일(`raw_response.json`, `items.json`, `items.csv`, `collection_log.json`)의 열 순서·건수·한글 보존 확인
+4. 시간이 남으면 1~3장 확인문제로 이론 복습
+
+## 1. Latest Update: Chapter 7-8 (8/9강) and Logits-to-Optimizer Notes
 
 ### Completed this week (2026-09-09 ~ 09-10)
 
@@ -38,7 +62,7 @@
 4. 8강·9강 실습은 자료가 아직 없어 이번 주말 우선순위에서는 제외 — 자료 도착 시 별도로 진행
 5. 이틀 안에 다 못 끝내도 괜찮음 — 이번 주말은 완주보다 "밀린 항목을 더 늘리지 않는 것"이 목표
 
-## 1. Latest Update: Chapters 5-7 and Graded Assignments
+## 2. Latest Update: Chapters 5-7 and Graded Assignments
 
 ### Completed this week (2026-09-06 ~ 09-08)
 
@@ -70,7 +94,7 @@
 3. 7-2 → 7-3 → 7-5 → 7-6 → 7-7 → 7-8 순서대로 이어서 진행 (Trainer 파이프라인이 순차적으로 쌓이는 구조라 순서를 지키는 게 유리함)
 4. 이틀 안에 다 못 끝내면 7-2~7-3(데이터 파이프라인)까지만이라도 완료해 다음 주 실습과 이어지게 함
 
-## 2. Chapter 9 and 10
+## 3. Chapter 9 and 10
 
 ### Completed on 2026-08-27
 
@@ -104,7 +128,7 @@
 9장 심화는 필수 주말 과제가 아닙니다. 10장 기본 흐름과 기존 미완료 항목을 무리 없이 확인한 뒤
 시간이 남을 때만 진행합니다.
 
-## 3. Latest Deep Learning Progress
+## 4. Latest Deep Learning Progress
 
 ### Completed on 2026-08-26
 
@@ -147,7 +171,7 @@
 주말에는 개별 노트북을 처음부터 모두 다시 풀기보다 먼저 눈으로 살펴보면서,
 각 내용이 8-8의 어느 코드에 해당하는지 표시합니다. 시간이 남으면 `run_epoch()`를 재작성합니다.
 
-## 4. Questions and Newly Learned Points
+## 5. Questions and Newly Learned Points
 
 ### Python and PyTorch Syntax
 
@@ -186,7 +210,7 @@
 - [ ] `loss.item() * y.shape[0]`이 batch 합계를 복원하는 이유 설명
 - [ ] validation에서 gradient와 parameter update를 모두 막아야 하는 이유 설명
 
-## 5. Highest Priority: 8-1~8-7 Visual Review
+## 6. Highest Priority: 8-1~8-7 Visual Review
 
 ### First Pass: Match Each Lesson to 8-8
 
@@ -218,7 +242,7 @@
 - [ ] Validation Loss의 최소 index로 best epoch 선택
 - [ ] Test 평가 횟수가 1회인지 report에 기록
 
-## 6. Data Pipeline Reinforcement
+## 7. Data Pipeline Reinforcement
 
 - [ ] Train 통계와 validation 자체 통계로 정규화한 결과 비교
 - [ ] `unbiased=True`와 `False`의 표준편차 차이 확인
@@ -229,7 +253,7 @@
 - [ ] Evaluation loader에서 `drop_last=True`가 sample을 버리는 예제 재현
 - [ ] 첫 batch의 shape·dtype·device·finite 값을 출력하는 audit 함수 작성
 
-## 7. Carried Backlog
+## 8. Carried Backlog
 
 ### Autograd Reinforcement
 
@@ -269,26 +293,26 @@
 - [ ] Sampler와 preprocessing을 CV train fold 안에 두어 leakage 방지
 - [ ] End-to-end artifact schema guard를 참고 없이 재작성
 
-## 8. Next Weekend Order
+## 9. Next Weekend Order
 
-### Saturday, 2026-09-12
+### Saturday, 2026-09-26
 
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
-2. `chapter01_starter.ipynb` TODO 1~3 완성을 최우선으로 진행 (분량이 짧고 오늘 이론과 바로 연결됨)
-3. 가능하면 10-1 이론에서 train·validation 곡선의 역할 확인 (계속 이월 중)
-4. 여유가 있으면 5장 실습(Masked LM/Causal LM 관련) 착수
+2. 데이터 엔지니어링 3장 실습을 최우선으로 진행 (`sample` → `live` 순서, 분량이 짧고 이번 주 이론과 바로 연결됨)
+3. 저장된 네 파일의 열 순서·건수·한글 보존 확인
+4. 여유가 있으면 1~3장 확인문제 20문항으로 이론 복습
 5. 몸 상태가 좋지 않으면 여기서 종료
 
-### Sunday, 2026-09-13
+### Sunday, 2026-09-27
 
-1. 가능하면 10-2 이론에서 Overfitting·Underfitting 차이 확인 (계속 이월 중)
-2. 6장 실습(AutoModel/AutoTokenizer, 저장·재로드) 진행
-3. 시간이 남으면 7-2 → 7-3 순서로 실습 진행 (DatasetDict/Split → Tokenization/Collator)
+1. `chapter01_starter.ipynb`(logits/optimizer) TODO 1~3 완성 (계속 이월 중)
+2. 가능하면 10-1·10-2 이론에서 학습 곡선과 Overfitting·Underfitting 차이 확인 (계속 이월 중)
+3. 시간이 남으면 Deep Learning Advanced 5장 → 6장 실습 착수
 4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인 (계속 이월 중)
 5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
-6. 7-5 이후·8강·9강 실습·9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
+6. 7-2 이후·8강·9강 실습·9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
 
-## 9. Working Rule
+## 10. Working Rule
 
 각 문제는 정답을 보기 전에 다음 네 줄을 먼저 작성합니다.
 

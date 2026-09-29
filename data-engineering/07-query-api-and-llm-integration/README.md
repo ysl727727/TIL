@@ -1,0 +1,120 @@
+# Chapter 7: Query API 설계와 LLM 연동
+
+> 2026-09-29 기록(강의는 2026-09-23 수강). 7-1강(Query 요청/응답 구조와 context 설계), 7-2강(로컬/외부 LLM API 연동) 이론을 정리했습니다. 질문과 근거의 계약을 먼저 고정하고, 같은 자리에 mock·외부·로컬 모델을 갈아 끼우는 구조가 핵심입니다. 실습 파일은 아직 받지 못해 이론만 기록합니다.
+
+## Learning Goals
+
+- 질문 요청에서 `document_id`와 `context` 중 하나만 허용하는 규칙을 모델 수준에서 강제한다.
+- 근거 본문과 출처 목록을 함께 반환하는 `resolve_context()` 구조를 설명한다.
+- 프롬프트를 지시문 → 근거 → 질문 → 답변 자리 순서로 조립한다.
+- 응답에 답변뿐 아니라 출처와 provider를 함께 담아야 하는 이유를 설명한다.
+- 환경 변수 하나로 mock / 외부 API / 로컬 모델을 전환하는 구조를 만든다.
+- 외부 호출 실패를 우리 API의 상태 코드(422·404·502·503)로 옮긴다.
+
+## Practice Files
+
+| Lesson | File | Practice status |
+| --- | --- | --- |
+| 7장 통합 | — | **자료 미수령** — 강의 교안만 받았고 실습 노트북이 없어 이론 정리만 진행 |
+
+## Core Theory
+
+### 1. 질문 요청의 계약
+
+```python
+class QueryRequest(BaseModel):
+    question: str = Field(min_length=1)
+    document_id: str | None = None
+    context: str | None = None
+```
+
+근거를 주는 방법은 두 가지다 — 이미 등록된 문서를 `document_id`로 가리키거나, 본문을 `context`로 직접 넣는 것.
+
+**둘 다 보내거나 둘 다 비우는 요청은 거부한다.** 둘 다 오면 어느 쪽을 근거로 삼았는지 응답만 보고 알 수 없고, 둘 다 없으면 모델이 아무 근거 없이 답하게 된다. 이 규칙은 두 필드를 함께 봐야 하므로 `@model_validator(mode="after")`에서 검사하고, 위반 시 422가 된다.
+
+### 2. `resolve_context()` — 근거와 출처를 함께 돌려주기
+
+```python
+def resolve_context(request: QueryRequest) -> tuple[str, list[str]]:
+    if request.document_id:
+        document = DOCUMENTS.get(request.document_id)
+        if document is None:
+            raise HTTPException(status_code=404, detail="document not found")
+        return document["content"], [request.document_id]
+    return request.context, ["inline-context"]
+```
+
+반환값을 본문 하나로 두지 않고 **(본문, 출처 목록)** 으로 둔다. 출처를 함께 들고 다녀야 응답에서 "이 답이 무엇을 보고 나왔는지"를 그대로 적을 수 있다.
+
+`document_id`가 형식은 맞지만 저장소에 없으면 404다(422가 아니다). 형식 위반은 모델 검증에서 이미 걸러졌다.
+
+### 3. 프롬프트 조립 순서
+
+```python
+def build_prompt(context: str, question: str) -> str:
+    return (
+        "아래 [근거]만 사용해 답하세요. 근거에 없으면 모른다고 답하세요.\n\n"
+        f"[근거]\n{context}\n\n"
+        f"[질문]\n{question}\n\n"
+        "[답변]\n"
+    )
+```
+
+- **지시문 먼저**: 무엇을 해도 되고 안 되는지를 근거보다 앞에 둔다.
+- **근거 다음, 질문 그다음**: 질문이 근거 뒤에 있어야 모델이 방금 읽은 내용에 이어서 답하기 쉽다.
+- **`[답변]` 자리로 끝**: 모델이 이어서 쓸 위치를 명시한다.
+
+근거와 질문을 구분 없이 한 덩어리로 넣으면 질문 문장이 근거의 일부처럼 읽힐 수 있다. 대괄호 라벨은 사람을 위한 것이 아니라 경계를 만들기 위한 것이다.
+
+### 4. 응답 계약
+
+```python
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[str]
+    provider: str
+```
+
+`answer`만 돌려주면 같은 질문에 대한 두 응답의 차이(어떤 근거였는지, 어떤 모델이었는지)를 나중에 재현할 수 없다. `provider`는 mock으로 만든 답을 실제 모델 답으로 착각하는 것을 막아 준다.
+
+### 5. 세 가지 모드 전환
+
+```python
+LLM_MODE = os.getenv("LLM_MODE", "mock")   # mock | external | ollama
+```
+
+| 모드 | 용도 | 특징 |
+| --- | --- | --- |
+| `mock` | 기본값. 구조 검증 | 네트워크·비용 없음, 결과 고정 |
+| `external` | 외부 LLM API | 인증 필요, 비용 발생 |
+| `ollama` | 로컬 모델 | 로컬 서버가 떠 있어야 함 |
+
+**기본값을 `mock`으로 두는 것이 핵심**이다. 테스트와 CI에서 키 없이 전체 흐름이 돌고, 키가 있을 때만 실제 호출로 바뀐다. 호출부는 하나로 유지하고 내부에서 분기하므로 프롬프트·응답 계약은 세 모드에서 동일하다.
+
+### 6. 외부 호출과 인증
+
+```python
+headers = {"Authorization": f"Bearer {api_key}"}
+```
+
+키는 **header에만** 넣는다. query string에 넣으면 서버 접근 로그·브라우저 기록·중간 프록시에 그대로 남는다. 키 자체는 환경 변수에서 읽고 코드·노트북·실행 결과에 적지 않는다.
+
+Ollama 응답은 본문 구조가 달라 답변 본문을 `data["message"]["content"]`에서 꺼낸다. 모드마다 다른 것은 **응답 파싱 위치**뿐이고, 그 뒤 `QueryResponse`로 맞춰 넣는 지점은 공통이다.
+
+### 7. 외부 실패를 우리 상태 코드로 옮기기
+
+| 상황 | 우리 API 응답 |
+| --- | --- |
+| 요청 JSON이 계약 위반(둘 다 보냄/둘 다 없음 등) | 422 |
+| `document_id`가 저장소에 없음 | 404 |
+| 외부 LLM이 오류를 반환하거나 응답 형식이 깨짐 | 502 |
+| 외부 LLM에 연결할 수 없음 / 준비되지 않음 | 503 |
+
+외부 서비스의 상태 코드를 그대로 흘려보내지 않는다. 호출하는 쪽에게 401이 나가면 "우리 API 인증이 틀렸다"로 오해된다. **외부 문제는 502·503으로 바꾸고, 원래 코드는 로그에만 남긴다.**
+
+## Questions and Newly Learned Points
+
+- "근거를 주는 방법이 두 가지면 편하지 않나"라고 생각했는데, 두 개를 동시에 허용하는 순간 응답만으로는 무엇을 봤는지 알 수 없게 된다는 점이 명확했다.
+- `resolve_context`가 출처까지 반환하도록 만든 덕분에 응답 모델에 `sources`를 채우는 코드가 한 줄로 끝났다 — 반환값을 어떻게 설계하느냐가 뒤 코드 분량을 정한다.
+- mock을 "테스트용 임시"가 아니라 **기본 모드**로 두는 발상이 새로웠다. 키가 없어도 전체 경로가 돌아가니 구조 문제를 먼저 잡을 수 있다.
+- 자주 하는 오해: "키는 query로 보내도 HTTPS면 안전하다"(로그에 남는다) / "외부 오류 코드는 그대로 전달하는 게 투명하다"(호출자가 우리 API 문제로 오해한다) / "프롬프트 순서는 취향이다"(경계가 없으면 질문이 근거에 섞인다) / "답변 문자열만 있으면 충분하다"(재현과 인용이 불가능하다).

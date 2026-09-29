@@ -1,6 +1,6 @@
 # TIL: Private LLM Engineer Journey
 
-> Deep Learning Basics Chapter 9, 12, 13, Deep Learning Advanced Chapter 1~8, LLM Practical Foundations Chapter 1, Data Engineering Chapter 1~3까지의 실제 파일 구조와 학습 상태를 2026-09-21 기준으로 갱신했습니다.
+> Deep Learning Basics Chapter 9, 12, 13, Deep Learning Advanced Chapter 1~8, LLM Practical Foundations Chapter 1·10, Data Engineering Chapter 1~8, LangChain Chapter 1~2, Python Basics까지의 실제 파일 구조와 학습 상태를 2026-09-29 기준으로 갱신했습니다. 밀린 3회차(9/22, 9/23, 9/29) 분량을 한 번에 정리한 기록입니다.
 
 KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 내용을 기록하는 저장소입니다.
 강의 원문을 옮기기보다 무엇을 이해했고, 코드로 무엇을 검증했으며,
@@ -9,10 +9,10 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 ## Current Status
 
 - 과정: KANT Private LLM 엔지니어 교육과정
-- 현재 단계: Deep Learning Foundations
-- 현재 주제: 데이터 수집 방식 선택과 리스크 게이트, HTTP/API 호출과 인증, Pagination·Rate Limit과 원천 데이터 저장
-- 최근 진행: 데이터 엔지니어링 입문 1~3장 이론 정리, 1장·2장 통합 실습 완료(수집 계획 판단, 공개 API 요청·응답 검증)
-- 복습 예정: 데이터 엔지니어링 3장 실습(페이지네이션·저장), 10-1·10-2 학습 곡선과 과적합 진단, 12-4 `loss_value` 미정의 셀 수정, Deep Learning Advanced 5·6장·7-2~7-8·8·9강 실습, logits/optimizer 통합 실습 TODO 완성
+- 현재 단계: Data Engineering → LLM Application
+- 현재 주제: 데이터 정제와 RAG 문서셋, FastAPI 서버와 Pydantic 스키마, Query API의 LLM 연동, 비동기 호출과 안정성, LangChain 기본 구조(Prompt·Model·Parser)
+- 최근 진행: 밀린 3회차 정리 — 데이터 엔지니어링 4~8장 이론, LLM 실전 10-1강(보강) 이론, LangChain 1~2장 이론, Python 보강 드릴 3종 실행
+- 복습 예정: LangChain 1장 통합 실습 TODO 1~3, 데이터 엔지니어링 3장 실습(페이지네이션·저장), 4~8장 실습(자료 도착 시), LLM 실전 2~9장, 딥러닝 기초 10-1·10-2 학습 곡선과 과적합 진단, 12-4 `loss_value` 미정의 셀 수정, Deep Learning Advanced 5·6장·7-2~7-8·8·9강 실습, logits/optimizer 통합 실습 TODO 완성
 - 목표: 평가와 운영까지 고려하는 LLM 엔지니어
 
 ## Deep Learning Basics Contents
@@ -50,6 +50,9 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | Chapter | Topics | Status |
 | --- | --- | --- |
 | 1 | Logit/Softmax 수치 안정성, MSE/BCE/Cross Entropy, Gradient Descent, SGD/Momentum/Adam | Theory reviewed; practice notebook uploaded but TODOs unfilled (starter state) |
+| 10 | 재시도 가능/불가 오류 분류, SDK 기본 retry와 timeout, Exponential Backoff + Full Jitter, Fallback Ladder, Responses API wrapper | Theory reviewed (밀린 강의 보강); practice file not provided |
+
+> 2~9장(Attention/MHA NumPy 실습, LLM Alignment·RLHF, LLM API 구조와 Prompt 설계, 프롬프트 실험 설계, Structured Output, Tool Calling, 멀티모달)은 아직 수강 전입니다. 10장 1강만 먼저 보강으로 진행했습니다.
 
 ## Data Engineering Contents
 
@@ -58,10 +61,28 @@ KANT Private LLM 엔지니어 교육과정에서 학습하고 직접 실험한 �
 | 1 | 수집 경로 vs 데이터 형식, RAG/질문 시점 API/스냅샷 선택, 5단계 리스크 게이트, 가능·주의·제외 판단과 출처 기록 | Theory reviewed; practice completed |
 | 2 | HTTP 요청/응답 계약, URL·endpoint·method·header·query·body, 상태 코드, 환경 변수 인증, HTTPX Client, 실패 위치 5단계 | Theory reviewed; practice completed |
 | 3 | page/page_size, has_next 종료 신호, 429 재시도, 원본·가공 파일 분리, JSON/CSV 저장 옵션, 최소 수집 로그 | Theory reviewed; practice pending |
+| 4 | 결측·중복·HTML·공백·날짜 정제, 정제 순서와 집계 등식, RAG 문서 3부 계약(`document_id`/`content`/`metadata`), ID 생성 규칙 | Theory reviewed; practice file not provided |
+| 5 | FastAPI vs Uvicorn 역할, REST 자원·method, path/query/body, `Query` 범위 검증, 404 vs 422, `TestClient` | Theory reviewed; practice file not provided |
+| 6 | Pydantic `BaseModel`·`Field`·`ConfigDict`, `field_validator`/`model_validator`, `ValidationError` 읽기, 요청·응답 모델 분리, 201/404/409/422 | Theory reviewed; practice file not provided |
+| 7 | Query 요청 계약(`document_id` xor `context`), `resolve_context`, 프롬프트 조립 순서, mock/external/ollama 모드 전환, 외부 실패의 502·503 변환 | Theory reviewed; practice file not provided |
+| 8 | `async`/`await`, `httpx.AsyncClient` 공유, `asyncio.gather` 입력 순서, 단계별 timeout, 제한된 재시도, 502 변환과 요청 로그 middleware | Theory reviewed; practice file not provided |
+
+## LangChain Contents
+
+| Chapter | Topics | Status |
+| --- | --- | --- |
+| 1 | OpenAI SDK 직접 호출 vs LangChain, Prompt→Model→Parser 3단계, `AIMessage`, 패키지 역할 분리, uv + Python 3.12 환경, `.env` 키 관리 | Theory reviewed; practice notebook uploaded but TODOs unfilled (starter state) |
+| 2 | `PromptTemplate`·`ChatPromptTemplate`, 입력 변수와 역할 분리, `StrOutputParser`/List Parser/JSON Parser, 형식 안내와 결과 검사 | Theory reviewed; practice file not provided |
+
+## Python Basics (보강) Contents
+
+| Chapter | Topics | Status |
+| --- | --- | --- |
+| 1 | 변수·자료형·f-string, 비교 체이닝, `if`/`elif`/중첩 조건문, 리스트 메서드(`extend`/`append`/`remove`/`pop`/`sort`), `dict.update`/`keys`, 중첩 반복문 | Practice completed |
 
 ## Repository Structure
 
-아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`, `llm-practical-foundations`, `data-engineering`과 채점용 `assignments` 영역만 표시합니다.
+아래 구조에는 현재 학습 중심인 `deep-learning-basics`, `deep-learning-advanced`, `llm-practical-foundations`, `data-engineering`, `langchain`, `python-basics`와 채점용 `assignments` 영역만 표시합니다.
 
 ```text
 TIL/
@@ -195,10 +216,12 @@ TIL/
         └── README.md
 
 llm-practical-foundations/
-└── 01-logits-softmax-and-optimizers/
-    ├── README.md
-    ├── 01-logits-loss-diagnosis-starter.ipynb
-    └── requirements.txt
+├── 01-logits-softmax-and-optimizers/
+│   ├── README.md
+│   ├── 01-logits-loss-diagnosis-starter.ipynb
+│   └── requirements.txt
+└── 10-stable-llm-api-calls/
+    └── README.md
 
 data-engineering/
 ├── 01-collection-strategy-and-risk/
@@ -209,10 +232,35 @@ data-engineering/
 │   ├── README.md
 │   ├── 01-public-api-request-and-validation.ipynb
 │   └── requirements.txt
-└── 03-pagination-and-raw-storage/
+├── 03-pagination-and-raw-storage/
+│   ├── README.md
+│   ├── 01-pagination-and-collection-bundle.ipynb
+│   └── requirements.txt
+├── 04-data-cleaning-and-rag-documents/
+│   └── README.md
+├── 05-fastapi-server-and-request-response/
+│   └── README.md
+├── 06-pydantic-schema-and-document-api/
+│   └── README.md
+├── 07-query-api-and-llm-integration/
+│   └── README.md
+└── 08-async-calls-and-stability/
+    └── README.md
+
+langchain/
+├── 01-app-structure-and-environment/
+│   ├── README.md
+│   ├── 01-direct-call-vs-langchain-starter.ipynb
+│   └── requirements.txt
+└── 02-prompt-template-and-output-parser/
+    └── README.md
+
+python-basics/
+└── 01-syntax-conditionals-collections/
     ├── README.md
-    ├── 01-pagination-and-collection-bundle.ipynb
-    └── requirements.txt
+    ├── 01-variables-types-and-fstrings.py
+    ├── 02-conditionals-and-list-methods.py
+    └── 03-dict-methods-and-nested-loops.py
 
 assignments/
 ├── basic-math-assignment/
@@ -224,6 +272,42 @@ assignments/
 ```
 
 ## Latest Learning Log
+
+### LangChain Basics and Python Drills (2026-09-29)
+
+- LangChain 1-1강: OpenAI SDK 직접 호출은 입력 준비·모델 실행·출력 정리를 한 함수가 모두 맡고, LangChain은 같은 일을 `Prompt → Model → Parser` 세 역할로 나눔 — 모델이 같으므로 답변 품질이 아니라 **코드 구성 방식**이 달라짐
+- `model.invoke()`의 반환값은 문자열이 아니라 `AIMessage`이며, 본문만 쓰려면 Parser를 붙여야 함. OpenAI의 `user`와 LangChain의 `human`은 같은 자리
+- 선택 기준: 프롬프트가 여러 개인가 / 모델·출력 형식을 교체할 가능성이 있는가 / Retriever·Memory를 연결할 계획인가 — 대부분 "예"면 LangChain, 단발 호출이면 직접 SDK
+- LangChain 1-2강: `langchain-core`(공통 규격) / `langchain-openai`(OpenAI 어댑터) / `langchain`(상위 기능) 역할 분리, 설치 이름의 하이픈과 import의 언더스코어 차이, uv `sync --locked --python 3.12` 환경 구성과 `.venv` 인터프리터 선택
+- `.env`로 키 분리 + `.gitignore`(`.env`, `.venv/`, `__pycache__/`) — `.gitignore`는 앞으로의 추적만 막을 뿐 이미 올라간 키를 무효화하지 않음
+- LangChain 2-1강: `PromptTemplate.format()`은 문자열, `ChatPromptTemplate.format_messages()`는 역할별 메시지 목록을 반환. 중괄호를 문자로 남기려면 `{{ }}`
+- LangChain 2-2강: `StrOutputParser`/`CommaSeparatedListOutputParser`/`JsonOutputParser`의 결과 자료형 차이, Parser는 형식을 **강제**하지 않고 `get_format_instructions()`를 Prompt에 넣는 단계가 따로 필요, JSON은 자료형→키→값 순서로 검사
+- `langchain_chapter01_starter.ipynb`(같은 사내 질문을 두 방식으로 처리) 확보했으나 TODO 1~3이 `NotImplementedError` 상태로 **미완료** — 주말로 이월
+- Python 기초 드릴 3종 직접 실행: 비교 체이닝과 `True == 1`, `append`/`extend`·`remove`/`pop`의 "값이냐 위치냐" 구분, 리스트 메서드가 제자리 수정이라 `None`을 반환한다는 점, 중첩 반복에서 안쪽 범위를 `len(matrix[i])`로 두어야 안전하다는 점
+
+### Data Engineering: Query API, Async Calls, and API Stability (2026-09-23)
+
+- 7-1강: 질문 요청에서 `document_id`와 `context` 중 **하나만** 허용 — 둘 다 오면 무엇을 근거로 답했는지 알 수 없고, 둘 다 없으면 근거 없는 답이 됨(`model_validator`로 검사 → 422)
+- 7-1강: `resolve_context()`가 (본문, 출처 목록)을 함께 반환하도록 설계하면 응답의 `sources`를 채우는 코드가 한 줄로 끝남. 프롬프트는 지시문 → `[근거]` → `[질문]` → `[답변]` 순서로 경계를 만들어 조립
+- 7-2강: `LLM_MODE` 환경 변수로 mock / external / ollama 전환, **기본값을 mock**으로 두어 키 없이 전체 흐름 검증. 키는 `Authorization: Bearer` header에만, Ollama는 `data["message"]["content"]`에서 본문 추출
+- 7-2강: 외부 실패를 그대로 흘리지 않고 422(계약 위반) / 404(문서 없음) / 502(외부 오류·형식 깨짐) / 503(연결 불가)로 우리 API 코드로 변환
+- 8-1강: 비동기는 **대기 시간이 겹칠 때만** 빨라짐. `httpx.AsyncClient`를 `async with`로 한 번만 만들어 공유, `response.json()`은 `await` 대상이 아님, `asyncio.gather()`의 결과는 완료 순서가 아니라 **입력 순서**
+- 8-2강: `timeout=2.0`은 전체가 아니라 connect/read/write/pool **단계별** 최대 시간. `for attempt in range(2)`는 최초 1회 + 재시도 1회 = 총 2회 호출
+- 8-2강: 재시도는 timeout과 5xx만, 4xx(429 포함)는 즉시 실패. `httpx.TimeoutException`이 `RequestError`의 하위 클래스라 **먼저 잡지 않으면 재시도가 사라짐**
+- 8-2강: `ExternalServiceError(RuntimeError)`로 좁힌 뒤 경계에서 `HTTPException(502)`로 변환, `@app.middleware("http")`는 `call_next()` 결과를 반드시 반환하고 method·path·status 세 가지만 기록
+- LLM 실전 10-1강(밀려 있던 강의를 보강으로 진행): 재시도 계층을 겹치면 SDK 3회 × 앱 3회 × Tool 3회 = 최대 27회까지 늘어남 — retry 책임을 한 계층에만 모으고 `OpenAI(max_retries=0)`로 명시. Full Jitter(`Uniform(0, min(cap, base×2^a))`)와 fallback ladder(기본 모델 → 재시도 → 단순 Prompt → 대체 모델 → 캐시·기능 축소 → 사람)까지 정리
+
+### Data Engineering: Cleaning, FastAPI, and Pydantic (2026-09-22)
+
+- 4강: 정제는 원본을 덮어쓰지 않고 별도 산출물을 만드는 일. 텍스트는 `html.unescape()` → `re.sub(r"<[^>]+>", " ", …)` → `" ".join(split())` 순서를 지켜야 이스케이프된 태그와 붙어 버리는 문장 문제를 함께 해결
+- 4강: 중복은 `set`으로 판정하고, `입력 = 정상 + 중복 제외 + 규칙 제외` 등식이 맞는지로 정제 코드를 1차 검증. RAG 문서는 `document_id`/`content`/`metadata` 세 부분으로 고정하고 출처·날짜를 본문에 섞지 않음
+- 4강: `make_document_id`는 허용 문자만 남기고 `-`로 치환 → `strip("-")` → `lower()` → `doc-news-001` 형태. 출처가 여럿이면 원본 ID끼리 충돌할 수 있어 출처를 ID에 포함
+- 5강: FastAPI는 경로·함수를 **선언**하고 Uvicorn이 포트를 열어 **실행** — 코드에 포트가 없는 이유. 경로는 자원(명사), 동작은 method
+- 5강: path(자원 특정) / query(거르거나 자르기) / body(구조화된 입력) 구분, `Query(default=30, ge=5, le=100)`로 규칙을 선언하면 `/openapi.json`에 그대로 노출. 422는 형식 위반(함수 진입 전), 404는 형식은 맞고 자원이 없음
+- 6강: `Field(min_length/max_length)`, list 기본값은 `default_factory=list`(가변 기본값 공유 방지), list의 `max_length`는 **원소 수**. `ConfigDict(str_strip_whitespace=True, extra="forbid")`로 공백 차이와 오타 키를 차단
+- 6강: `@field_validator(..., mode="before")`는 타입 변환 전 필드 하나, `@model_validator(mode="after")`는 전부 채워진 뒤 모델 전체이며 `self`를 반환해야 함. `ValidationError.errors()`의 `loc`·`type`으로 원인 분류
+- 6강: 요청 모델과 응답 모델을 분리하고 `response_model`로 응답 필드를 고정, 201/404/409/422를 구분. 메모리 저장소 `DOCUMENTS`와 보조 인덱스 `SOURCE_INDEX`는 항상 함께 갱신·초기화
+- 4~8강 모두 **강의 교안만 수령**하고 실습 파일이 없어 이론 정리만 진행
 
 ### Data Collection: Strategy, API Calls, and Raw Storage
 

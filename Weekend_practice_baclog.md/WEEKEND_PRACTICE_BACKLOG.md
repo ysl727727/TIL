@@ -1,15 +1,50 @@
 # Weekend Practice Backlog
 
-> Updated on 2026-09-21 after the Data Engineering (데이터 수집의 정석) Chapter 1-3 lectures
-> and practice.
+> Updated on 2026-09-29 after catching up on three backlogged sessions —
+> Data Engineering Chapter 4-8, LLM Practical Foundations Chapter 10-1 (catch-up), and LangChain Chapter 1-2.
 
-오늘은 데이터 엔지니어링 입문 1~3장 이론을 정리하고 1장·2장 통합 실습을 완료했습니다. 3장
-실습은 solution 파일을 받아 두었지만 아직 실행하지 못했습니다. 아래 1번 이후 항목(딥러닝
-심화 5·6장, 7-2~7-8, 8·9강 실습과 `chapter01_starter.ipynb` TODO)은 이번 자료에 포함되지
-않아 상태를 그대로 유지했습니다. 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
+밀려 있던 세 회차(9/22, 9/23, 9/29)를 한 번에 정리했습니다. 이번 구간은 **강의 교안은 받았지만
+실습 파일이 거의 없는 상태**라 이론 정리 비중이 큽니다. 실습이 존재하는 항목은 LangChain 1장
+통합 실습 하나이며 아직 TODO가 비어 있습니다. 아래 2번 이후 항목은 이번 자료에 포함되지 않아
+상태를 그대로 유지했습니다. 체크박스는 강의를 들었거나 자료를 받았다는 뜻이 아니라,
 **직접 실행하고 결과를 설명할 수 있는지**를 기준으로 표시합니다.
 
-## 0. Latest Update: Data Engineering Chapters 1-3
+## 0. Latest Update: Data Engineering 4-8, LLM Practical Foundations 10-1, LangChain 1-2
+
+### Completed on 2026-09-22 ~ 09-29
+
+- [x] 4강 이론: 결측·중복·HTML·공백·날짜 다섯 문제, 정제 순서(엔티티→태그→공백), `set` 중복 판정과 집계 등식, RAG 문서 3부 계약과 `document_id` 생성 규칙
+- [x] 5강 이론: FastAPI/Uvicorn 역할 분리, 자원·method 기반 경로, path/query/body 구분, `Query` 범위 선언, 404 vs 422, `TestClient`와 `/health`
+- [x] 6강 이론: `BaseModel`·`Field`·`ConfigDict`, `default_factory=list`, `field_validator`/`model_validator`, `ValidationError.errors()`의 `loc`·`type`, 요청·응답 모델 분리, 201/404/409/422
+- [x] 7-1강 이론: `document_id` xor `context` 규칙, `resolve_context()`의 (본문, 출처) 반환, 프롬프트 조립 순서, 응답에 `sources`·`provider` 포함
+- [x] 7-2강 이론: `LLM_MODE` 기반 mock/external/ollama 전환, Bearer header 인증, 외부 실패의 502·503 변환
+- [x] 8-1강 이론: `async`/`await`/`asyncio.run()`, `AsyncClient` 공유, `gather`의 입력 순서 보장
+- [x] 8-2강 이론: 단계별 timeout, 최대 2회 호출 재시도, 429 즉시 실패, `TimeoutException`을 먼저 잡아야 하는 이유, 502 변환과 요청 로그 middleware
+- [x] LLM 실전 10-1강 이론(밀렸던 강의 보강): 오류 분류표, SDK 기본 retry와 계층 중첩(최대 27회), Full Jitter backoff, fallback ladder, Responses API wrapper 구조
+- [x] LangChain 1-1강 이론: 직접 호출 vs LangChain, Prompt→Model→Parser, `AIMessage`, 선택 기준
+- [x] LangChain 1-2강 이론: 패키지 역할 분리, uv + Python 3.12 환경, `.env`/`.gitignore` 키 관리, `ChatOpenAI` 기본 호출
+- [x] LangChain 2-1강 이론: `PromptTemplate` vs `ChatPromptTemplate`, `input_variables`, 중괄호 이스케이프
+- [x] LangChain 2-2강 이론: 단계별 자료형, `StrOutputParser`/List/JSON Parser, 형식 안내와 결과 검사 순서
+- [x] Python 보강 자료 3종 직접 실행 (변수·자료형, 조건문·리스트 메서드, 딕셔너리·중첩 반복)
+
+### Not Completed
+
+- [ ] LangChain 1장 통합 실습 TODO 1~3 (`01-direct-call-vs-langchain-starter.ipynb`) — `ask_direct` / `ask_langchain` / `check_answers` 모두 `NotImplementedError` 상태, 실행 기록 없음
+- [ ] 데이터 엔지니어링 4~8장 실습 — **실습 파일 미수령**. 자료가 오면 진행
+- [ ] LangChain 2장 실습(`실습.py`) — 자료 미수령
+- [ ] LLM 실전 10-1강 로컬 retry 함수 / Responses API wrapper 직접 구현
+- [ ] LLM 실전 2~9장 (Attention NumPy 실습 → RLHF 개요 → LLM API 구조 → 프롬프트 실험 설계 → Structured Output → Tool Calling → 멀티모달) — 10장보다 앞선 구간이 통째로 밀려 있음
+- [ ] 4~8강 확인문제 풀이
+
+### Minimum Catch-Up Plan (2026-10-03~04)
+
+1. LangChain 1장 TODO 1~3 완성 — 이번 구간에서 **유일하게 실행 가능한 실습**이므로 최우선
+2. 1-2강 환경 설정을 실제로 마치고(`uv sync --locked --python 3.12`, `.venv` 선택, `.env` 생성) `ChatOpenAI` 한 번 호출까지 확인
+3. LLM 실전 10-1강 로컬 retry 함수(`calculate_backoff_seconds` + `retry_call` + 가짜 `flaky_operation`)를 API 없이 직접 작성 — 비용이 들지 않고 이론 확인에 가장 효과적
+4. 남은 시간에 데이터 엔지니어링 3장 실습(계속 이월 중)
+5. 실습 파일이 없는 4~8강은 이번 주말 목표에서 제외 — 자료 도착 시 별도 진행
+
+## 1. Latest Update: Data Engineering Chapters 1-3
 
 ### Completed on 2026-09-21
 
@@ -34,7 +69,7 @@
 3. 저장된 네 파일(`raw_response.json`, `items.json`, `items.csv`, `collection_log.json`)의 열 순서·건수·한글 보존 확인
 4. 시간이 남으면 1~3장 확인문제로 이론 복습
 
-## 1. Latest Update: Chapter 7-8 (8/9강) and Logits-to-Optimizer Notes
+## 2. Latest Update: Chapter 7-8 (8/9강) and Logits-to-Optimizer Notes
 
 ### Completed this week (2026-09-09 ~ 09-10)
 
@@ -62,7 +97,7 @@
 4. 8강·9강 실습은 자료가 아직 없어 이번 주말 우선순위에서는 제외 — 자료 도착 시 별도로 진행
 5. 이틀 안에 다 못 끝내도 괜찮음 — 이번 주말은 완주보다 "밀린 항목을 더 늘리지 않는 것"이 목표
 
-## 2. Latest Update: Chapters 5-7 and Graded Assignments
+## 3. Latest Update: Chapters 5-7 and Graded Assignments
 
 ### Completed this week (2026-09-06 ~ 09-08)
 
@@ -94,7 +129,7 @@
 3. 7-2 → 7-3 → 7-5 → 7-6 → 7-7 → 7-8 순서대로 이어서 진행 (Trainer 파이프라인이 순차적으로 쌓이는 구조라 순서를 지키는 게 유리함)
 4. 이틀 안에 다 못 끝내면 7-2~7-3(데이터 파이프라인)까지만이라도 완료해 다음 주 실습과 이어지게 함
 
-## 3. Chapter 9 and 10
+## 4. Chapter 9 and 10
 
 ### Completed on 2026-08-27
 
@@ -128,7 +163,7 @@
 9장 심화는 필수 주말 과제가 아닙니다. 10장 기본 흐름과 기존 미완료 항목을 무리 없이 확인한 뒤
 시간이 남을 때만 진행합니다.
 
-## 4. Latest Deep Learning Progress
+## 5. Latest Deep Learning Progress
 
 ### Completed on 2026-08-26
 
@@ -171,7 +206,7 @@
 주말에는 개별 노트북을 처음부터 모두 다시 풀기보다 먼저 눈으로 살펴보면서,
 각 내용이 8-8의 어느 코드에 해당하는지 표시합니다. 시간이 남으면 `run_epoch()`를 재작성합니다.
 
-## 5. Questions and Newly Learned Points
+## 6. Questions and Newly Learned Points
 
 ### Python and PyTorch Syntax
 
@@ -210,7 +245,7 @@
 - [ ] `loss.item() * y.shape[0]`이 batch 합계를 복원하는 이유 설명
 - [ ] validation에서 gradient와 parameter update를 모두 막아야 하는 이유 설명
 
-## 6. Highest Priority: 8-1~8-7 Visual Review
+## 7. Highest Priority: 8-1~8-7 Visual Review
 
 ### First Pass: Match Each Lesson to 8-8
 
@@ -242,7 +277,7 @@
 - [ ] Validation Loss의 최소 index로 best epoch 선택
 - [ ] Test 평가 횟수가 1회인지 report에 기록
 
-## 7. Data Pipeline Reinforcement
+## 8. Data Pipeline Reinforcement
 
 - [ ] Train 통계와 validation 자체 통계로 정규화한 결과 비교
 - [ ] `unbiased=True`와 `False`의 표준편차 차이 확인
@@ -253,7 +288,7 @@
 - [ ] Evaluation loader에서 `drop_last=True`가 sample을 버리는 예제 재현
 - [ ] 첫 batch의 shape·dtype·device·finite 값을 출력하는 audit 함수 작성
 
-## 8. Carried Backlog
+## 9. Carried Backlog
 
 ### Autograd Reinforcement
 
@@ -293,26 +328,29 @@
 - [ ] Sampler와 preprocessing을 CV train fold 안에 두어 leakage 방지
 - [ ] End-to-end artifact schema guard를 참고 없이 재작성
 
-## 9. Next Weekend Order
+## 10. Next Weekend Order
 
-### Saturday, 2026-09-26
+### Saturday, 2026-10-03
 
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
-2. 데이터 엔지니어링 3장 실습을 최우선으로 진행 (`sample` → `live` 순서, 분량이 짧고 이번 주 이론과 바로 연결됨)
-3. 저장된 네 파일의 열 순서·건수·한글 보존 확인
-4. 여유가 있으면 1~3장 확인문제 20문항으로 이론 복습
+2. LangChain 1-2강 환경 설정을 실제로 완료 (`uv sync --locked --python 3.12` → `.venv` 인터프리터 선택 → `.env` 생성 → `ChatOpenAI` 1회 호출)
+3. 이어서 LangChain 1장 통합 실습 TODO 1~3 완성 — 두 호출 방식의 답변과 `check_answers` 결과까지 확인
+4. 여유가 있으면 LLM 실전 10-1강 로컬 retry 함수를 API 없이 직접 작성 (`calculate_backoff_seconds` → `retry_call` → 가짜 `flaky_operation`)
 5. 몸 상태가 좋지 않으면 여기서 종료
 
-### Sunday, 2026-09-27
+### Sunday, 2026-10-04
 
-1. `chapter01_starter.ipynb`(logits/optimizer) TODO 1~3 완성 (계속 이월 중)
-2. 가능하면 10-1·10-2 이론에서 학습 곡선과 Overfitting·Underfitting 차이 확인 (계속 이월 중)
-3. 시간이 남으면 Deep Learning Advanced 5장 → 6장 실습 착수
-4. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인 (계속 이월 중)
-5. 추가 여유가 있으면 8-1~8-7 눈복습 중 한 항목만 선택
+1. 데이터 엔지니어링 3장 실습 (`sample` → `live`, 계속 이월 중)
+2. `chapter01_starter.ipynb`(logits/optimizer) TODO 1~3 완성 (계속 이월 중)
+3. 가능하면 10-1·10-2 이론에서 학습 곡선과 Overfitting·Underfitting 차이 확인 (계속 이월 중)
+4. 시간이 남으면 Deep Learning Advanced 5장 → 6장 실습 착수
+5. 9-3·9-5 수정 셀을 Colab에서 다시 실행해 출력 확인 (계속 이월 중)
 6. 7-2 이후·8강·9강 실습·9장 심화는 위 항목이 끝나고 시간이 남을 때만 진행
 
-## 10. Working Rule
+실습 파일이 없는 구간(데이터 엔지니어링 4~8강, LangChain 2장)은 목표에 넣지 않습니다.
+**실행할 수 있는 것부터** 채우고, 자료가 도착하면 그때 별도 회차로 진행합니다.
+
+## 11. Working Rule
 
 각 문제는 정답을 보기 전에 다음 네 줄을 먼저 작성합니다.
 

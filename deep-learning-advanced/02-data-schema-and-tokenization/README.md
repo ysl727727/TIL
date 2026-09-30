@@ -1,8 +1,8 @@
-# Chapter 2: Data Schema Auditing and Tokenization
+# 2장. 데이터 스키마 감사와 토큰화
 
-> 2026-09-02 학습 기록. 2-1~2-3 기본·심화 실습을 모두 정리했습니다. (2-2·2-3 기본은 전날 이월분을 오늘 완료)
+> 2026-09-02 학습 기록. 2-1\~2-3 기본·심화 실습을 모두 정리했습니다. (2-2·2-3 기본은 전날 이월분을 오늘 완료)
 
-## Learning Goals
+## 학습 목표
 
 - 필수 key 누락, 공백 텍스트, 중복 ID, 허용되지 않은 label을 원본 행 단계에서 한 번에 감사하는 함수를 만든다.
 - Greedy longest-match 방식의 toy subword tokenizer를 구현해 `##` prefix 규칙과 `[CLS]/[SEP]/[UNK]` 역할을 분리한다.
@@ -14,9 +14,9 @@
 - Fast tokenizer의 `offset_mapping`으로 subword가 원문의 어느 문자 범위에서 왔는지 추적한다.
 - 원본 token 길이 분포와 절단 비율을 근거로 `max_length` 후보를 감사·선택한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 2-1 기본 | `01-schema-audit-and-tokenizer-basic.ipynb` | 뉴스 샘플 schema 감사기(누락 key·공백 텍스트·중복 ID·허용 label), greedy longest-match subword tokenizer와 ID 왕복 확인 |
 | 2-1 심화 | `02-vocabulary-comparison-advanced.ipynb` | 작은/큰 vocabulary의 평균 token 수·UNK 수·embedding parameter 수 비교, "클수록 무조건 좋지 않은" 이유 정리 확인 |
@@ -27,7 +27,7 @@
 
 여섯 파일 모두 첫 실행에서 자동 검증(`PASS`)을 통과했고 별도 수정 셀은 없었습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 원본 행 단계 데이터 감사
 
@@ -99,7 +99,7 @@ tokenized = dataset.map(tokenize_batch, batched=True)
 - 후보 길이별로 `truncated_count`(절단되는 문장 수), 보존 token 비율을 계산한다.
 - 절단 비율이 가장 낮은 후보를 선택하고, 동률이면 더 작은 후보를 선택해 불필요하게 큰 `max_length`를 피한다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

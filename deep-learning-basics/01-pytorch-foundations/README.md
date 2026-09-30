@@ -1,29 +1,29 @@
-# PyTorch Foundations: Tensor, Device, and Debugging
+# 1\~2장. PyTorch 기초: Tensor, Device, 디버깅
 
 규칙 기반·머신러닝·딥러닝의 적용 기준에서 시작해 PyTorch 학습 흐름과
 Tensor의 dtype·shape·batch·broadcasting·device 및 오류 디버깅을 실습했습니다.
 
-> 진행 상태: 1-2~2-4 기본 실습 완료. 별도 심화 실습은 1-2와 2-3을 완료했습니다.
+> 진행 상태: 1-2\~2-4 기본 실습 완료. 별도 심화 실습은 1-2와 2-3을 완료했습니다.
 
-## Practice Status
+## 실습 상태
 
-| Notebook label | Topic | Basic | Separate advanced |
+| 노트북 | 주제 | 기본 | 별도 심화 |
 | --- | --- | --- | --- |
-| 1-2 | 규칙 기반·ML·DL 선택 | Completed | Completed |
-| 1-3 | 데이터→모델→손실→최적화→평가 | Completed | Pending |
-| 1-4 | 문제 유형·출력·Loss 연결 | Completed | Pending |
-| 1-5 | PyTorch 코드 구조 읽기 | Completed | Pending |
-| 2-1 | Tensor dtype·shape·ndim | Completed | Pending |
-| 2-2 | Batch dimension·broadcasting | Completed | Pending |
-| 2-3 | CPU/GPU device와 `.to(device)` | Completed | Completed |
-| 2-4 | Shape·dtype·device 오류 디버깅 | Completed | Not provided |
+| 1-2 | 규칙 기반·ML·DL 선택 | ✅ 완료 | ✅ 완료 |
+| 1-3 | 데이터→모델→손실→최적화→평가 | ✅ 완료 | ⏳ 대기 |
+| 1-4 | 문제 유형·출력·Loss 연결 | ✅ 완료 | ⏳ 대기 |
+| 1-5 | PyTorch 코드 구조 읽기 | ✅ 완료 | ⏳ 대기 |
+| 2-1 | Tensor dtype·shape·ndim | ✅ 완료 | ⏳ 대기 |
+| 2-2 | Batch dimension·broadcasting | ✅ 완료 | ⏳ 대기 |
+| 2-3 | CPU/GPU device와 `.to(device)` | ✅ 완료 | ✅ 완료 |
+| 2-4 | Shape·dtype·device 오류 디버깅 | ✅ 완료 | 📭 자료 없음 |
 
 기본 노트북 안에 포함된 심화 항목도 직접 작성하고 실행했습니다. 공개 노트북에는
 강의 원문이나 제공 정답 대신 작성한 코드와 실행 결과만 남겼습니다.
 
-## What I Learned
+## 배운 내용
 
-### Tensor and Device Contract
+### Tensor와 Device의 계약
 
 Tensor를 만나면 다음 네 항목부터 확인합니다.
 
@@ -44,7 +44,7 @@ y = y.to(device)
 모델과 입력 Tensor가 서로 다른 device에 있으면 연산할 수 없습니다. 학습 루프에서는
 모델을 한 번 옮기고, DataLoader에서 꺼낸 각 batch의 입력과 target을 같은 device로 옮깁니다.
 
-### Shape·Dtype·Device Debugging Order
+### Shape·Dtype·Device 디버깅 순서
 
 ```text
 오류 메시지의 마지막 줄 확인
@@ -59,9 +59,9 @@ y = y.to(device)
 - `CrossEntropyLoss` target은 class index 형태의 `torch.int64`여야 합니다.
 - prediction과 target shape이 다르면 의도하지 않은 broadcasting부터 확인합니다.
 
-### Useful Python and PyTorch Syntax
+### 유용한 Python·PyTorch 문법
 
-| Expression | Meaning |
+| 표현 | 의미 |
 | --- | --- |
 | `tensor.long()` | Tensor를 `torch.int64`로 변환 |
 | `tensor.to(torch.int64)` | 목표 dtype을 지정해 변환 |
@@ -81,21 +81,21 @@ first_cuda_run = next(
 
 두 번째 인자 `None`은 조건을 만족하는 항목이 없을 때 `StopIteration` 대신 반환할 기본값입니다.
 
-## Learning Reflection
+## 돌아보기
 
 dtype와 shape뿐 아니라 device도 연산 전에 맞춰야 하는 Tensor의 계약이라는 점을 확인했습니다.
 오류가 길어도 마지막 줄에서 종류를 분류하고, 연산 직전의 shape·dtype·device를 출력하면
 확인 범위를 줄일 수 있었습니다.
 
-## Next Steps
+## 다음 할 일
 
-- [x] 1-2~2-4 기본 실습
+- [x] 1-2\~2-4 기본 실습
 - [x] 1-2·2-3 별도 심화 실습
-- [ ] 1-3~2-2 별도 심화 실습
+- [ ] 1-3\~2-2 별도 심화 실습
 - [ ] dtype·shape·device 오류를 각각 하나씩 다시 만들고 수정
 - [ ] batch 이동 helper를 참고 없이 재작성
 
-## Files
+## 파일 구성
 
 ```text
 01-pytorch-foundations/

@@ -1,16 +1,16 @@
-# Chapter 1: 변수·조건문·리스트·딕셔너리 기초 드릴
+# 1장. 변수·조건문·리스트·딕셔너리 기초 드릴
 
 > 2026-09-29 학습 기록. **Python 보강 자료**로 받은 연습 파일 3개를 직접 타이핑하며 확인했습니다. 변수와 자료형, 조건문, 리스트·딕셔너리 메서드, 중첩 반복문이 대상입니다. 강의 노트가 아니라 손으로 돌려 본 드릴이라 정답 코드와 주석 형태로 남겼습니다.
 
-## Practice Files
+## 실습 파일
 
-| File | Topics | Practice status |
+| 파일 | 주제 | 실습 상태 |
 | --- | --- | --- |
 | `01-variables-types-and-fstrings.py` | 변수 재할당, `int`/`float`/`str` 변환, `type().__name__`, 비교 연산과 체이닝, 문자열 결합 3가지, 이스케이프 | 완료(직접 실행) |
 | `02-conditionals-and-list-methods.py` | `if`/`elif`/`else`, 중첩 조건문과 `input()`, `extend`/`append`/`remove`/`pop`/`sort(reverse=True)` | 완료(직접 실행) |
 | `03-dict-methods-and-nested-loops.py` | `dict.update`/`keys`, 2차원 리스트 인덱스 탐색, 짝수/홀수 합 | 완료(직접 실행) |
 
-## Core Points
+## 핵심 포인트
 
 ### 1. 변수와 자료형
 
@@ -99,7 +99,7 @@ for row in matrix2:
 
 `range(len(...))` 없이 원소를 직접 순회하면 인덱스를 신경 쓰지 않아도 된다. **인덱스가 필요하면 `range(len(...))`, 값만 필요하면 직접 순회**로 구분한다. 음수까지 다룰 때는 홀수 판정을 `n % 2 == 1` 대신 `n % 2 != 0`으로 쓰는 편이 안전하다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - `True <= priority <= 3`이 참인 이유가 `True == 1`이기 때문이라는 점이 가장 의외였다.
 - `append`와 `extend`, `remove`와 `pop`의 차이를 "값이냐 위치냐", "하나냐 풀어서냐"로 정리하니 헷갈리지 않았다.

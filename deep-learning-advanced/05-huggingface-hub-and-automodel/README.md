@@ -1,8 +1,8 @@
-# Chapter 5: Hugging Face Hub and AutoModel
+# 5장. Hugging Face Hub와 AutoModel
 
 > 2026-09-07 학습 기록. 6-1, 6-3, 6-4, 6-5강 이론을 정리했습니다. 실습 노트북은 아직 없고 이론만 정리된 상태이며(주말로 이월), 아래 Core Theory는 `딥러닝_심화_6장_HuggingFace_강의_정리.md`를 기반으로 합니다.
 
-## Learning Goals
+## 학습 목표
 
 - Hugging Face Hub가 모델 weight+설정+문서+버전을 함께 관리하는 저장소임을 이해하고, Model Card를 체크리스트(task, language, intended use, training data, metrics, limitations, license)로 읽는다.
 - Model ID와 revision(branch/tag/commit)의 차이를 구분하고, 재현성이 중요할 때 commit hash로 고정해야 하는 이유를 설명한다.
@@ -11,11 +11,11 @@
 - `AutoModelForSequenceClassification`(`[B,C]`)과 `AutoModelForCausalLM`(`[B,L,V]`)의 출력 shape과 후처리 차이를 비교한다.
 - `save_pretrained()`/`from_pretrained()`로 모델과 tokenizer를 한 쌍으로 저장·재로드하고, 저장 전후 logits를 비교해 추론 재현성을 검증하는 흐름을 이해한다.
 
-## Practice Files
+## 실습 파일
 
-아직 실습 노트북이 없습니다. 6장 실습은 주말(2026-09-12~13)로 이월했습니다.
+아직 실습 노트북이 없습니다. 6장 실습은 주말(2026-09-12\~13)로 이월했습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. Hugging Face Hub와 Model Card
 
@@ -52,6 +52,6 @@
 - 재현성은 seed 하나로 끝나지 않는다 — Model ID, 정확한 revision(commit hash), 라이브러리 버전(`transformers`, `torch`), device/dtype, 전처리 설정(padding, truncation, max length)까지 메타데이터로 함께 기록해야 완성된다.
 - (선택) 폐쇄망 반입 시에는 허용된 모델·revision·license를 승인 기록에 남기고, 필요한 파일(weight/config/tokenizer/generation config/custom code)을 확인하고, checksum으로 무결성을 검증한 뒤 `local_files_only=True`로 오프라인 재현 결과를 baseline과 비교해야 한다.
 
-## Environment
+## 실행 환경
 
 이 챕터는 아직 실습 코드가 없습니다. 실습을 추가하면 `torch`, `transformers`, `huggingface_hub`가 필요합니다.

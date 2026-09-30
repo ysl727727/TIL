@@ -1,8 +1,8 @@
-# Chapter 1: Logits, Loss Functions, and Optimizers
+# 1장. Logit, 손실 함수, Optimizer
 
 > 2026-09-10 학습 기록. 1장(1-1, 1-2강)과 2장(2-1, 2-2강) 이론을 정리했습니다. 아래 Core Theory는 `1장__2장_Logits부터_Optimizer까지_-_딥러닝_학습의_기본기.pdf`를 기반으로 합니다. "딥러닝 실전 & 프롬프트 엔지니어링" 정리자료로, `deep-learning-advanced`의 KANT 강의 번호 체계와는 별개의 자료입니다.
 
-## Learning Goals
+## 학습 목표
 
 - logit(클래스별 원시 점수)과 probability(정규화된 확률)를 구분하고, softmax가 지수화+정규화로 합이 1인 분포를 만드는 과정을 설명한다.
 - 큰 logits에서 `exp()`가 overflow(`inf`/`nan`)를 일으키는 이유를 확인하고, max trick으로 수치 안정성을 확보한 stable softmax/log-softmax를 구현한다.
@@ -11,15 +11,15 @@
 - learning rate가 너무 작거나 클 때 각각 어떤 현상(느린 수렴, 진동/발산)이 나타나는지 비교한다.
 - SGD/Momentum/Adam이 각각 어떤 정보(현재 gradient만 / velocity / 1차·2차 모멘트)를 기억하는지 구분하고, 같은 문제에서 loss curve로 비교한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 1장 통합 | `01-logits-loss-diagnosis-starter.ipynb` | **미완료** — TODO 1(stable softmax/log-softmax), TODO 2(문의별 CE/MSE/BCE), TODO 3(예측·정답·평균·최대 CE 문의 찾기)이 모두 `NotImplementedError`로 남아 있는 시작 템플릿 상태 |
 
-이 노트북은 사내 LLM 출력 화면(담당 부서 분류=CE, 답변 품질=MSE, 민감정보 여부=BCE)을 소재로 세 손실 함수를 한 번에 다루는 통합 실습입니다. 현재는 TODO가 채워지지 않아 실행하면 오류가 발생하는 상태이며, 주말(2026-09-12~13)에 완성해 재업로드할 예정입니다.
+이 노트북은 사내 LLM 출력 화면(담당 부서 분류=CE, 답변 품질=MSE, 민감정보 여부=BCE)을 소재로 세 손실 함수를 한 번에 다루는 통합 실습입니다. 현재는 TODO가 채워지지 않아 실행하면 오류가 발생하는 상태이며, 주말(2026-09-12\~13)에 완성해 재업로드할 예정입니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. Logit과 Softmax (1-1강)
 
@@ -68,7 +68,7 @@
 - optimizer 선택 기준: 단순하고 통제된 실험엔 SGD, 같은 방향 gradient가 반복되는 구간엔 Momentum, Transformer/LLM 등 빠른 baseline엔 Adam/AdamW가 흔히 쓰인다. optimizer만 바꾸고 learning rate를 그대로 두면 공정한 비교가 아닐 수 있다 — optimizer마다 적절한 learning rate 범위가 다르다.
 - checkpoint에는 모델 가중치뿐 아니라 optimizer state(velocity, `m`, `v`)도 함께 저장해야 학습을 정확히 이어갈 수 있다.
 
-### 5. 전체 흐름 (1~2장 통합)
+### 5. 전체 흐름 (1\~2장 통합)
 
 ```
 logits → softmax(max trick) → probability
@@ -81,7 +81,7 @@ logits → softmax(max trick) → probability
 
 모든 단계에서 shape과 axis(어느 축으로 합/평균을 내는지)를 확인하는 습관이 실수를 막는 핵심 기본기다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

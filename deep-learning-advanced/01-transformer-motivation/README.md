@@ -1,8 +1,8 @@
-# Chapter 1: RNN/LSTM Limits and Transformer Motivation
+# 1장. RNN/LSTM의 한계와 Transformer 등장 배경
 
-> 2026-09-02 학습 기록. 1-1~1-2 기본·심화 실습을 모두 정리했습니다.
+> 2026-09-02 학습 기록. 1-1\~1-2 기본·심화 실습을 모두 정리했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - `nn.RNN` 없이 수동으로 hidden state 순환 계산을 구현해 순차 의존성을 직접 확인한다.
 - RNN의 위치 간 최단 경로(`length-1`)와 Self-Attention 한 층의 경로(`1`), 그리고 attention score 원소 수(`length²`)를 계산해 서로 다른 병목을 비교한다.
@@ -12,9 +12,9 @@
 - 긴 문맥·병렬 학습·streaming 조건을 근거로 RNN/LSTM과 Transformer 중 첫 baseline 후보를 추천한다.
 - 실험 설정을 순서·공백에 무관한 canonical JSON과 SHA-256 hash로 식별해 재현성을 보장한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 1-1 기본 | `01-hidden-state-and-attention-cost-basic.ipynb` | 수동 RNN hidden state 구현, 첫 token 변경 시 마지막 상태 변화 검증, RNN vs Self-Attention 경로 길이·score 수 비교 확인 |
 | 1-2 기본 | `02-nlp-task-workflow-and-contract-basic.ipynb` | workflow 누락/중복/순서 검증기, classification·generation task별 실행 계약 생성기 확인 |
@@ -23,7 +23,7 @@
 
 네 파일 모두 첫 실행에서 자동 검증(`PASS`)을 통과했고 별도 수정 셀은 없었습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 수동 RNN Hidden State
 
@@ -74,7 +74,7 @@ config_hash = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:12]
 - 반환값에는 원본이 아니라 `dict(config)`, `dict(environment)`처럼 복사본을 담아 호출로 인한 원본 오염(side effect)을 막는다.
 - 검증 결과: key 순서만 바꾼 설정은 원본과 hash가 같고(`same order-independent`), `seed`만 바꾼 설정은 hash가 다르다(`seed changes hash`) — 같은 설정이면 항상 같은 실험 식별자가 나오고, 설정이 실제로 바뀌면 반드시 다른 식별자가 나온다는 뜻이다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

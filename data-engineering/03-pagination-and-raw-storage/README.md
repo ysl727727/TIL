@@ -1,8 +1,8 @@
-# Chapter 3: Pagination·Rate Limit과 원천 데이터 저장
+# 3장. Pagination·Rate Limit과 원천 데이터 저장
 
 > 2026-09-21 학습 기록. 3-1강(API 조건 설정·Pagination·Rate Limit 확인), 3-2강(응답 JSON 파싱과 원천 데이터 저장) 이론을 정리했습니다. 3장 통합 실습(solution) 파일은 확보했으나 아직 실행하지 못해 주말로 이월했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - API 문서에서 검색 조건, `page`, `page_size` 규칙을 찾고 시작 번호와 최댓값을 확인한다.
 - page 번호를 1씩 올리며 마지막 페이지까지 반복 수집하고, 한 페이지 결과를 전체 목록에 이어 붙인다.
@@ -12,15 +12,15 @@
 - `json.dumps`의 `ensure_ascii`·`indent`·`sort_keys`와 `csv.DictWriter`의 `fieldnames`를 지정해 한글·줄바꿈·열 순서를 안정적으로 저장한다.
 - 출처·수집 시각·건수·상태를 담은 최소 수집 로그를 만들고, API 키나 개인정보는 넣지 않는다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 3장 통합 | `01-pagination-and-collection-bundle.ipynb` | **미완료** — solution 파일은 확보했으나 셀 실행 기록이 없음(모든 `execution_count`가 비어 있음). 주말 backlog로 이월 |
 
 이 노트북은 페이지 수집(`fetch_page`의 429 재시도 / `collect`의 페이지 누적 / CSV 저장) 세 부분을 다루며, 실행하면 `collected/` 폴더에 `raw_response.json`, `items.json`, `items.csv`, `collection_log.json` 네 파일이 생성됩니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 한 번의 호출로 데이터가 모두 오지 않는 이유 (3-1강)
 
@@ -136,14 +136,14 @@ CSV는 `csv.DictWriter`에 `fieldnames`로 열 이름과 순서를 명시하고,
 
 `complete`와 `limited`의 구분도 중요하다 — 마지막 응답에 다음 페이지 신호가 없으면 `complete`(해당 조건의 페이지를 끝까지 받음), 다음 페이지가 있는데 최대 page에서 멈췄으면 `limited`(범위 제한에 따른 종료)다. 최대 범위에 도달했다고 종료 신호를 거짓으로 바꾸면 이 차이가 사라진다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - 수집 중 일부만 실패했을 때 실제 데이터와 샘플을 섞으면 출처가 다른 자료가 하나의 결과가 된다 — 처음부터 다시 시작해 결과를 통째로 교체하는 편이 안전하다.
 - 중복 글과 공백 제목을 수집 단계에서 지우면 받은 내용과 정제한 내용을 구분하기 어려워진다 — 이번 장은 수집과 저장을 다루므로 원본 상태를 그대로 남기고, 정제는 4장에서 다룬다.
 - 줄바꿈이 있는 필드 때문에 CSV 파일의 눈에 보이는 줄 수는 글 수와 다를 수 있다 — CSV를 다시 읽었을 때 필드 내용이 유지되는지가 기준이다.
 - 자주 하는 오해: "`page_size`는 클수록 항상 좋다"(서버 최댓값과 응답 크기·timeout 위험이 있다) / "빈 `items`면 언제나 마지막이다"(필터 조건이나 일시적 결과일 수 있다) / "429는 API 키가 틀렸다는 뜻이다"(인증 실패는 주로 401) / "반복 수집은 동시에 많이 보내야 빠르다"(입문 단계에서는 순차 수집이 흐름을 이해하고 호출 한도를 지키기 쉽다) / "JSON이면 언제나 표로 바로 바꿀 수 있다"(중첩 객체와 배열이 있으면 어떤 행과 열로 펼칠지 먼저 정해야 한다).
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

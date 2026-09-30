@@ -1,8 +1,8 @@
-# Chapter 2: HTTP 요청/응답과 Python API 호출
+# 2장. HTTP 요청/응답과 Python API 호출
 
 > 2026-09-21 학습 기록. 2-1강(HTTP 요청/응답과 API 문서 읽기), 2-2강(Python API 호출과 인증/환경변수) 이론과 2장 통합 실습을 정리했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - HTTP 요청과 응답이 오가는 흐름을 설명하고 URL, endpoint, method, header, query parameter, request body를 구분한다.
 - API 문서에서 한 번의 요청에 필요한 정보(기능·경로·인증·입력·출력·오류)를 찾는다.
@@ -12,15 +12,15 @@
 - `raise_for_status()`가 필요한 이유를 설명하고 상태 → Content-Type → JSON 구조 순서로 응답을 검증한다.
 - HTTPX의 `MockTransport`로 인터넷 없이 요청·응답을 재현한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 2장 통합 | `01-public-api-request-and-validation.ipynb` | **완료** — `live` 모드로 JSONPlaceholder 공개 API에 실제 GET 요청, 상태 200·글 2건 확인. 로컬 `MockTransport` 인증 연습(`Bearer` 접두사 검사) 통과 |
 
 실행 결과: `로컬 인증 연습: True` / `실행 모드: live` / `GET https://jsonplaceholder.typicode.com/posts?userId=1&_page=1&_limit=2` / `응답: 200 | 글 수: 2`.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 클라이언트와 서버의 대화 (2-1강)
 
@@ -143,7 +143,7 @@ if not isinstance(items, list):       # 원하는 형식인지 검사
 
 `live` 요청이나 응답 확인에 실패하면 제공 샘플로 전환해 `sample_fallback`을 표시한다. 샘플에 붙어 있는 요청 URL은 HTTPX가 만든 요청 정보이며 그 주소로 네트워크 연결을 했다는 증거가 아니다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - `request_posts`(요청+상태 확인, 응답 객체 반환)와 `read_posts`(본문 해석, 리스트 반환)는 반환값의 종류가 다르다 — 두 함수가 모두 리스트를 반환한다고 생각하면 뒤에서 `.headers`나 `.json()`을 쓸 때 오류가 난다.
 - 404인 JSON 응답은 상태 검사에서 멈추고, 200이지만 본문이 객체 하나인 응답은 상태·JSON 문법 검사를 통과한 뒤 리스트 검사에서 멈춘다 — 같은 "실패"라도 멈추는 위치가 다르다.
@@ -152,7 +152,7 @@ if not isinstance(items, list):       # 원하는 형식인지 검사
 - `os.getenv`의 기본값을 빈 문자열로 두면 변수가 없을 때도 `.strip()`을 쓸 수 있고, 공백만 있던 값은 빈 문자열이 되어 요청 전에 `RuntimeError`로 멈출 수 있다.
 - 자주 하는 오해: "환경 변수를 쓰면 키를 출력해도 괜찮다"(로그와 화면 출력도 유출 경로) / "timeout은 인터넷이 느릴 때만 필요하다"(로컬 네트워크와 서버도 멈출 수 있다) / "200이면 원하는 필드가 반드시 있다"(API 버전이나 응답 조건에 따라 구조가 다를 수 있다).
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

@@ -1,29 +1,29 @@
-# End-to-End MLP Training and Validation
+# 8장. MLP 학습과 검증 전체 흐름
 
 `nn.Module` 모델 정의부터 Loss·optimizer 연결, train/validation loop, metric 누적,
 epoch 기록과 validation 기반 best model 선택까지 하나의 MLP 파이프라인으로 연결했습니다.
 
-> 진행 상태: 시간상 8-1~8-7 개별 실습 대신 그 내용을 한 번에 모은 8-8 종합 심화 실습을 완료했습니다.
-> 8-1~8-7 개별 실습은 미완료이며, 주말에 각 흐름을 눈으로 다시 살펴볼 예정입니다.
+> 진행 상태: 시간상 8-1\~8-7 개별 실습 대신 그 내용을 한 번에 모은 8-8 종합 심화 실습을 완료했습니다.
+> 8-1\~8-7 개별 실습은 미완료이며, 주말에 각 흐름을 눈으로 다시 살펴볼 예정입니다.
 
-## Practice Status
+## 실습 상태
 
-| Lesson | Topic | Status |
+| 강 | 주제 | 상태 |
 | --- | --- | --- |
-| 8-1 | `nn.Module` 구조와 `forward` 설계 | Not completed individually |
-| 8-2 | MLP 모델 클래스 완성 | Not completed individually |
-| 8-3 | Loss와 optimizer 연결 | Not completed individually |
-| 8-4 | Train loop 작성 | Not completed individually |
-| 8-5 | Validation loop 작성 | Not completed individually |
-| 8-6 | Accuracy와 metric 누적 | Not completed individually |
-| 8-7 | Epoch 로그와 시각화 | Not completed individually |
-| 8-8 | 8-1~8-7을 연결한 MLP 종합 실습 | Completed |
+| 8-1 | `nn.Module` 구조와 `forward` 설계 | ⏳ 개별 실습 미완료 |
+| 8-2 | MLP 모델 클래스 완성 | ⏳ 개별 실습 미완료 |
+| 8-3 | Loss와 optimizer 연결 | ⏳ 개별 실습 미완료 |
+| 8-4 | Train loop 작성 | ⏳ 개별 실습 미완료 |
+| 8-5 | Validation loop 작성 | ⏳ 개별 실습 미완료 |
+| 8-6 | Accuracy와 metric 누적 | ⏳ 개별 실습 미완료 |
+| 8-7 | Epoch 로그와 시각화 | ⏳ 개별 실습 미완료 |
+| 8-8 | 8-1\~8-7을 연결한 MLP 종합 실습 | ✅ 완료 |
 
 8-8이 앞의 내용을 합친 종합 실습이어서 제한된 시간에는 전체 연결을 우선 확인했습니다.
 다만 종합 코드를 실행한 것과 각 단계를 독립적으로 설명할 수 있는 것은 다르므로,
-8-1~8-7은 완료로 표시하지 않았습니다.
+8-1\~8-7은 완료로 표시하지 않았습니다.
 
-## End-to-End Flow
+## 전체 흐름
 
 ```text
 Dataset과 split
@@ -41,7 +41,7 @@ Dataset과 split
 `nn.Module`에서는 layer를 `__init__()`에 등록하고 계산 순서를 `forward()`에 작성합니다.
 `model(x)`를 호출하면 PyTorch가 내부적으로 `forward(x)`를 실행합니다.
 
-## Train and Validation Contract
+## 학습과 검증의 계약
 
 학습과 검증은 비슷한 반복 구조를 갖지만 parameter 업데이트 여부가 다릅니다.
 
@@ -70,7 +70,7 @@ def run_epoch(training, loader):
 
 실습 결과 3 epoch 동안 train loss가 감소했고, 모든 validation 전후에 model parameter가 변하지 않았습니다.
 
-## Questions I Asked and What I Learned
+## 내가 한 질문과 알게 된 점
 
 ### 1. `total_loss = seen = 0`
 
@@ -111,7 +111,7 @@ best_index = min(range(len(valid_loss)), key=lambda i: valid_loss[i])
 `x.shape`은 `torch.Size([4, 6])` 같은 전체 shape tuple이어서 곱셈에 쓸 수 없고,
 현재 batch 수가 필요할 때는 `x.shape[0]` 또는 `y.shape[0]`을 사용합니다.
 
-## Metric and Model Selection
+## Metric과 모델 선택
 
 ```text
 epoch_loss = total_loss / total_samples
@@ -124,14 +124,14 @@ accuracy도 batch별 accuracy의 단순 평균 대신 전체 정답 수를 전�
 모델과 hyperparameter는 validation으로 선택하고 test는 선택을 마친 뒤 한 번만 평가합니다.
 test 결과를 보고 다시 설정을 바꾸면 test가 사실상 validation 역할을 하게 되어 leakage가 발생합니다.
 
-## Weekend Review
+## 주말 복습
 
-- [ ] 8-1~8-7 개별 실습을 순서대로 눈으로 살펴보기
+- [ ] 8-1\~8-7 개별 실습을 순서대로 눈으로 살펴보기
 - [ ] 각 실습이 8-8 종합 코드의 어느 부분에 해당하는지 표시하기
 - [ ] `nn.Module → loss/optimizer → train → validation → metric → history`를 말로 설명하기
 - [ ] 시간이 되면 공통 `run_epoch()`의 뼈대를 보지 않고 다시 작성하기
 
-## Files
+## 파일 구성
 
 - `01-mlp-end-to-end-advanced.ipynb`: 파이프라인 오류 진단, 3 epoch MLP baseline, validation 기반 report
 - `requirements.txt`: 최소 실행 환경

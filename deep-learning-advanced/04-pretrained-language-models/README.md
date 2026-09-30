@@ -1,8 +1,8 @@
-# Chapter 4: Pretrained Language Models (BERT vs GPT)
+# 4장. 사전학습 언어모델 (BERT vs GPT)
 
 > 2026-09-07 학습 기록. 5-1, 5-2, 5-4강 이론을 정리했습니다. 실습 노트북은 아직 없고 이론만 정리된 상태이며(주말로 이월), 아래 Core Theory는 `딥러닝_심화_5장_사전학습언어모델_정리.md`를 기반으로 합니다.
 
-## Learning Goals
+## 학습 목표
 
 - 언어모델이 토큰의 등장 패턴·순서·문맥 관계를 학습하는 것이며, 사실을 정확히 암기하는 것이 아님을 구분한다.
 - 사전학습(대규모 비라벨 데이터로 일반 패턴 학습)과 Fine-tuning(목적별 데이터로 추가 학습)의 관계를 설명한다.
@@ -11,11 +11,11 @@
 - BERT의 `[CLS]`/`[SEP]`/`[MASK]`/`[PAD]` 역할과 Token/Position/Token Type embedding 구성을 이해한다.
 - GPT의 Causal Self-Attention, 한 칸 shift 구조, Autoregressive Generation(`generate()`) 흐름을 이해한다.
 
-## Practice Files
+## 실습 파일
 
-아직 실습 노트북이 없습니다. 5장 실습은 주말(2026-09-12~13)로 이월했습니다.
+아직 실습 노트북이 없습니다. 5장 실습은 주말(2026-09-12\~13)로 이월했습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 언어모델과 사전학습
 
@@ -55,6 +55,6 @@
 - 생성 결과 해석 시 주의: 다음 토큰 확률은 사실성 점수가 아니고, Prompt 표현에 민감하며, 생성이 길어질수록 오류가 누적될 수 있고, Greedy가 항상 최선은 아니다.
 - (선택) Causal LM의 label/loss mask: padding 위치와 prompt 위치(response-only 학습 시)는 `labels=-100`으로 학습 대상에서 제외한다. Causal mask(미래 차단)와 loss mask(어느 위치를 학습할지)는 이름은 비슷하지만 역할이 다르다.
 
-## Environment
+## 실행 환경
 
 이 챕터는 아직 실습 코드가 없습니다. 실습을 추가하면 `torch`, `transformers`가 필요합니다.

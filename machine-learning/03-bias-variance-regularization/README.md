@@ -1,13 +1,13 @@
-# Bias-Variance Diagnosis and Regularization
+# 3장. 편향-분산 진단과 규제
 
 편향·분산 관점에서 과소적합과 과적합을 진단하는 방법과
 Ridge·Lasso·ElasticNet이 계수를 다루는 방식을 학습했습니다.
 
 > 진행 상태: 개념 학습 완료. 오늘 머신러닝 실습은 진행하지 못했습니다.
 
-## What I Learned
+## 배운 내용
 
-### Bias and Variance
+### 편향과 분산
 
 - 편향은 모델이 반복적으로 비슷한 방향으로 빗나가는 정도입니다.
 - 분산은 학습 데이터가 달라질 때 모델의 예측이 흔들리는 정도입니다.
@@ -15,11 +15,11 @@ Ridge·Lasso·ElasticNet이 계수를 다루는 방식을 학습했습니다.
 - Train 성능은 높고 validation 성능이 낮으면 과적합을 의심할 수 있습니다.
 - 한 번의 점수나 점수 차이만으로 원인을 확정하지 않고 데이터 분포, 라벨 오류와 누수도 함께 확인해야 합니다.
 
-### Learning Curve and Validation Curve
+### Learning Curve와 Validation Curve
 
 학습곡선과 검증곡선은 바꾸는 대상과 답하려는 질문이 다릅니다.
 
-| Curve | What changes? | Main question |
+| 곡선 | 무엇이 바뀌나 | 핵심 질문 |
 | --- | --- | --- |
 | Learning curve | 훈련 샘플 수 | 데이터를 더 모을 가치가 있는가? |
 | Validation curve | 모델 복잡도 또는 하이퍼파라미터 | 어느 정도의 복잡도가 적절한가? |
@@ -30,7 +30,7 @@ Ridge·Lasso·ElasticNet이 계수를 다루는 방식을 학습했습니다.
 Gap이 작다는 사실만으로 좋은 모델이라고 판단할 수 없습니다.
 Train과 validation 점수가 모두 낮으면 gap이 작아도 과소적합일 수 있습니다.
 
-### Regularization
+### 규제
 
 규제는 예측 오차에 계수 크기에 대한 벌점을 더해 모델이 훈련 데이터에
 지나치게 민감해지는 것을 줄이는 방법입니다.
@@ -42,7 +42,7 @@ regularized loss = prediction error + alpha × coefficient penalty
 `alpha`가 커질수록 규제가 강해집니다. 규제가 너무 약하면 과적합이 남을 수 있고,
 너무 강하면 실제 신호까지 줄여 과소적합이 생길 수 있으므로 같은 CV에서 선택해야 합니다.
 
-| Model | Penalty | Coefficient behavior |
+| 모델 | 규제 항 | 계수 변화 |
 | --- | --- | --- |
 | Ridge | L2, 제곱합 | 여러 계수를 대체로 남기면서 부드럽게 축소 |
 | Lasso | L1, 절댓값 합 | 일부 계수를 정확히 0으로 만들 수 있음 |
@@ -52,7 +52,7 @@ regularized loss = prediction error + alpha × coefficient penalty
 `StandardScaler`와 모델을 `Pipeline`에 함께 넣으면 각 CV fold의 train 데이터만으로
 스케일러를 학습하여 전처리 누수를 막을 수 있습니다.
 
-### Fair Model Comparison
+### 공정한 모델 비교
 
 Ridge·Lasso·ElasticNet을 비교할 때 다음 조건을 동일하게 유지해야 합니다.
 
@@ -63,7 +63,7 @@ Ridge·Lasso·ElasticNet을 비교할 때 다음 조건을 동일하게 유지�
 5. 성능뿐 아니라 계수의 크기와 0이 된 계수 수도 확인합니다.
 6. 선택한 후보 하나만 봉인한 Test에서 평가합니다.
 
-## Learning Reflection
+## 돌아보기
 
 Ridge·Lasso·ElasticNet의 목적과 차이를 비교하는 개념은 잘 이해했습니다.
 하지만 실습 문제를 처음 마주했을 때 입력과 출력, 중간 작업과 필요한 함수를 스스로 정하는 과정은 여전히 어렵습니다. 
@@ -72,7 +72,7 @@ AI 역량평가 결과를 통해 기초수학에서 보완할 부분이 있다�
 기초수학 개념을 다시 공부하고 있지만 관련 실습 문제는 아직 난도가 높아 완료하지 못했습니다.
 현재 문제는 개념을 전혀 모르는 것보다 개념을 수식과 코드의 실행 순서로 연결하는 경험이 부족하다고 생각합니다.
 
-## Weekend Study Plan
+## 주말 학습 계획
 
 주말에는 다음 순서로 부족한 기초를 보완할 계획입니다.
 
@@ -86,7 +86,7 @@ AI 역량평가 결과를 통해 기초수학에서 보완할 부분이 있다�
 목표는 다음 머신러닝 심화 과정과 딥러닝 기초·활용 과정에서 개념을 이해하는 데 그치지 않고,
 실습 문제의 시작점과 코드 작성 순서를 스스로 세울 수 있도록 준비하는 것입니다.
 
-## Next Steps
+## 다음 할 일
 
 - [x] 편향·분산과 과소적합·과적합의 관계 정리
 - [x] 학습곡선과 검증곡선이 답하는 질문 구분
@@ -97,7 +97,7 @@ AI 역량평가 결과를 통해 기초수학에서 보완할 부분이 있다�
 - [ ] 세 규제 모델을 동일 CV에서 비교하는 실습
 - [ ] alpha 선택 후 한 후보만 Test에서 평가
 
-## Files
+## 파일 구성
 
 ```text
 03-bias-variance-regularization/

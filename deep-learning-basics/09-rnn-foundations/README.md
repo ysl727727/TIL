@@ -1,8 +1,8 @@
-# Chapter 13: RNN Sequence Modeling and Gradient Stability
+# 13장. RNN 시퀀스 모델링과 경사 안정성
 
-> 2026-08-31 학습 기록. 13-1~13-3 이론과 기본 실습을 정리했습니다.
+> 2026-08-31 학습 기록. 13-1\~13-3 이론과 기본 실습을 정리했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - sequence 데이터를 `[batch, seq_len, input_size]` 형태로 구성하고 `nn.RNN`의 `output`·`h_n` shape를 해석한다.
 - `batch_first` 설정에 따라 입력 축 순서를 맞추고, 마지막 time step output과 `h_n[-1]`이 값까지 동일함을 확인한다.
@@ -11,9 +11,9 @@
 - 전체 파라미터 gradient의 global L2 norm을 계산해 학습 신호 크기를 모니터링한다.
 - `clip_grad_norm_`으로 gradient clipping을 적용하고 clipping 전후 norm을 비교한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Basic practice status |
+| 강 | 파일 | 기본 실습 상태 |
 | --- | --- | --- |
 | 13-1 | `01-sequence-hidden-state-basic.ipynb` | sequence batch 구성, RNN `output`/`h_n` shape 확인, 마지막 hidden으로 분류 확인 |
 | 13-2 | `02-rnn-forward-shape-basic.ipynb` | `batch_first` 변환, 마지막 time step 선택, 2-layer RNN hidden 해석 확인 |
@@ -21,7 +21,7 @@
 
 13-3의 두 문제는 첫 실행 셀과 동일한 코드를 다시 실행해 값을 재확인한 셀이며, 별도의 코드 수정은 없었습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. RNN output과 h_n shape
 
@@ -54,13 +54,13 @@
 
 `torch.nn.utils.clip_grad_norm_(params, max_norm)`은 clipping 전의 global L2 norm을 반환하면서, gradient가 `max_norm`보다 클 때 update 크기를 제한한다. RNN/LSTM처럼 sequence 길이에 영향을 받는 모델에서 학습 안정화에 자주 쓰인다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - RNN `output`/`h_n` shape 해석: `output`은 모든 시점, `h_n`은 마지막 시점만 담는다는 점을 12장의 CNN feature map shape 계산과 비교하며 재확인했다.
 - `hidden_size=5`처럼 hidden 차원 수는 seq_len과 무관하게 임의로 정할 수 있는 설계값이라는 점.
 - gradient norm 계산과 clipping은 RNN처럼 긴 시퀀스를 반복 통과하는 구조에서 특히 중요하다는 점 — 12장 학습 루프(`loss.backward()` → `optimizer.step()`)에 이어지는 확장으로 정리했다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

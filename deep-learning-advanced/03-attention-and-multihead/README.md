@@ -1,8 +1,8 @@
-# Chapter 3: Attention and Multi-Head Shape
+# 3장. Attention과 Multi-Head의 shape
 
-> 2026-09-03 학습 기록. 3-1~3-5 실습을 모두 완료하고 Q&A를 정리했습니다.
+> 2026-09-03 학습 기록. 3-1\~3-5 실습을 모두 완료하고 Q&A를 정리했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - Query·Key·Value가 입력에 서로 다른 학습된 projection을 곱해 만들어진다는 것을 이해하고, `Q=K=V=X`가 "값이 같다"가 아니라 "입력 출처가 같다"는 뜻임을 구분한다.
 - Q·K 내적으로 token 간 관련도를 구하고, 자기 자신을 제외한 최상위 관계를 찾는다.
@@ -14,9 +14,9 @@
 - MHA/GQA의 Query/KV head 수 차이와 KV Cache 메모리 절감 배수를 계산한다.
 - Shape trace로 `view`·`transpose` 순서 오류가 발생한 첫 단계를 찾는다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 3-1 | `01-qkv-projection-and-relevance.ipynb` | Q·K·V projection 함수, Query별 최상위 Key 찾기(`find_top_keys`), softmax+threshold 기반 관계 리포트(`build_relation_report`) 확인 |
 | 3-2 | `02-scaled-dot-product-attention.ipynb` | Scaled Dot-Product Attention 전체 구현, padding mask 적용, `[B,T,D]` batch attention 확장 확인 |
@@ -26,7 +26,7 @@
 
 다섯 파일 모두 첫 실행에서 assert 검증을 통과했고 별도 수정 셀은 없었습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. Query · Key · Value
 
@@ -106,7 +106,7 @@ def merge_heads(x):
 - "K/V가 Q와 다를 수 있다"는 두 가지 서로 다른 축의 이야기다 — ① Self vs Cross-Attention: **토큰 개수**(`L_query` vs `L_key`)가 다를 수 있음, ② MHA/MQA/GQA: **head 개수**(`H_q` vs `H_kv`)가 다를 수 있음. 두 축은 동시에 적용될 수 있다(`Q:[B,32,L_query,D_head]`, `K/V:[B,8,L_key,D_head]`).
 - Shape trace 디버거는 `input → qkv → split → scores → merged` 각 단계의 기대 shape를 미리 계산해두고, 실제 값과 처음 어긋나는 단계를 찾는다 — 오류가 마지막 matmul에서 발생하더라도 원인은 그 앞의 head 분리일 수 있기 때문이다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - `torch.matmul`과 `@`는 완전히 동일하며, 3차원 이상(배치 포함) 입력에서는 앞쪽 배치 차원을 유지한 채 마지막 두 차원끼리만 행렬곱한다.
 - `d_k`와 `D_head`는 논문/강의 표기만 다를 뿐 같은 개념이다.
@@ -115,7 +115,7 @@ def merge_heads(x):
 - `X.size(-1)`은 입력 `[B, L, D_model]`의 마지막 차원(`D_model`)을 가리키며, projection 가능 여부 검증이나 스케일링 계수 계산에 쓰인다.
 - Self-Attention에서는 입력 `X`가 하나이고 `W_q`/`W_k`/`W_v`가 서로 달라 Q/K/V가 달라지는 것이지, `X` 자체가 세 개로 나뉘는 것이 아니다(`X_query`, `X_key`로 나누는 것은 Cross-Attention의 별도 예시).
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

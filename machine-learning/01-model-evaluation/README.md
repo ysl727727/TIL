@@ -1,17 +1,17 @@
-# Model Evaluation and Threshold Selection
+# 1장. 모델 평가와 임계값 선택
 
 회귀와 분류 문제에서 높은 점수 하나만 보는 대신, baseline과 여러 평가 지표를 함께 사용하고
 validation에서 선택한 정책을 test에 그대로 적용하는 과정을 실습했습니다.
 
-## Questions
+## 탐구 질문
 
 1. 회귀 모델은 train 평균을 예측하는 baseline보다 실제로 나은가?
 2. 악성 종양을 놓치는 비용이 클 때 Accuracy 외에 어떤 지표를 봐야 하는가?
 3. Recall 정책을 만족하는 임계값은 어느 데이터에서 결정해야 하는가?
 
-## Datasets
+## 데이터셋
 
-| Task | Dataset | Split | Positive class |
+| 문제 유형 | 데이터셋 | Split | 양성 클래스 |
 | --- | --- | --- | --- |
 | Regression | scikit-learn Diabetes | 265 / 88 / 89 | - |
 | Classification | Wisconsin Breast Cancer | 341 / 114 / 114 | Malignant = 1 |
@@ -21,12 +21,12 @@ validation에서 선택한 정책을 test에 그대로 적용하는 과정을 �
 - 분류 데이터는 `stratify` 적용
 - 원본 인덱스 교집합 검사를 통해 분할 중복 확인
 
-## Experiment 1: Regression Baseline
+## 실험 1: 회귀 baseline
 
 `StandardScaler → LinearRegression` pipeline을 train에서 학습하고,
 train target 평균을 반복 예측하는 baseline과 동일한 validation set에서 비교했습니다.
 
-| Candidate | MAE | RMSE | R² |
+| 후보 | MAE | RMSE | R² |
 | --- | ---: | ---: | ---: |
 | Linear Regression | 38.22 | 49.15 | 0.5810 |
 | Train-mean baseline | 67.52 | 76.16 | -0.0062 |
@@ -34,7 +34,7 @@ train target 평균을 반복 예측하는 baseline과 동일한 validation set�
 Linear Regression의 RMSE는 baseline보다 약 27.01 낮았습니다. R²는 약 0.581로,
 validation target 변동의 약 58.1%를 설명했습니다.
 
-## Experiment 2: Classification Metrics
+## 실험 2: 분류 지표
 
 `StandardScaler → LogisticRegression` pipeline의 validation 결과입니다.
 
@@ -45,7 +45,7 @@ validation target 변동의 약 58.1%를 설명했습니다.
 Accuracy가 높더라도 일부 악성 사례를 놓칠 수 있으므로 Recall을 함께 확인했습니다.
 ROC-AUC와 AP에는 이진 예측값이 아니라 연속 확률을 사용해 순위 능력을 평가했습니다.
 
-## Experiment 3: Recall Policy
+## 실험 3: Recall 정책
 
 validation Recall이 0.90 이상인 후보 중 F1이 가장 높은 임계값을 선택했습니다.
 동률일 때는 Precision과 임계값 순으로 결정했습니다.
@@ -59,7 +59,7 @@ validation Recall이 0.90 이상인 후보 중 F1이 가장 높은 임계값을 
 test 결과를 보고 모델이나 임계값을 다시 고르면 test가 선택 과정에 포함되어 최종 평가의
 독립성이 깨집니다. 따라서 test 결과는 최종 성능 보고에만 사용했습니다.
 
-## Key Takeaways
+## 핵심 정리
 
 - 모델 성능은 반드시 의미 있는 baseline과 비교한다.
 - 지표는 문제의 비용과 positive class 정의에 맞춰 선택한다.
@@ -67,7 +67,7 @@ test 결과를 보고 모델이나 임계값을 다시 고르면 test가 선택 
 - 모델과 임계값 선택은 validation에서 끝낸다.
 - test는 모든 선택을 고정한 뒤 마지막에 한 번만 확인한다.
 
-## Files
+## 파일 구성
 
 ```text
 01-model-evaluation/
@@ -76,7 +76,7 @@ test 결과를 보고 모델이나 임계값을 다시 고르면 test가 선택 
 └── requirements.txt
 ```
 
-## Run
+## 실행 방법
 
 ```bash
 python -m pip install -r requirements.txt

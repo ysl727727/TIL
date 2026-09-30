@@ -1,8 +1,8 @@
-# Chapter 7: Prompt Engineering to PEFT
+# 7장. Prompt Engineering에서 PEFT까지
 
 > 2026-09-09 학습 기록. 8-1, 8-2, 8-4, 8-5강 이론을 정리했습니다. 실습 노트북은 아직 없고 이론만 정리된 상태이며(주말로 이월), 아래 Core Theory는 `260908_7강_강의요약.docx` 다음 강의인 8강 정리자료(`8강_Prompt_Engineering부터_PEFT_Fine-tuning까지.pdf`)를 기반으로 합니다.
 
-## Learning Goals
+## 학습 목표
 
 - Prompt Engineering, Prompt-only, Prompt-tuning, PEFT, Full Fine-tuning이 "무엇을 바꾸는가"(입력 vs 모델 파라미터) 기준으로 어떻게 다른지 구분한다.
 - 새로운 태스크를 만났을 때 바로 Fine-tuning을 선택하지 않고 Prompt-only baseline부터 시작해야 하는 이유를 설명한다.
@@ -11,11 +11,11 @@
 - Prompt Tuning과 LoRA의 차이(입력 앞 soft prompt vs 모델 내부 Linear layer 경로)를 구분한다.
 - Prompt-only와 Fine-tuned/PEFT 모델을 공정 비교(같은 평가셋·정답·metric·parsing 규칙)하는 방법과, 평균 성능이 좋아져도 regression(기존에 맞던 사례가 틀리게 되는 것) 사례를 반드시 확인해야 하는 이유를 이해한다.
 
-## Practice Files
+## 실습 파일
 
-아직 실습 노트북이 없습니다. 8장 실습은 주말(2026-09-12~13)로 이월했습니다.
+아직 실습 노트북이 없습니다. 8장 실습은 주말(2026-09-12\~13)로 이월했습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 모델 적응 방법의 스펙트럼 (8-1강)
 
@@ -58,6 +58,6 @@ Baseline 설계 4요소: 평가셋(고정된 샘플), Prompt template(모든 샘
 - 비교 리포트 7항목: 문제 정의, 실험 조건(모델·prompt 버전·split·seed·후처리 규칙), 정량 결과, 정성 결과, 오류 분석, 결론(Prompt-only 유지/PEFT 적용/데이터 보강/Fine-tuning 확대 중 선택), 한계.
 - (선택) 생성 모델의 Release Gate: Task 품질, 안전·보안(민감정보 노출·prompt injection·유해 출력), Regression(기존 통과 사례 유지), 시스템(TTFT/TPOT/VRAM), 운영(rollback 절차)을 모두 통과해야 배포하며, 평가용 decoding parameter와 실제 서비스 설정이 다르면 결과도 달라지므로 둘 다 기록해야 한다.
 
-## Environment
+## 실행 환경
 
 이 챕터는 아직 실습 코드가 없습니다. 실습을 추가하면 `transformers`, `peft`, `accelerate`, `torch`가 필요합니다.

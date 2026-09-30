@@ -1,8 +1,8 @@
-# Chapter 6: Text Classification Fine-tuning with Trainer
+# 6장. Trainer로 하는 텍스트 분류 Fine-tuning
 
-> 2026-09-08 학습 기록. 7-1, 7-2, 7-3, 7-5, 7-6, 7-7, 7-8강 이론을 정리했습니다(7-4강 자료는 아직 없음). 실습은 7-1만 완료했고, 7-2~7-8 실습은 주말(2026-09-12~13)로 이월했습니다.
+> 2026-09-08 학습 기록. 7-1, 7-2, 7-3, 7-5, 7-6, 7-7, 7-8강 이론을 정리했습니다(7-4강 자료는 아직 없음). 실습은 7-1만 완료했고, 7-2\~7-8 실습은 주말(2026-09-12\~13)로 이월했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - 텍스트 분류 문제를 Fine-tuning 전에 입력/출력/라벨/성공 기준(5요소)으로 먼저 정의해야 하는 이유를 설명한다.
 - 결측·중복·label 불균형·split 간 leakage를 데이터 단계에서 점검하는 감사 함수를 만든다.
@@ -13,9 +13,9 @@
 - Checkpoint/Best Model/Final Model의 차이를 구분하고, 학습 실패(정체·과적합·NaN·OOM) 진단을 위한 소규모 오버핏 sanity check를 이해한다.
 - Error Analysis(Classification Report, Confusion Matrix, High/Low Confidence 오류)로 오류 패턴을 해석하고 Fine-tuning 리포트의 6대 구성 요소를 정리한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 7-1 | `01-data-quality-and-leakage-audit.ipynb` | 텍스트 정규화 후 빈 문장·허용 안 된 label·중복 감사(`audit_classification_records`), label 분포·imbalance ratio 계산, train/validation 간 정확 중복+Jaccard 기반 near-duplicate leakage 탐지 확인 |
 | 7-2 | 미완료 | 주말 backlog로 이월 (DatasetDict, Label Encoding, Stratified Split) |
@@ -27,7 +27,7 @@
 
 7-1은 첫 실행에서 assert 검증을 모두 통과했고 별도 수정 셀은 없었습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 문제 정의와 데이터 품질 점검 (7-1강)
 
@@ -74,7 +74,7 @@
 - 틀린 샘플은 High Confidence Error(강하게 확신했지만 틀림 → 잘못된 패턴 학습이나 라벨 오류 의심)와 Low Confidence Error(모델도 애매 → 문장 모호성이나 라벨 경계 불명확 의심)로 나눠 해석한다.
 - Fine-tuning 리포트는 성적 자랑이 아니라 재현·개선을 위한 기록이며, 문제 정의·데이터(split seed 포함)·모델/tokenizer·학습 설정·평가 결과·오류 분석 및 개선안 6가지를 반드시 포함해야 한다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

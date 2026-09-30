@@ -1,13 +1,13 @@
-# Class Imbalance, Cross-Validation, and Leakage Prevention
+# 4장. 클래스 불균형, 교차검증, 누수 방지
 
 불균형 분류에서 Accuracy 하나만으로 모델을 판단할 때 생기는 문제와,
 데이터의 독립 단위와 시간 구조에 맞게 교차검증을 선택하고 누수를 막는 원칙을 학습했습니다.
 
 > 진행 상태: 개념 학습 완료. 4-1과 4-2 실습은 아직 진행하지 못했습니다.
 
-## What I Learned
+## 배운 내용
 
-### Metrics for Imbalanced Classification
+### 불균형 분류의 지표
 
 - 양성이 드물면 모든 행을 음성으로 예측해도 Accuracy가 높을 수 있습니다.
 - Precision은 양성 예측의 신뢰도, Recall은 실제 양성을 놓치지 않는 정도를 봅니다.
@@ -15,9 +15,9 @@
 - 희소 양성 문제에서는 ROC-AUC뿐 아니라 AP, PR 곡선, FP와 FN의 실제 개수를 함께 확인합니다.
 - Threshold는 모델의 순위 능력을 바꾸는 학습 파라미터가 아니라 점수를 운영 행동으로 바꾸는 정책입니다.
 
-### Imbalance Handling
+### 불균형 처리
 
-| Method | Main idea | Main caution |
+| 방법 | 핵심 아이디어 | 주의점 |
 | --- | --- | --- |
 | Class weight | 소수 클래스 오류에 더 큰 가중치 부여 | 모든 모델에서 같은 효과를 보장하지 않음 |
 | Undersampling | 다수 클래스 행 일부 제거 | 유용한 정보가 사라질 수 있음 |
@@ -25,9 +25,9 @@
 
 리샘플링은 개발 데이터 전체가 아니라 각 CV의 train fold 안에서만 수행해야 합니다.
 
-### Choosing a CV Splitter
+### CV Splitter 고르기
 
-| Data structure | Splitter candidate | What it protects |
+| 데이터 구조 | Splitter 후보 | 막아 주는 것 |
 | --- | --- | --- |
 | 독립적인 일반 행 | `KFold` | 반복 분할을 통한 평균과 변동 확인 |
 | 불균형 분류 | `StratifiedKFold` | fold별 클래스 비율의 큰 흔들림 완화 |
@@ -37,7 +37,7 @@
 `StratifiedKFold`는 클래스 비율 문제를 줄일 뿐, 같은 원문의 chunk나 같은 사용자가
 양쪽에 들어가는 group 누수까지 막지는 못합니다.
 
-### Leakage Prevention
+### 누수 방지
 
 이번 강의에서 구분한 주요 누수는 다음과 같습니다.
 
@@ -51,12 +51,12 @@
 Pipeline은 전처리와 리샘플링의 `fit` 경계를 CV train fold 안으로 넣는 데 도움을 줍니다.
 하지만 잘못된 group이나 시간 분할, target 특성 설계까지 자동으로 해결하지는 않습니다.
 
-## Learning Reflection
+## 돌아보기
 
 강의에서 지표·분할·누수의 판단 원칙은 학습했지만, 직접 코드를 작성하고 결과를 해석하는
 실습은 하지 못했습니다. 따라서 이 기록은 개념을 정리한 상태이며, 구현 능력을 검증한 완료 기록은 아닙니다.
 
-## Next Steps
+## 다음 할 일
 
 - [ ] 불균형 데이터에서 Accuracy와 AP 기준선 비교
 - [ ] 같은 validation에서 class weight, undersampling, SMOTE 비교
@@ -65,7 +65,7 @@ Pipeline은 전처리와 리샘플링의 `fit` 경계를 CV train fold 안으로
 - [ ] 전체 데이터 전처리와 Pipeline 전처리의 누수 차이 확인
 - [ ] 후보 선택을 Dev에서 끝내고 sealed Test를 한 번만 평가
 
-## Files
+## 파일 구성
 
 ```text
 04-class-imbalance-cv-leakage/

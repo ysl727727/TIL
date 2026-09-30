@@ -1,8 +1,8 @@
-# Chapter 1: 단순 API 호출과 LangChain 앱 구조, 그리고 개발 환경
+# 1장. 단순 API 호출과 LangChain 앱 구조, 그리고 개발 환경
 
-> 2026-09-29 학습 기록. 1-1강(단순 API 호출과 LangChain 앱 구조 비교), 1-2강(패키지 구조와 개발 환경 설정) 이론을 정리했습니다. 1장 통합 실습 노트북은 받았지만 TODO 1~3이 아직 `NotImplementedError` 상태로 **미완료**이며 주말 backlog로 이월했습니다.
+> 2026-09-29 학습 기록. 1-1강(단순 API 호출과 LangChain 앱 구조 비교), 1-2강(패키지 구조와 개발 환경 설정) 이론을 정리했습니다. 1장 통합 실습 노트북은 받았지만 TODO 1\~3이 아직 `NotImplementedError` 상태로 **미완료**이며 주말 backlog로 이월했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - OpenAI SDK 직접 호출과 LangChain 호출의 공통점·차이점을 설명한다.
 - LangChain 기본 흐름 `Prompt → Model → Parser`를 순서대로 설명한다.
@@ -12,11 +12,11 @@
 - `ChatOpenAI`의 기본 호출로 `AIMessage`를 받아 본문을 확인한다.
 - 앱의 복잡도에 따라 직접 호출과 LangChain 중 무엇이 적합한지 판단한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
-| 1장 통합 | `01-direct-call-vs-langchain-starter.ipynb` | **미완료** — 모든 코드 셀의 `execution_count`가 비어 있고 출력이 없음. TODO 1~3(`ask_direct`, `ask_langchain`, `check_answers`)이 `raise NotImplementedError` 상태 |
+| 1장 통합 | `01-direct-call-vs-langchain-starter.ipynb` | **미완료** — 모든 코드 셀의 `execution_count`가 비어 있고 출력이 없음. TODO 1\~3(`ask_direct`, `ask_langchain`, `check_answers`)이 `raise NotImplementedError` 상태 |
 
 노트북은 같은 사내 안내문·질문을 **두 방식으로 처리해 결과를 비교**하는 구조다. 고정 입력은 `DOCUMENT`, `QUESTION`, `SYSTEM`, `USER_TEMPLATE = "안내문: {document}\n질문: {question}"`이며 채워야 할 부분은 세 군데다.
 
@@ -24,7 +24,7 @@
 2. `ask_langchain(model, document, question)` — 역할별 메시지 → 모델 응답 → 문자열 순으로 만들고 마지막 두 값을 반환
 3. `check_answers(direct_answer, chain_answer)` — 두 값의 문자열 여부와 빈 값을 확인해 `direct`/`langchain` 딕셔너리로 반환
 
-## Core Theory
+## 핵심 이론
 
 ### 1. LangChain이 필요해지는 지점 (1-1강)
 
@@ -155,7 +155,7 @@ print(response.content)
 
 답변 문장은 실행할 때마다 달라진다. 확인할 것은 **인증 오류 없이 문자열 답변이 나오는가**이다. `max_retries=0`은 수업에서 재시도 동작을 숨기지 않기 위한 설정이다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - "LangChain을 쓰면 코드가 더 길어졌다"는 첫 예제에서는 정상이다 — 장점은 한 번의 호출을 짧게 만드는 데 있지 않고, 단계가 늘어날 때 역할과 변경 지점을 분리하는 데 있다.
 - 설치 이름과 import 이름이 다른 규칙(하이픈 ↔ 언더스코어)을 처음 명확히 정리했다.
@@ -163,7 +163,7 @@ print(response.content)
 - `model.invoke()`가 문자열이 아니라 `AIMessage`를 돌려준다는 점이 Parser가 필요한 이유였다.
 - 자주 하는 오해: "LangChain이 답변을 더 잘하게 만든다"(모델이 같다) / "설치했는데 import가 안 되면 재설치해야 한다"(인터프리터 선택 문제인 경우가 많다) / "두 방식의 답이 다르면 잘못된 것이다"(LLM 응답은 매번 달라질 수 있다).
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

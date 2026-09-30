@@ -1,20 +1,20 @@
-# Activation Functions and Classification Output Layers
+# 4장. 활성화 함수와 분류 출력층
 
 선형층만 쌓았을 때의 한계에서 시작해 ReLU가 만드는 비선형성,
 이진 분류의 Sigmoid·`BCEWithLogitsLoss`, 다중 분류의 Softmax·`CrossEntropyLoss` 계약을 실습했습니다.
 
-> 진행 상태: 4-1~4-4 기본 실습과 별도 심화 실습을 모두 완료했습니다.
+> 진행 상태: 4-1\~4-4 기본 실습과 별도 심화 실습을 모두 완료했습니다.
 
-## Practice Status
+## 실습 상태
 
-| Lesson | Topic | Basic | Separate advanced |
+| 강 | 주제 | 기본 | 별도 심화 |
 | --- | --- | --- | --- |
-| 4-1 | 비선형성과 활성화 함수의 필요성 | Completed | Completed |
-| 4-2 | ReLU의 역할과 사용 위치 | Completed | Completed |
-| 4-3 | Sigmoid와 이진 분류 출력층 | Completed | Completed |
-| 4-4 | Softmax와 다중 분류 출력층 | Completed | Completed |
+| 4-1 | 비선형성과 활성화 함수의 필요성 | ✅ 완료 | ✅ 완료 |
+| 4-2 | ReLU의 역할과 사용 위치 | ✅ 완료 | ✅ 완료 |
+| 4-3 | Sigmoid와 이진 분류 출력층 | ✅ 완료 | ✅ 완료 |
+| 4-4 | Softmax와 다중 분류 출력층 | ✅ 완료 | ✅ 완료 |
 
-## Why Non-linearity Is Necessary
+## 비선형성이 필요한 이유
 
 활성화 함수 없이 `Linear` 층만 여러 개 연결하면 전체 연산은 결국 하나의 아핀 변환으로 합쳐집니다.
 
@@ -44,14 +44,14 @@ ReLU(x) = max(0, x)
 
 활성화 함수의 대표적인 차이도 함께 정리했습니다.
 
-| Function | Output or behavior | Main note |
+| 함수 | 출력·동작 | 메모 |
 | --- | --- | --- |
 | ReLU | 음수 0, 양수 유지 | 빠르지만 Dead ReLU 가능 |
 | LeakyReLU | 음수에도 작은 기울기 유지 | Dead ReLU 완화 |
 | Tanh | `-1~1` | 양 끝에서 vanishing gradient 가능 |
 | GELU | 입력을 부드럽게 조절 | Transformer에서 널리 사용 |
 
-## Binary Classification Contract
+## 이진 분류의 계약
 
 이진 분류에서는 샘플마다 class 1에 대한 raw logit 하나를 출력합니다.
 
@@ -72,7 +72,7 @@ preds = (probs >= 0.5).long()
 
 확률 `0.5`는 raw logit `0.0`과 같은 결정 경계입니다.
 
-## Multiclass Classification Contract
+## 다중 분류의 계약
 
 다중 분류에서는 샘플마다 class 수만큼 raw logits를 출력합니다.
 
@@ -95,7 +95,7 @@ preds = torch.argmax(logits, dim=-1)
 Softmax는 값의 순서를 바꾸지 않으므로 class index만 필요할 때는 raw logits에서 바로
 `argmax`를 적용해도 같은 class가 선택됩니다.
 
-## `dim=1` and `dim=-1`
+## `dim=1`과 `dim=-1`
 
 - `[B, C]`에서 `dim=1`과 `dim=-1`은 모두 class 축입니다.
 - `[B, L, C]`처럼 차원이 늘어나도 `dim=-1`은 마지막 class·feature 축을 가리킵니다.
@@ -107,7 +107,7 @@ Softmax는 값의 순서를 바꾸지 않으므로 class index만 필요할 때�
 assert torch.allclose(probs.sum(dim=-1), torch.ones(probs.shape[0]))
 ```
 
-## Newly Learned PyTorch and Python Syntax
+## 새로 알게 된 PyTorch·Python 문법
 
 ### `criterion`
 
@@ -136,7 +136,7 @@ Tensor들을 지정한 축으로 이어 붙입니다.
 expanded = torch.cat([x, nonlinear_feature], dim=1)
 ```
 
-### Tensor condition: `&` versus `and`
+### Tensor 조건식: `&`와 `and`
 
 Tensor의 각 원소에 조건을 적용할 때는 `and`가 아니라 `&`를 사용하고 각 비교식을 괄호로 묶습니다.
 
@@ -144,23 +144,23 @@ Tensor의 각 원소에 조건을 적용할 때는 `and`가 아니라 `&`를 사
 mask = (target >= 0) & (target < logits.shape[1])
 ```
 
-## Learning Reflection
+## 돌아보기
 
 활성화 함수는 단순히 값을 바꾸는 함수가 아니라 여러 선형층이 하나의 선형 변환으로 합쳐지는 것을 막고,
 모델이 비선형 패턴을 표현할 수 있게 한다는 점을 확인했습니다. 또한 출력층 활성화는 습관적으로 선택하는 것이 아니라
 문제 유형, logits shape, target shape·dtype, Loss 함수의 계약을 한 묶음으로 설계해야 한다는 점을 배웠습니다.
 
-## Next Steps
+## 다음 할 일
 
-- [x] 4-1~4-4 기본 실습
-- [x] 4-1~4-4 별도 심화 실습
+- [x] 4-1\~4-4 기본 실습
+- [x] 4-1\~4-4 별도 심화 실습
 - [ ] 이진·다중 분류 계약을 보지 않고 다시 작성
 - [ ] 잘못된 Sigmoid·Softmax 중복 적용을 직접 만들고 수정
 - [ ] `dim=0`과 `dim=-1` Softmax 결과를 행 합으로 비교
 - [ ] ReLU·LeakyReLU·Tanh·GELU의 출력과 gradient 차이 실험
 - [ ] threshold를 고정값으로만 보지 않고 Validation 정책과 연결해 복습
 
-## Files
+## 파일 구성
 
 ```text
 03-activation-output-layers/

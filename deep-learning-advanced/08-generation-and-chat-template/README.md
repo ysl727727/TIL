@@ -1,8 +1,8 @@
-# Chapter 8: Text Generation and Chat Templates
+# 8장. 텍스트 생성과 Chat Template
 
 > 2026-09-09 학습 기록. 9-1, 9-2, 9-3, 9-4, 9-5강 이론을 정리했습니다. 실습 노트북은 아직 없고 이론만 정리된 상태이며(주말로 이월), 아래 Core Theory는 `9강_generate__로_시작하는_텍스트_생성과_Chat_Template.pdf`를 기반으로 합니다.
 
-## Learning Goals
+## 학습 목표
 
 - Forward pass(logits 한 번 계산)와 `generate()`(다음 토큰 선택+입력에 붙이기를 반복하는 autoregressive 과정)의 차이를 설명한다.
 - `max_length`(입력+출력 전체 길이)와 `max_new_tokens`(새로 생성할 토큰 수만 제한)의 차이를 구분한다.
@@ -11,11 +11,11 @@
 - Chat model 입력이 단순 문자열이 아니라 `role`/`content` 구조의 messages임을 이해하고, `system`/`user`/`assistant` role의 차이를 설명한다.
 - `apply_chat_template()`이 필요한 이유와 `add_generation_prompt`의 역할을 이해하고, formatted text → tokenized input → generate 순서로 입력을 디버깅하는 흐름을 익힌다.
 
-## Practice Files
+## 실습 파일
 
-아직 실습 노트북이 없습니다. 9장 실습은 주말(2026-09-12~13)로 이월했습니다.
+아직 실습 노트북이 없습니다. 9장 실습은 주말(2026-09-12\~13)로 이월했습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. Forward Pass vs generate() (9-1강)
 
@@ -75,6 +75,6 @@
 
 - (선택) Decoder-only batch의 Left Padding과 Context Budget: 생성 batch는 마지막 열에서 다음 토큰 logits를 읽으므로 decoder-only 모델은 left padding을 권장하는 경우가 많다(짧은 시퀀스 왼쪽에 PAD를 채움). `attention_mask`는 PAD 위치를 0으로 표시한다. Context 예산은 대략 `prompt tokens + max_new_tokens <= effective context limit`로 잡으며, chat template의 system/role 토큰과 검색 문서도 prompt 길이에 포함되므로 truncation이 필요하면 system 지시나 최신 user 요청을 무심코 잘라내지 않도록 우선순위를 정해야 한다.
 
-## Environment
+## 실행 환경
 
 이 챕터는 아직 실습 코드가 없습니다. 실습을 추가하면 `transformers`, `torch`가 필요합니다.

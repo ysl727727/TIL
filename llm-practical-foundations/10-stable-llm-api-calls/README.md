@@ -1,10 +1,10 @@
-# Chapter 10: 안정적인 LLM API 호출 — Timeout · Rate Limit · Retry · Fallback
+# 10장. 안정적인 LLM API 호출 — Timeout · Rate Limit · Retry · Fallback
 
-> 2026-09-29 기록(강의 자료는 2026-09-23 확보). 10장 1강 이론을 정리했습니다. 밀려 있던 강의를 뒤늦게 따라잡은 회차라 앞 장(2~9장)보다 먼저 정리되었습니다. 실습 파일은 아직 받지 못해 이론만 기록합니다.
+> 2026-09-29 기록(강의 자료는 2026-09-23 확보). 10장 1강 이론을 정리했습니다. 밀려 있던 강의를 뒤늦게 따라잡은 회차라 앞 장(2\~9장)보다 먼저 정리되었습니다. 실습 파일은 아직 받지 못해 이론만 기록합니다.
 >
 > 선수지식으로 걸려 있는 7-3강(Validation Error 처리와 출력 복구)과 8장(Tool/Function Calling 파이프라인)은 아직 수강 전이라, Tool 관련 서술은 개념 수준으로만 정리했습니다. 데이터 엔지니어링 8장이 **우리가 만든 API 안에서의 최소 안정성**이었다면, 이 장은 **OpenAI Responses API를 직접 호출하는 쪽**의 재시도·대기·대체 경로 설계를 다룹니다.
 
-## Learning Goals
+## 학습 목표
 
 - API 오류를 재시도 가능 여부에 따라 분류한다.
 - OpenAI Python SDK의 기본 retry·timeout 동작을 설명한다.
@@ -13,13 +13,13 @@
 - 인증·잘못된 요청처럼 재시도하면 안 되는 오류를 구분한다.
 - 실패 시 모델·기능·사람 처리로 이어지는 fallback ladder를 설계한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 10-1 | — | **자료 미수령** — 교안의 로컬 retry 함수·Responses API wrapper 코드만 읽고 정리. 직접 실행하지 않음 |
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 안정적인 호출은 오류를 숨기는 코드가 아니다
 
@@ -166,7 +166,7 @@ def is_retryable_status(status_code: int | None) -> bool:
 
 결과는 `ok` / `output_text` / `error_code` / `attempts` / `latency_ms` / `request_id`를 담은 하나의 객체로 반환한다. `request_id`는 장애 문의와 추적에 쓰이므로 **성공·실패 로그 모두에** 남긴다. 성공 여부를 예외 대신 반환값으로 표현하면 호출하는 쪽이 분기하기 쉽다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - 가장 인상 깊었던 것은 **retry 계층을 겹치면 27회까지 늘어날 수 있다**는 계산이었다. "SDK도 재시도한다"는 사실을 모르면 내 wrapper의 3회가 실제로는 3회가 아니다.
 - Jitter는 "대충 랜덤하게"가 아니라 여러 client가 같은 순간에 다시 몰리는 재시도 폭주를 막기 위한 것이다.

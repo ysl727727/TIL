@@ -1,22 +1,22 @@
-# Loss, Optimizer, and Parameter Update Flow
+# 5장. 손실 함수, Optimizer, 파라미터 갱신 흐름
 
 손실 함수가 예측 오차를 scalar로 만드는 과정부터 문제별 Loss 선택,
 SGD·Adam과 learning rate, `backward()`와 `optimizer.step()`의 역할까지 실습했습니다.
 
 > 진행 상태: 5-1·5-3·5-4 기본·별도 심화 완료. 5-2 기본 완료, 별도 심화는 3문제 중 2문제 실행 완료이며 `compute_loss` 재실행이 남았습니다.
 
-## Practice Status
+## 실습 상태
 
-| Lesson | Topic | Basic | Separate advanced |
+| 강 | 주제 | 기본 | 별도 심화 |
 | --- | --- | --- | --- |
-| 5-1 | 손실 함수의 역할과 목표 함수 | Completed | Completed |
-| 5-2 | 문제 유형별 손실 함수 선택 | Completed | In progress: 2/3 executed |
-| 5-3 | SGD·Adam과 learning rate | Completed | Completed |
-| 5-4 | 파라미터 업데이트 코드 흐름 | Completed | Completed |
+| 5-1 | 손실 함수의 역할과 목표 함수 | ✅ 완료 | ✅ 완료 |
+| 5-2 | 문제 유형별 손실 함수 선택 | ✅ 완료 | 🧪 진행 중 (2/3 실행) |
+| 5-3 | SGD·Adam과 learning rate | ✅ 완료 | ✅ 완료 |
+| 5-4 | 파라미터 업데이트 코드 흐름 | ✅ 완료 | ✅ 완료 |
 
 강의 원문과 제공된 해설 대신 직접 작성한 코드와 실행 결과를 공개 노트북에 남겼습니다.
 
-## Chapter Map
+## 장 구성
 
 ```text
 입력
@@ -38,12 +38,12 @@ optimizer.step()
 
 말로 바꾸면 `이전 gradient 제거 → 예측 → 채점 → 수정 방향 계산 → 실제 수정`입니다.
 
-## 5-1. Loss Function
+## 5-1. 손실 함수
 
 손실 함수는 단순히 정답·오답을 나누는 것이 아니라 예측이 정답에서 얼마나 벗어났는지를
 미분 가능한 숫자로 표현합니다.
 
-### MSE by hand
+### MSE 손으로 계산하기
 
 ```python
 error = pred - target
@@ -56,9 +56,9 @@ assert torch.allclose(manual_mse, torch_mse)
 
 MSE가 오차를 제곱하는 이유는 양수·음수 오차의 상쇄를 막고 큰 오차에 더 큰 벌점을 주기 위해서입니다.
 
-### Reduction
+### Reduction 방식
 
-| Option | Result | Use |
+| 옵션 | 결과 | 용도 |
 | --- | --- | --- |
 | `none` | 원소별 Loss 유지 | 샘플별 오류 분석·가중치 적용 |
 | `sum` | Loss 합계 | 합 자체가 필요한 경우 |
@@ -68,7 +68,7 @@ MSE가 오차를 제곱하는 이유는 양수·음수 오차의 상쇄를 막�
 Loss 숫자는 같은 문제·데이터·함수·reduction 조건 안에서 비교해야 하며,
 MSE와 Cross Entropy의 절대값을 서로 직접 비교하면 안 됩니다.
 
-## 5-2. Match the Task Contract
+## 5-2. 문제 유형에 맞는 계약
 
 Loss 이름만 외우지 않고 다음을 한 세트로 확인합니다.
 
@@ -76,7 +76,7 @@ Loss 이름만 외우지 않고 다음을 한 세트로 확인합니다.
 문제 유형 → 출력 shape → target shape → target dtype → Loss
 ```
 
-| Task | Model output | Target | Target dtype | Loss |
+| 문제 유형 | 모델 출력 | 정답 | 정답 dtype | Loss |
 | --- | --- | --- | --- | --- |
 | 회귀 | `[B, 1]` 실수 | `[B, 1]` 실수 | float | `MSELoss` |
 | 이진 분류 | `[B, 1]` logit | `[B, 1]` 0/1 | float | `BCEWithLogitsLoss` |
@@ -100,7 +100,7 @@ def compute_loss(task, output, target):
     raise ValueError(f"unknown task: {task}")
 ```
 
-## 5-3. Optimizer and Learning Rate
+## 5-3. Optimizer와 learning rate
 
 `backward()`는 gradient를 계산해 `.grad`에 저장하고, optimizer는 그 gradient를 사용해 parameter를 바꿉니다.
 
@@ -117,7 +117,7 @@ new_parameter = old_parameter - learning_rate × gradient
 같은 learning rate에서도 gradient 크기에 따라 실제 이동량은 다릅니다.
 학습률 실험은 데이터·초기 parameter·optimizer·step 수를 고정하고 learning rate만 바꿔야 공정합니다.
 
-### SGD and Adam
+### SGD와 Adam
 
 - SGD는 gradient 크기에 learning rate를 곱해 직접 이동합니다.
 - Momentum SGD는 이전 이동 방향을 누적해 진동을 완화합니다.
@@ -127,16 +127,16 @@ new_parameter = old_parameter - learning_rate × gradient
 가상 Loss `(w - 2)²`, `w=0`, `lr=0.1`의 첫 step에서 SGD는 gradient `-4`에 비례해
 `w=0.4`로 이동하고, Adam은 초기 보정 결과 약 `w=0.1`로 이동하는 차이를 확인했습니다.
 
-## 5-4. Parameter Update and Verification
+## 5-4. 파라미터 갱신과 검증
 
 각 단계의 역할은 명확히 다릅니다.
 
-| Code | Role | Changes parameter? |
+| 코드 | 역할 | 파라미터 변경? |
 | --- | --- | --- |
-| `criterion(outputs, targets)` | 오차 계산 | No |
-| `loss.backward()` | gradient 계산 | No |
-| `optimizer.step()` | weight·bias 업데이트 | Yes |
-| `optimizer.zero_grad()` | 이전 gradient 제거 | No |
+| `criterion(outputs, targets)` | 오차 계산 | 아니오 |
+| `loss.backward()` | gradient 계산 | 아니오 |
+| `optimizer.step()` | weight·bias 업데이트 | 예 |
+| `optimizer.zero_grad()` | 이전 gradient 제거 | 아니오 |
 
 `step()`은 parameter를 변경하지만 `.grad`를 자동으로 비우지 않습니다. 다음 step의
 `backward()` 전에 `zero_grad()`가 실행되어야 의도하지 않은 gradient 누적을 막을 수 있습니다.
@@ -157,7 +157,7 @@ assert torch.allclose(weight_after, expected)
 
 `detach()`는 계산 그래프에서 분리하고, `clone()`은 값이 독립된 새 Tensor를 만듭니다.
 
-## Questions I Asked and What I Learned
+## 내가 한 질문과 알게 된 점
 
 ### 1. `if not all(math.isfinite(value) for value in values)`는 어떻게 동작하는가?
 
@@ -241,7 +241,7 @@ total_loss += loss.item()
 `loss.item()`은 계산 그래프와 분리된 Python 숫자를 반환합니다. 따라서 기록에는 `.item()`을 쓰고,
 역전파는 Tensor인 `loss.backward()`로 실행합니다. `.item()` 결과에는 `backward()`를 호출할 수 없습니다.
 
-## Learning Reflection
+## 돌아보기
 
 이번 장에서 Loss 계산, gradient 계산, parameter 수정이 서로 다른 단계라는 점을 코드 흐름으로 연결했습니다.
 특히 학습이 실행됐다는 사실만 확인하지 않고 non-finite Loss, 호출 순서, 유일한 승인 후보,
@@ -251,7 +251,7 @@ total_loss += loss.item()
 `zip(values, values[1:])`은 연속 쌍 생성, `next()`는 첫 실패 원인 검색,
 `loss.item()`은 기록용 숫자 추출이라는 역할로 구분했습니다.
 
-## Next Steps
+## 다음 할 일
 
 - [x] 5-1·5-3·5-4 기본·별도 심화 실습
 - [x] 5-2 기본 실습
@@ -261,7 +261,7 @@ total_loss += loss.item()
 - [ ] `loss.item()` 사용 전후 누적 변수의 type과 graph 연결 비교
 - [ ] 호출 순서 audit 함수를 작은 문제로 다시 작성
 
-## Files
+## 파일 구성
 
 ```text
 04-loss-optimization-training-loop/

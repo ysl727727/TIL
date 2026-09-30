@@ -1,8 +1,8 @@
-# Chapter 9: Experiment Reproducibility and Checkpoints
+# 9장. 실험 재현성과 Checkpoint
 
-> 2026-08-27 학습 기록. 9-1~9-5 이론과 기본 실습을 정리했습니다. 별도 심화 문제는 이번 기록에서 제외했으며 시간이 남을 때 진행합니다.
+> 2026-08-27 학습 기록. 9-1\~9-5 이론과 기본 실습을 정리했습니다. 별도 심화 문제는 이번 기록에서 제외했으며 시간이 남을 때 진행합니다.
 
-## Learning Goals
+## 학습 목표
 
 - Python, NumPy, PyTorch와 데이터 순서에 영향을 주는 seed를 함께 관리한다.
 - 실험 설정과 epoch별 metric을 파일로 남겨 비교 가능한 실험을 만든다.
@@ -10,9 +10,9 @@
 - 실험별 폴더에 config, metrics, checkpoint와 결과물을 모아 관리한다.
 - seed 고정만으로 모든 환경에서 완전히 같은 결과가 보장되지는 않는다는 한계를 기록한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Basic practice status |
+| 강 | 파일 | 기본 실습 상태 |
 | --- | --- | --- |
 | 9-1 | `01-seed-reproducibility-basic.ipynb` | Python·NumPy·PyTorch seed와 모델 초기화 재현 확인 |
 | 9-2 | `02-logging-design-basic.ipynb` | epoch log dictionary와 log list 누적 확인 |
@@ -22,9 +22,9 @@
 
 9-3의 `model_State` 표기는 이후 코드와 이름을 일관되게 맞추기 위해 `model_state`로 수정했습니다. 9-5의 `make_exp_dir()`는 생성한 상세 경로를 `Path(root)`로 다시 덮어쓰던 줄을 제거했습니다. 두 수정 셀은 현재 환경에서 PyTorch를 실행할 수 없어 출력 재검증이 필요합니다.
 
-## Core Theory
+## 핵심 이론
 
-### 1. Seed and Reproducibility
+### 1. Seed와 재현성
 
 재현성을 높이려면 하나의 seed만 적는 것으로 끝나지 않습니다. 다음 난수 흐름과 데이터 순서를 함께 관리해야 합니다.
 
@@ -36,7 +36,7 @@
 
 같은 seed라도 PyTorch·CUDA 버전, 장치, 연산 종류와 실행 순서가 달라지면 결과가 완전히 같지 않을 수 있습니다. 따라서 코드와 seed뿐 아니라 실행 환경도 함께 기록합니다.
 
-### 2. Logging Contract
+### 2. 로깅 계약
 
 `config.json`에는 실험 조건을, metric log에는 epoch별 결과를 남깁니다.
 
@@ -48,7 +48,7 @@ checkpoint: model · optimizer · completed epoch · history
 
 재개할 때는 checkpoint의 완료 epoch와 기존 metric log의 마지막 epoch가 같은지 먼저 확인하고 다음 epoch만 추가해야 중복 기록을 막을 수 있습니다.
 
-### 3. `state_dict` and Checkpoint
+### 3. `state_dict`와 Checkpoint
 
 - `model.state_dict()`: weight, bias와 등록된 buffer의 값
 - `optimizer.state_dict()`: optimizer 설정과 Adam의 moving average 같은 내부 상태
@@ -58,11 +58,11 @@ checkpoint: model · optimizer · completed epoch · history
 
 `state_dict`는 모델 구조 자체가 아니므로 같은 구조의 모델을 먼저 만든 뒤 `load_state_dict()`로 값을 주입해야 합니다.
 
-### 4. Resume Boundary
+### 4. 재개 경계
 
 이번 강의에서 정확한 재개란 모든 batch 처리와 history 기록이 끝난 epoch 경계에서 다음 epoch를 시작하는 경우입니다. epoch 중간에 중단되었다면 미완료 epoch를 처음부터 다시 실행합니다. seed를 다시 지정하는 것만으로는 저장 시점의 난수 상태로 돌아가지 않습니다.
 
-### 5. Experiment Directory
+### 5. 실험 폴더
 
 한 실험의 설정과 결과는 하나의 run directory 안에서 연결합니다.
 
@@ -79,9 +79,9 @@ runs/<timestamp>_<experiment>/
 
 `last.pt`는 마지막 완료 epoch에서 재개하기 위한 상태이고, `best.pt`는 validation 기준으로 선택된 평가·추론용 상태입니다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
-### Config and JSON
+### Config와 JSON
 
 - `os.makedirs(path, exist_ok=True)`는 중간 폴더까지 만들며 기존 폴더가 있어도 오류를 내지 않는다.
 - `os.path.join(a, b)`은 Windows와 Linux의 경로 구분자를 직접 하드코딩하지 않고 경로를 연결한다.
@@ -92,7 +92,7 @@ runs/<timestamp>_<experiment>/
 - 변수 이름은 숫자로 시작할 수 없다. `0json_text`가 아니라 `json_text`처럼 작성한다.
 - `json_text[:80]`은 JSON 문자열의 처음 80글자만 미리 확인하는 slicing이다.
 
-### File Modes and Logging
+### 파일 모드와 로깅
 
 - `w`: 기존 내용을 지우고 새로 작성
 - `a`: 기존 내용을 유지하고 파일 끝에 추가
@@ -100,11 +100,11 @@ runs/<timestamp>_<experiment>/
 
 완성된 config는 보통 `w`로 저장하고, epoch가 끝날 때마다 한 줄씩 누적하는 log는 `a`를 사용할 수 있습니다.
 
-### Function Call Flow
+### 함수 호출 흐름
 
 `make_epoch_log(2, 0.812345, 0.923456, 0.73456)`의 네 값은 함수 parameter에 순서대로 전달됩니다. 함수가 dictionary를 `return`하고, 바깥의 `print()`가 반환된 dictionary를 화면에 출력합니다.
 
-### Loading a Checkpoint
+### Checkpoint 불러오기
 
 - `torch.load(path, map_location="cpu")`: checkpoint 파일을 Python dictionary로 읽는다.
 - `model.load_state_dict(checkpoint["model_state"])`: 읽은 parameter 값을 실제 모델에 주입한다.
@@ -113,22 +113,22 @@ runs/<timestamp>_<experiment>/
 - `strict=True`: model과 state dictionary의 key가 정확히 맞아야 한다.
 - `strict=False`: 맞는 key만 불러올 수 있지만 누락을 숨길 수 있으므로 결과를 확인해야 한다.
 
-### Files, Directories, and the `make_exp_dir` Bug
+### 파일·폴더와 `make_exp_dir` 버그
 
 - `Path(path).unlink(missing_ok=True)`는 파일 하나를 삭제한다.
 - `shutil.rmtree(path, ignore_errors=True)`는 하위 내용을 포함한 폴더 전체를 삭제한다.
 - `Path(root) / f"{exp_name}_seed{seed}"`는 `pathlib` 방식의 안전한 경로 결합이다.
 - 생성한 상세 경로 뒤에 다시 `path = Path(root)`를 대입하면 반환값이 상위 `runs`로 바뀐다. 생성한 경로를 그대로 `return path`해야 한다.
 
-## Chapter 10 Status
+## 10장 진행 상태
 
 10-1 학습 곡선 해석과 10-2 Overfitting·Underfitting 진단은 건강 문제로 오늘 진행하지 못했습니다. 완료로 표시하지 않으며, 컨디션이 회복된 뒤 이론과 실습을 차례대로 확인합니다.
 
-## Deferred Advanced Practice
+## 미룬 심화 실습
 
 9장 별도 심화 문제는 현재 필수 백로그로 두지 않습니다. 기본 흐름과 10장이 정리된 뒤 시간이 남을 때 진행합니다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

@@ -24,13 +24,13 @@
 5. 마지막에 최종 test로 한 번만 성능을 확인하고, 자동 검증 셀로 전체 흐름이 깨지지 않았는지 체크
 6. 노트북 마지막에 AI(Claude 등)를 활용한 부분을 개념/함수·문법/그래프 구현으로 구분해 별도 기록
 
-## Files
+## 파일 구성
 
-| File | 설명 |
+| 파일 | 설명 |
 | --- | --- |
-| `deep_learning_basic_assignment_이용석.ipynb` | 1~4단계 구현, 최종 test 및 자동 검증 포함 |
+| `deep_learning_basic_assignment_이용석.ipynb` | 1\~4단계 구현, 최종 test 및 자동 검증 포함 |
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install torch torchvision matplotlib

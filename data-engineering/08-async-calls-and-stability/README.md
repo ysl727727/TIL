@@ -1,8 +1,8 @@
-# Chapter 8: 비동기 호출과 안정성
+# 8장. 비동기 호출과 안정성
 
 > 2026-09-29 기록(강의는 2026-09-23 수강). 8-1강(비동기 처리와 `httpx.AsyncClient`), 8-2강(Timeout/retry/rate limit/middleware 통합) 이론을 정리했습니다. 대기 시간이 겹치는 비동기 호출에 timeout·제한된 재시도·502 변환·요청 로그를 더해 "느려도 예측 가능한" API로 만드는 단계입니다. 실습 파일은 아직 받지 못해 이론만 기록합니다.
 
-## Learning Goals
+## 학습 목표
 
 - `async def` / `await` / `asyncio.run()`의 역할과, 비동기가 빨라지는 조건(대기 시간이 겹칠 때)을 설명한다.
 - `httpx.AsyncClient`를 `async with`로 한 번만 만들어 공유한다.
@@ -11,13 +11,13 @@
 - 재시도를 timeout과 5xx로만 제한하고, 4xx(429 포함)는 즉시 실패시킨다.
 - 외부 실패를 우리 API의 502로 바꾸고, middleware로 method·path·status만 기록한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 8장 통합 | — | **자료 미수령** — 강의 교안만 받았고 실습 노트북이 없어 이론 정리만 진행 |
 
-## Core Theory
+## 핵심 이론
 
 ### 1. 비동기가 빨라지는 조건
 
@@ -117,7 +117,7 @@ async def log_requests(request, call_next):
 - 기록하는 것은 method·path·status **세 가지뿐**이다. 요청 본문이나 header 전체를 남기면 질문 내용과 인증 값이 로그에 쌓인다.
 - 쿼리 문자열까지 남기면 query에 들어간 값이 함께 기록되므로 `url.path`만 쓴다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - `await`를 "비동기 함수 앞에 붙이는 것"으로 외우면 `response.json()`에서 걸린다 — **기다림이 있는지**가 기준이다.
 - `except`의 순서가 동작을 바꾼다는 점(하위 클래스를 먼저)이 이 장에서 가장 실수하기 쉬운 부분이었다.

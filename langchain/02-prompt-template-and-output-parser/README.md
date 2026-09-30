@@ -1,8 +1,8 @@
-# Chapter 2: PromptTemplate과 ChatPromptTemplate, ChatModel과 Output Parser
+# 2장. PromptTemplate과 ChatPromptTemplate, ChatModel과 Output Parser
 
 > 2026-09-29 학습 기록. 2-1강(PromptTemplate과 ChatPromptTemplate), 2-2강(ChatModel과 Output Parser 연결) 이론을 정리했습니다. 이 장의 실습 파일(`실습.py`)은 아직 받지 못해 이론만 기록합니다.
 
-## Learning Goals
+## 학습 목표
 
 - Prompt에서 고정 문장과 실행할 때 바뀌는 입력값을 구분한다.
 - `PromptTemplate`으로 재사용 가능한 문자열 Prompt를 만든다.
@@ -11,13 +11,13 @@
 - `StrOutputParser`로 `AIMessage`를 문자열로 바꾼다.
 - List Parser와 JSON Parser로 응답을 `list`·`dict`로 바꾸고, 필요한 키가 있는지 확인한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Practice status |
+| 강 | 파일 | 실습 상태 |
 | --- | --- | --- |
 | 2-1 / 2-2 | — | **자료 미수령** — 강의 교안만 확보. 실습 `실습.py`는 1-2강에서 만든 프로젝트의 하위 폴더에서 `uv run python 실습.py`로 실행하는 구조 |
 
-## Core Theory
+## 핵심 이론
 
 ### 1. Template은 편지 양식 (2-1강)
 
@@ -165,7 +165,7 @@ except OutputParserException as error:
 
 실습 `실습.py`는 상단의 `EXAMPLE = "text"` 값을 `"list"`, `"json"`으로 바꿔 한 번에 예제 하나만 실행한다 — **각 실행이 실제 API를 한 번씩 호출**하므로 필요한 예제만 돌린다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
 - Parser를 "모델이 형식을 지키게 하는 장치"로 오해하기 쉬운데, 실제로는 **형식 안내를 Prompt에 넣는 일**과 **응답을 변환하는 일**이 따로다.
 - Template을 만들었는데 모델 답변이 없는 것은 정상이다 — Template은 메시지만 만든다.

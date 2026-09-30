@@ -1,8 +1,8 @@
-# Chapter 12: CNN Design, Training, and Reporting
+# 12장. CNN 설계, 학습, 리포트
 
-> 2026-08-31 학습 기록. 12-1~12-8 이론과 기본 실습을 정리했습니다.
+> 2026-08-31 학습 기록. 12-1\~12-8 이론과 기본 실습을 정리했습니다.
 
-## Learning Goals
+## 학습 목표
 
 - 입력이 grayscale인지 RGB인지에 따라 첫 `Conv2d`의 `in_channels`를 맞추고, filter progression으로 Conv block을 쌓는다.
 - dummy 입력을 통과시켜 classifier의 `in_features`를 자동 계산해 Linear dimension mismatch를 방지한다.
@@ -13,9 +13,9 @@
 - 실험 설정(config)과 결과(metric)를 하나의 row로 합치고, best epoch·loss gap을 계산해 리포트 문장을 자동 생성한다.
 - `nn.Module`을 상속한 CNN 클래스를 직접 작성하고, 학습·검증·추론(softmax·argmax·confidence)까지 종합적으로 실행한다.
 
-## Practice Files
+## 실습 파일
 
-| Lesson | File | Basic practice status |
+| 강 | 파일 | 기본 실습 상태 |
 | --- | --- | --- |
 | 12-1 | `01-cnn-input-channel-basic.ipynb` | grayscale/RGB `in_channels`, filter progression, classifier 입력 차원 자동 계산 확인 |
 | 12-2 | `02-training-pipeline-basic.ipynb` | `TensorDataset`/`DataLoader` 구성, 학습 loop와 validation accuracy 계산 확인 |
@@ -28,7 +28,7 @@
 
 12-4의 `loss_value` 변수는 어디에서도 정의되지 않은 채 `round(loss_value, 4)`에 사용되어 `NameError`가 발생합니다. `loss.item()`으로 고쳐야 하며 아직 재실행하지 못했습니다. 12-8 문제 3의 첫 시도는 `with torch.no_grad:`처럼 괄호가 빠진 채 작성되어 실행되지 않았고, 이어지는 셀에서 `torch.no_grad()`로 고친 뒤 `torch.allclose`로 softmax 행 합까지 확인해 재검증했습니다.
 
-## Core Theory
+## 핵심 이론
 
 ### 1. PyTorch 기초 표기
 
@@ -63,7 +63,7 @@
 
 ### 6. 활성화 함수와 경사 소실
 
-- `tanh`: 출력 범위 -1~1, zero-centered. sigmoid(0~1)보다 학습에 유리하지만 기울기 소실 문제는 여전히 존재한다.
+- `tanh`: 출력 범위 -1\~1, zero-centered. sigmoid(0\~1)보다 학습에 유리하지만 기울기 소실 문제는 여전히 존재한다.
 - 기울기 소실: sigmoid/tanh는 미분값이 항상 1보다 작아(sigmoid 최대 0.25) 레이어를 거슬러 곱해질수록 기울기가 기하급수적으로 작아진다 → 앞쪽 레이어 학습이 어려워진다.
 - ReLU: 양수 구간 미분값이 항상 1이라 기울기가 줄어들지 않아 깊은 네트워크 학습에 유리하다. 단점은 Dying ReLU(음수 영역 뉴런이 영원히 죽을 수 있음).
 
@@ -77,20 +77,20 @@
 - `{**config, **metric}`: 두 딕셔너리를 병합하며 겹치는 key는 뒤 딕셔너리 값이 우선한다. 실험 설정+결과를 한 줄(row)로 만들어 표로 정리할 때 유용하다.
 - `tensor_mb`: `tensor.numel() * tensor.element_size() / (1024 ** 2)`. 총 원소 수 × 원소당 바이트를 MB로 변환한다.
 
-## Questions and Newly Learned Points
+## 질문과 새로 알게 된 점
 
-### Design Choices
+### 설계 선택
 
 - one-step loss는 초기화 영향이 커서 모델 선택 기준으로 쓰지 않으며, 실제 비교는 같은 학습 조건의 validation metric으로 판단해야 한다.
 - validation loss가 가장 낮은 epoch를 best epoch로 고르고, 그 epoch의 `train_loss - valid_loss`(loss gap)로 과적합 신호를 살핀다. accuracy gap과 혼동하지 않도록 metric 종류를 이름에 명시한다.
 - 리포트는 숫자 나열이 아니라 선택 기준·결론·한계까지 함께 적어야 한다.
 
-### Inference
+### 추론
 
 - 추론에서는 `model.eval()`과 `torch.no_grad()`를 함께 사용한다.
 - `F.softmax(logits, dim=1)` 결과의 행 합이 1인지 `torch.allclose`로 확인한 뒤, `argmax` index를 미리 정의한 class mapping(`idx_to_class`)으로 되돌려 사람이 읽을 class 이름과 confidence를 함께 남긴다.
 
-## Environment
+## 실행 환경
 
 ```bash
 pip install -r requirements.txt

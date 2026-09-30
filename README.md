@@ -16,7 +16,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 현재 단계 | 데이터 엔지니어링 → LLM 애플리케이션(LangChain) |
-| 최근 학습 | **2026-09-29** · 밀린 3회차 정리 — 데이터 엔지니어링 4\~8장, LLM 실전 10-1강(보강), LangChain 1\~2장, Python 보강 드릴 |
+| 최근 학습 | **2026-09-30** · LangChain 3\~5장과 6-1강 — LCEL 실행, Runnable 조합, 구조화 출력, Document (6-2강부터 10/01 진행) |
 | 이번 주말 | **10/03\~04** · LangChain 1장 통합 실습 TODO 1\~3 → 10-1강 retry 함수 직접 작성 → 데이터 엔지니어링 3장 실습 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -109,6 +109,10 @@ flowchart LR
 | --- | --- | --- |
 | [1](./langchain/01-app-structure-and-environment/) | SDK 직접 호출 vs LangChain, Prompt → Model → Parser, uv + Python 3.12 환경 | 📘 이론 정리 · ⏳ 실습 TODO 미완 |
 | [2](./langchain/02-prompt-template-and-output-parser/) | `PromptTemplate`·`ChatPromptTemplate`, Str·List·JSON Output Parser | 📘 이론 정리 · 📭 |
+| [3](./langchain/03-lcel-pipe-and-execution/) | LCEL pipe 연산자, `invoke`·`batch`·`stream`, 단계별 자료형 디버깅과 체인 재사용 | 📘 이론 정리 |
+| [4](./langchain/04-runnable-sequence-parallel-assign/) | `RunnableSequence`·`RunnableParallel`, `RunnablePassthrough`·`RunnableLambda`·`.assign()` | 📘 이론 정리 |
+| [5](./langchain/05-structured-output-and-validation/) | Pydantic 스키마와 `with_structured_output()`, Parser 검증과 오류 읽기, 1회 복구 | 📘 이론 정리 |
+| [6](./langchain/06-document-and-retriever/) | `Document`의 `page_content`·`metadata`, formatter (6-2 Retriever, 6-3 retrieval chain 예정) | 📘 6-1까지 · ⬜ 6-2\~6-3 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
@@ -129,6 +133,16 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-09-30 · LangChain 3\~6-1: LCEL, Runnable 조합, 구조화 출력, Document
+
+- 3장: `prompt | model | parser`는 **연결만** 하고 API 호출은 `invoke()` 때 일어남. 오류가 나면 `dict → ChatPromptValue → AIMessage → str` 경계 중 어디서 자료형이 달라졌는지부터 확인
+- 3-2강: `invoke()`는 1건, `batch()`는 리스트(결과도 입력 순서대로 리스트, 입력 수만큼 API 호출), `stream()`은 조각을 반복문으로 받음
+- 4장: 앞 결과가 필요하면 Sequence, 같은 입력을 각자 쓰면 Parallel(모델 branch 수만큼 API 호출). `.assign()`은 원본 dict를 보존하며 필드를 추가하고, 서로 의존하는 필드는 assign을 단계별로 나눔
+- 5장: `with_structured_output()`으로 Pydantic 객체를 받고, `parser.parse()`는 JSON 해석 → 스키마 검증 두 단계. `parse()` 실패는 `OutputParserException`, `model_validate()` 실패는 `ValidationError`
+- 5-3강: 검증 실패 시 수정 요청은 **최대 1회**, 같은 Parser로 재검증하고 실패하면 `None`. 스키마 통과는 형식만 보장하고 내용의 정확성은 보장하지 않음
+- 6-1강: 본문은 `page_content`(str), 부가 정보는 `metadata`(dict). 같은 의미는 모든 문서에서 같은 키로, 선택 키는 `.get()`으로 읽음. formatter는 Document를 바꾸지 않고 표시용 문자열만 만듦
+- 6-2강(Retriever)·6-3강(retrieval chain)은 10/01에 이어서 진행
+
 ### 2026-09-29 · LangChain 기초와 Python 보강 드릴
 
 - SDK 직접 호출과 LangChain은 모델이 같아 답변 품질이 아니라 **코드 구성 방식**이 다름 — LangChain은 `Prompt → Model → Parser` 세 역할로 나눔
@@ -143,13 +157,6 @@ flowchart LR
 - 외부 실패는 그대로 흘리지 않고 422 / 404 / 502 / 503으로 우리 API 코드로 변환
 - 비동기는 **대기 시간이 겹칠 때만** 빨라지고, `asyncio.gather()` 결과는 입력 순서를 따름
 - 재시도 계층을 겹치면 최대 27회까지 늘어남 — retry 책임은 한 계층에만 둠 (LLM 실전 10-1강 보강)
-
-### 2026-09-22 · 데이터 엔지니어링: 정제, FastAPI, Pydantic
-
-- 정제는 원본을 덮어쓰지 않고 별도 산출물을 만드는 일, `입력 = 정상 + 중복 제외 + 규칙 제외` 등식으로 1차 검증
-- FastAPI는 경로·함수를 **선언**하고 Uvicorn이 포트를 열어 **실행** — 코드에 포트가 없는 이유
-- 요청 모델과 응답 모델을 나누고 `response_model`로 응답 필드를 고정
-- 4\~8장은 강의 교안만 받아 이론만 정리
 
 ## 📂 폴더 구조
 
@@ -166,7 +173,7 @@ TIL/
 ├── deep-learning-advanced/        # 1~8장
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
-├── langchain/                     # 1~2장
+├── langchain/                     # 1~6장 (6장 진행 중)
 ├── python-basics/                 # Python 보강
 └── assignments/                   # 채점용 종합 과제
 ```

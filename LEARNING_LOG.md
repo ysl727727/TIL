@@ -3,6 +3,16 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-09-30 · LangChain 3\~6-1: LCEL, Runnable 조합, 구조화 출력, Document
+
+- 3장: `prompt | model | parser`는 **연결만** 하고 API 호출은 `invoke()` 때 일어남. 오류가 나면 `dict → ChatPromptValue → AIMessage → str` 경계 중 어디서 자료형이 달라졌는지부터 확인
+- 3-2강: `invoke()`는 1건, `batch()`는 리스트(결과도 입력 순서대로 리스트, 입력 수만큼 API 호출), `stream()`은 조각을 반복문으로 받음
+- 4장: 앞 결과가 필요하면 Sequence, 같은 입력을 각자 쓰면 Parallel(모델 branch 수만큼 API 호출). `.assign()`은 원본 dict를 보존하며 필드를 추가하고, 서로 의존하는 필드는 assign을 단계별로 나눔
+- 5장: `with_structured_output()`으로 Pydantic 객체를 받고, `parser.parse()`는 JSON 해석 → 스키마 검증 두 단계. `parse()` 실패는 `OutputParserException`, `model_validate()` 실패는 `ValidationError`
+- 5-3강: 검증 실패 시 수정 요청은 **최대 1회**, 같은 Parser로 재검증하고 실패하면 `None`. 스키마 통과는 형식만 보장하고 내용의 정확성은 보장하지 않음
+- 6-1강: 본문은 `page_content`(str), 부가 정보는 `metadata`(dict). 같은 의미는 모든 문서에서 같은 키로, 선택 키는 `.get()`으로 읽음. formatter는 Document를 바꾸지 않고 표시용 문자열만 만듦
+- 6-2강(Retriever)·6-3강(retrieval chain)은 10/01에 이어서 진행
+
 ## 2026-09-29 · LangChain 기초와 Python 보강 드릴
 
 - LangChain 1-1강: OpenAI SDK 직접 호출은 입력 준비·모델 실행·출력 정리를 한 함수가 모두 맡고, LangChain은 같은 일을 `Prompt → Model → Parser` 세 역할로 나눔 — 모델이 같으므로 답변 품질이 아니라 **코드 구성 방식**이 달라짐

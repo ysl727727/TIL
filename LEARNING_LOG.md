@@ -3,6 +3,15 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-01 · LangChain 6-2\~10장: Retriever, 대화 기억, 관찰, 실패 대응, 통합 Q&A 앱
+
+- 6-2·6-3강: Retriever는 `str → list[Document]` 계약, 0건도 빈 목록이라는 정상 결과. Prompt에는 문서 목록이 아니라 formatter가 만든 context 문자열을 넣고, `assign`으로 `documents`도 함께 남겨 출처 확인에 씀
+- 7장: 모델은 호출마다 기억이 없어서 앱이 `HumanMessage`·`AIMessage`를 session별로 저장했다가 `MessagesPlaceholder`에 **목록**으로 다시 넣음. 현재 질문은 모델 호출 **후에** 답변과 한 쌍으로 저장
+- 8장: 답은 `stream()` 반복문 한 곳에서 출력, Callback은 시작·조각·완료·오류를 **관찰만** 함. 토큰 정보가 없으면 0이 아니라 "제공되지 않음", `flush()` 완료 ≠ 원격 조회 가능
+- 9장: `stop_after_attempt`는 최초 호출 포함 횟수, Retry는 모델 호출 단계에만 붙이고 내부 재시도와 곱해지지 않게 `max_retries=0`. Fallback은 같은 출력 계약 + `status="degraded"`로 기능 저하를 솔직히 알림
+- 10장: 검색은 모델보다 먼저, 구조화 검증은 저장보다 먼저. 검색 0건이면 모델 호출 없이 `not_found`, `sources`는 실제 검색 ID와 `issubset`으로 다시 대조. LangGraph는 반복·재개·사람 승인·영속 상태가 필요할 때만 검토
+- 실습: 6\~10장은 이론 분량이 많아 **10장 통합 실습(`starter.py`) TODO 1\~3**만 진행 — Prompt(system → history → human), `history.messages[-4:]`로 `policy.invoke()` 1회, 출처 검증 뒤에만 질문·답변 저장
+
 ## 2026-09-30 · LangChain 3\~6-1: LCEL, Runnable 조합, 구조화 출력, Document
 
 - 3장: `prompt | model | parser`는 **연결만** 하고 API 호출은 `invoke()` 때 일어남. 오류가 나면 `dict → ChatPromptValue → AIMessage → str` 경계 중 어디서 자료형이 달라졌는지부터 확인

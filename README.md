@@ -16,7 +16,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 현재 단계 | 데이터 엔지니어링 → LLM 애플리케이션(LangChain) |
-| 최근 학습 | **2026-09-30** · LangChain 3\~5장과 6-1강 — LCEL 실행, Runnable 조합, 구조화 출력, Document (6-2강부터 10/01 진행) |
+| 최근 학습 | **2026-10-01** · LangChain 6-2\~10장 — Retriever, 대화 기억, Streaming·Callback, Retry·Fallback, 통합 문서 Q&A 앱 (실습은 10장 통합 실습) |
 | 이번 주말 | **10/03\~04** · LangChain 1장 통합 실습 TODO 1\~3 → 10-1강 retry 함수 직접 작성 → 데이터 엔지니어링 3장 실습 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -112,7 +112,11 @@ flowchart LR
 | [3](./langchain/03-lcel-pipe-and-execution/) | LCEL pipe 연산자, `invoke`·`batch`·`stream`, 단계별 자료형 디버깅과 체인 재사용 | 📘 이론 정리 |
 | [4](./langchain/04-runnable-sequence-parallel-assign/) | `RunnableSequence`·`RunnableParallel`, `RunnablePassthrough`·`RunnableLambda`·`.assign()` | 📘 이론 정리 |
 | [5](./langchain/05-structured-output-and-validation/) | Pydantic 스키마와 `with_structured_output()`, Parser 검증과 오류 읽기, 1회 복구 | 📘 이론 정리 |
-| [6](./langchain/06-document-and-retriever/) | `Document`의 `page_content`·`metadata`, formatter (6-2 Retriever, 6-3 retrieval chain 예정) | 📘 6-1까지 · ⬜ 6-2\~6-3 |
+| [6](./langchain/06-document-and-retriever/) | `Document`·metadata, 키워드 Retriever(`str → list[Document]`), 기본 retrieval chain | 📘 이론 정리 |
+| [7](./langchain/07-chat-history-and-session/) | `HumanMessage`·`AIMessage`, session별 history, `MessagesPlaceholder`, Retriever vs history | 📘 이론 정리 |
+| [8](./langchain/08-streaming-callback-and-tracing/) | `stream()` 출력, `BaseCallbackHandler` 이벤트, 실행 시간·토큰 기록, Langfuse trace | 📘 이론 정리 |
+| [9](./langchain/09-retry-fallback-and-degradation/) | `with_retry`와 예외 유형별 처리, `with_fallbacks`, graceful degradation | 📘 이론 정리 |
+| [10](./langchain/10-integrated-document-qa-app/) | 통합 문서 Q&A 앱 설계·구현, 출처 검증, `RunRecord` 관측, LCEL vs LangGraph | 📘 이론 정리 · 🧪 통합 실습 진행 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
@@ -133,6 +137,15 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-10-01 · LangChain 6-2\~10장: Retriever, 대화 기억, 관찰, 실패 대응, 통합 Q&A 앱
+
+- 6-2·6-3강: Retriever는 `str → list[Document]` 계약, 0건도 빈 목록이라는 정상 결과. Prompt에는 문서 목록이 아니라 formatter가 만든 context 문자열을 넣고, `assign`으로 `documents`도 함께 남겨 출처 확인에 씀
+- 7장: 모델은 호출마다 기억이 없어서 앱이 `HumanMessage`·`AIMessage`를 session별로 저장했다가 `MessagesPlaceholder`에 **목록**으로 다시 넣음. 현재 질문은 모델 호출 **후에** 답변과 한 쌍으로 저장
+- 8장: 답은 `stream()` 반복문 한 곳에서 출력, Callback은 시작·조각·완료·오류를 **관찰만** 함. 토큰 정보가 없으면 0이 아니라 "제공되지 않음", `flush()` 완료 ≠ 원격 조회 가능
+- 9장: `stop_after_attempt`는 최초 호출 포함 횟수, Retry는 모델 호출 단계에만 붙이고 내부 재시도와 곱해지지 않게 `max_retries=0`. Fallback은 같은 출력 계약 + `status="degraded"`로 기능 저하를 솔직히 알림
+- 10장: 검색은 모델보다 먼저, 구조화 검증은 저장보다 먼저. 검색 0건이면 모델 호출 없이 `not_found`, `sources`는 실제 검색 ID와 `issubset`으로 다시 대조. LangGraph는 반복·재개·사람 승인·영속 상태가 필요할 때만 검토
+- 실습: 6\~10장은 이론 분량이 많아 **10장 통합 실습(`starter.py`) TODO 1\~3**만 진행 — Prompt(system → history → human), `history.messages[-4:]`로 `policy.invoke()` 1회, 출처 검증 뒤에만 질문·답변 저장
+
 ### 2026-09-30 · LangChain 3\~6-1: LCEL, Runnable 조합, 구조화 출력, Document
 
 - 3장: `prompt | model | parser`는 **연결만** 하고 API 호출은 `invoke()` 때 일어남. 오류가 나면 `dict → ChatPromptValue → AIMessage → str` 경계 중 어디서 자료형이 달라졌는지부터 확인
@@ -151,13 +164,6 @@ flowchart LR
 - Parser는 형식을 **강제하지 않음** — `get_format_instructions()`를 Prompt에 넣는 단계가 따로 필요
 - 통합 실습 노트북은 TODO 1\~3이 `NotImplementedError` 상태로 **미완료**, 주말로 이월
 
-### 2026-09-23 · 데이터 엔지니어링: Query API, 비동기 호출, API 안정성
-
-- 질문 요청은 `document_id`와 `context` 중 **하나만** 허용 — 근거가 무엇인지 분명하게 하기 위함
-- 외부 실패는 그대로 흘리지 않고 422 / 404 / 502 / 503으로 우리 API 코드로 변환
-- 비동기는 **대기 시간이 겹칠 때만** 빨라지고, `asyncio.gather()` 결과는 입력 순서를 따름
-- 재시도 계층을 겹치면 최대 27회까지 늘어남 — retry 책임은 한 계층에만 둠 (LLM 실전 10-1강 보강)
-
 ## 📂 폴더 구조
 
 <details>
@@ -173,7 +179,7 @@ TIL/
 ├── deep-learning-advanced/        # 1~8장
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
-├── langchain/                     # 1~6장 (6장 진행 중)
+├── langchain/                     # 1~10장
 ├── python-basics/                 # Python 보강
 └── assignments/                   # 채점용 종합 과제
 ```

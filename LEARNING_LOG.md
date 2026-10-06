@@ -3,6 +3,14 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-06 · 복습 1일차: 데이터 점검, 기준 모델, BERT 분류기 학습
+
+- 프로젝트 전 복습 수업 1일차: `project2-kit`으로 환경 준비(09) → step01\~03(데이터 읽기·점검·TF-IDF 기준 모델) → step04 BERT 학습 2회를 직접 실행. 검증 macro F1이 lr2e5 0.7827→0.9722→1.0, lr5e5 0.9441→1.0→1.0으로 교안 값과 일치
+- 트러블슈팅은 원인부터 구분: 명령은 `pyproject.toml`이 있는 폴더에서 실행, 다운로드 타임아웃은 `UV_HTTP_TIMEOUT=300`으로 해결. Traceback은 **맨 아랫줄**(예외 종류와 메시지)부터 읽음
+- `Path(__file__).resolve().parents[1]`로 실행 위치와 무관하게 프로젝트 루트를 계산하고, step 파일은 앞 단계 함수를 import해 하나의 파이프라인으로 이어짐
+- gradient accumulation: 4배치의 gradient가 각 가중치의 `.grad`에 **더해지므로** loss를 4로 나눠야 큰 배치 1번과 같은 크기가 됨. `optimizer.step()`·`zero_grad()`는 4배치마다 한 번
+- checkpoint 저장 조건 `>`와 `>=`의 차이: lr5e5는 epoch 2와 3이 모두 F1 1.0이라 `>`면 **epoch 2**가 남음 — 동점 처리 규칙을 미리 정해 두어야 함
+
 ## 2026-10-01 · LangChain 6-2\~10장: Retriever, 대화 기억, 관찰, 실패 대응, 통합 Q&A 앱
 
 - 6-2·6-3강: Retriever는 `str → list[Document]` 계약, 0건도 빈 목록이라는 정상 결과. Prompt에는 문서 목록이 아니라 formatter가 만든 context 문자열을 넣고, `assign`으로 `documents`도 함께 남겨 출처 확인에 씀

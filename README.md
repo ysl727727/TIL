@@ -16,8 +16,8 @@
 | 항목 | 내용 |
 | --- | --- |
 | 현재 단계 | LangChain 마무리 → 프로젝트 전 복습(Review) |
-| 최근 학습 | **2026-10-06** · 복습 1일차 — 데이터 점검, TF-IDF 기준 모델, BERT 분류기 학습 2회 (교안 값 재현) |
-| 다음 할 일 | 복습 2일차 05\~08 — 그 전에 Ollama `qwen3:4b` 모델과 `.env`의 `OPENAI_API_KEY` 준비 |
+| 최근 학습 | **2026-10-07** · 복습 2일차 — 모델 선택, checkpoint 복원·예측, Ollama·OpenAI 생성 호출과 최종 비교, FastAPI 서버 (교안 값 재현) |
+| 다음 할 일 | 목요일 프로젝트 시작 — 복습 2일차 선택 실습(practice06 실습 2·3, practice07 실습 2)은 주말에 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -125,12 +125,14 @@ flowchart LR
 | 일차 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./private-llm-review/day01-data-baseline-bert/) | 환경 준비, 데이터 읽기·점검, TF-IDF 기준 모델, BERT 분류기 학습과 gradient accumulation | ✅ 완료 |
+| [2](./private-llm-review/day02-model-select-generate-api/) | 모델 선택과 동점 처리, checkpoint 복원·예측, 생성 호출, 기록·비교, FastAPI 서버(422·502) | ✅ 완료 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./python-basics/01-syntax-conditionals-collections/) | 변수·자료형·f-string, 조건문, 리스트·딕셔너리 메서드, 중첩 반복문 | ✅ 완료 |
+| [2](./python-basics/02-class-lambda-decorator/) | 클래스·`self`, 람다와 `sorted(key=…)`, 데코레이터, `@app.get("/")` | ✅ 완료 |
 
 ### 종합 과제 · [`assignments/`](./assignments/)
 
@@ -144,6 +146,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-10-07 · 복습 2일차: 모델 선택, 복원과 예측, 생성 호출, API
+
+- 프로젝트 전 복습 수업 2일차(교안 05\~08): step05 모델 선택 → step06 checkpoint 복원·예측 → step07 생성 호출 → step08 체인 → step09 기록·비교 → step10 API까지 모두 실행. 공통 문의 confidence 0.6360으로 교안 값과 일치
+- `selected.json`은 가중치가 아니라 "누구의 어느 실험을 무슨 기준으로 골랐는지"의 기록. `max(key=lambda …)`는 동점이면 **목록 앞 후보**(lr2e5)를 남기므로 점수와 동점 처리 기준을 함께 기록
+- confidence는 softmax 확률 중 가장 큰 값일 뿐 정답 확률이 아님. 띄어쓰기 한 칸만 달라도 토큰이 달라져 0.7210 vs 0.7126처럼 점수가 바뀜
+- 프롬프트에는 `json.dumps(원문)`으로 경계를 표시하고, Ollama는 `ollama run` 없이 서버만 켜져 있으면 `httpx`로 호출. 성공·실패 모두 같은 모양으로 반환하고 형식 검사는 필드·타입만, 내용은 사람이 판단
+- step10: 422는 함수 실행 **전** 요청 모델 검사, 502는 뒤쪽 LLM 실패, 200이어도 답의 정확성은 따로 확인. `/compare`는 분류 한 번 + 같은 프롬프트로 두 LLM을 같은 조건에서 비교
+- `if __name__ == "__main__":` 밖의 코드는 import될 때도 실행됨 — step 파일에 붙인 퀴즈가 practice08 실행 때 먼저 출력된 원인. 퀴즈는 별도 파일로 분리
+- Python 보강 2장: 클래스(`self`, `return` vs `print`), 람다와 `sorted(key=…)`, 데코레이터(`@wrap` = 포장, `@app.get("/")` = 등록)
 
 ### 2026-10-06 · 복습 1일차: 데이터 점검, 기준 모델, BERT 분류기 학습
 
@@ -161,16 +173,6 @@ flowchart LR
 - 9장: `stop_after_attempt`는 최초 호출 포함 횟수, Retry는 모델 호출 단계에만 붙이고 내부 재시도와 곱해지지 않게 `max_retries=0`. Fallback은 같은 출력 계약 + `status="degraded"`로 기능 저하를 솔직히 알림
 - 10장: 검색은 모델보다 먼저, 구조화 검증은 저장보다 먼저. 검색 0건이면 모델 호출 없이 `not_found`, `sources`는 실제 검색 ID와 `issubset`으로 다시 대조. LangGraph는 반복·재개·사람 승인·영속 상태가 필요할 때만 검토
 - 실습: 6\~10장은 이론 분량이 많아 **10장 통합 실습(`starter.py`) TODO 1\~3**만 진행 — Prompt(system → history → human), `history.messages[-4:]`로 `policy.invoke()` 1회, 출처 검증 뒤에만 질문·답변 저장
-
-### 2026-09-30 · LangChain 3\~6-1: LCEL, Runnable 조합, 구조화 출력, Document
-
-- 3장: `prompt | model | parser`는 **연결만** 하고 API 호출은 `invoke()` 때 일어남. 오류가 나면 `dict → ChatPromptValue → AIMessage → str` 경계 중 어디서 자료형이 달라졌는지부터 확인
-- 3-2강: `invoke()`는 1건, `batch()`는 리스트(결과도 입력 순서대로 리스트, 입력 수만큼 API 호출), `stream()`은 조각을 반복문으로 받음
-- 4장: 앞 결과가 필요하면 Sequence, 같은 입력을 각자 쓰면 Parallel(모델 branch 수만큼 API 호출). `.assign()`은 원본 dict를 보존하며 필드를 추가하고, 서로 의존하는 필드는 assign을 단계별로 나눔
-- 5장: `with_structured_output()`으로 Pydantic 객체를 받고, `parser.parse()`는 JSON 해석 → 스키마 검증 두 단계. `parse()` 실패는 `OutputParserException`, `model_validate()` 실패는 `ValidationError`
-- 5-3강: 검증 실패 시 수정 요청은 **최대 1회**, 같은 Parser로 재검증하고 실패하면 `None`. 스키마 통과는 형식만 보장하고 내용의 정확성은 보장하지 않음
-- 6-1강: 본문은 `page_content`(str), 부가 정보는 `metadata`(dict). 같은 의미는 모든 문서에서 같은 키로, 선택 키는 `.get()`으로 읽음. formatter는 Document를 바꾸지 않고 표시용 문자열만 만듦
-- 6-2강(Retriever)·6-3강(retrieval chain)은 10/01에 이어서 진행
 
 ## 📂 폴더 구조
 

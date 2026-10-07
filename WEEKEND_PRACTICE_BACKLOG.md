@@ -12,9 +12,9 @@
 
 - [x] 05 step05 모델 선택(`selected.json`, 동점이면 목록 앞 후보) — 실습 1, 퀴즈 1-1
 - [x] 05 step06 checkpoint 복원·예측 — 공통 문의 confidence 0.6360 교안과 일치, 실습 3(띄어쓰기에 따른 점수 변화)
-- [x] 06 step07 Ollama 생성 호출, `practice06` 실습 1(`json.dumps` 경계와 복원)
+- [x] 06 `.env` 설정 후 step07 Ollama·OpenAI 생성 호출, `practice06` 실습 1(`json.dumps` 경계와 복원)
 - [x] 07 `practice07` 실습 1, 퀴즈 2-2를 실제 step10 서버로 요청(200·422 비교)
-- [x] 07\~08 step08 체인 연결 → step09 기록과 비교 → step10 API 서버 실행 (step05\~10 전체 완료)
+- [x] 07\~08 step08 체인 연결 → step09 기록과 최종 비교 → step10 API 서버 실행 (step05\~10 전체 완료)
 - [x] step10 코드 한 줄씩 읽기(입력 검사, lifespan, `/generate`·`/compare`, `__main__`)
 - [x] Python 보강 2장: 클래스·람다·데코레이터·`@app.get("/")` 예제 직접 실행
 
@@ -36,7 +36,7 @@
 ### 미완료
 
 - [x] `ollama pull qwen3:4b-instruct-2507-q4_K_M` 미리 받아 두기 — 2026-10-07 step07에서 호출 성공
-- [ ] `.env`에 `OPENAI_API_KEY` 설정 확인
+- [x] `.env`에 `OPENAI_API_KEY` 설정 확인 — 2026-10-07 완료
 - [ ] step04 학습 루프의 `if` 블록(`unscale_` → `clip_grad_norm_` → `scheduler`) 한 줄씩 다시 설명해 보기
 - [ ] step01\~03 핵심 줄을 한 줄씩 설명해 보기
 - [x] step05 `selected.json`의 동점 처리 규칙 확인 — 2026-10-07 `max`는 목록 앞 후보(lr2e5)

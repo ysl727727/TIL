@@ -16,9 +16,9 @@
 | --- | --- | --- |
 | 05 | `step05_select_model.py` — lr2e5 / lr5e5 검증 F1 비교 → `selected.json` | ✅ 완료 |
 | 05 | `step06_predict.py` — checkpoint 복원과 예측, 실습 1·3, 퀴즈 1-1·2-1 | ✅ 완료 (공통 문의 confidence 0.6360, 교안과 일치) |
-| 06 | `step07_call_models.py` — Ollama 생성 호출, `practice06` 실습 1 | ✅ 완료 |
+| 06 | `step07_call_models.py` — Ollama·OpenAI 생성 호출(`.env` 설정 포함), `practice06` 실습 1 | ✅ 완료 |
 | 07 | `step08` 체인 연결, `practice07` 실습 1, `step10_serve_api.py` 코드 읽기와 실제 요청 | ✅ 완료 |
-| 08 | `step09_compare.py` 기록과 비교, `practice08` | ✅ 완료 |
+| 08 | `step09_compare.py` 기록과 비교(최종 비교까지), `practice08` | ✅ 완료 |
 
 실습 코드는 수업에서 받은 키트(`project2-kit`)라 올리지 않고, 실행 결과와 이해한 내용만 기록합니다.
 
@@ -31,7 +31,7 @@
 | 무엇을 | step05(모델 선택) → step06(복원·예측) → step07(생성 호출) → step08(체인) → step09(기록·비교) → step10(API), practice06·07·08, 퀴즈 |
 | 어떻게 | 파일 전체 코드를 먼저 보고 위에서부터 한 줄씩 읽기, 실행 결과를 교안 값과 대조 |
 | 왜 | 어제 학습한 BERT를 실제 문의 → 라벨 → 답변 흐름에 연결하기 위해 |
-| 결과 | 공통 문의 confidence 0.6360(교안과 일치), Ollama 생성 호출 성공, 실습 결과와 에러 원인 정리 |
+| 결과 | 공통 문의 confidence 0.6360(교안과 일치), Ollama·OpenAI 호출과 최종 비교까지 완료, 실습 결과와 에러 원인 정리 |
 
 ## 2일차 파이프라인
 

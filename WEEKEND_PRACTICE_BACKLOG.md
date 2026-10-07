@@ -14,16 +14,14 @@
 - [x] 05 step06 checkpoint 복원·예측 — 공통 문의 confidence 0.6360 교안과 일치, 실습 3(띄어쓰기에 따른 점수 변화)
 - [x] 06 step07 Ollama 생성 호출, `practice06` 실습 1(`json.dumps` 경계와 복원)
 - [x] 07 `practice07` 실습 1, 퀴즈 2-2를 실제 step10 서버로 요청(200·422 비교)
+- [x] 07\~08 step08 체인 연결 → step09 기록과 비교 → step10 API 서버 실행 (step05\~10 전체 완료)
 - [x] step10 코드 한 줄씩 읽기(입력 검사, lifespan, `/generate`·`/compare`, `__main__`)
 - [x] Python 보강 2장: 클래스·람다·데코레이터·`@app.get("/")` 예제 직접 실행
 
 ### 미완료
 
-- [ ] `.env`에 `OPENAI_API_KEY` 넣고 `check_environment.py`에서 True 확인 → step07 `PROVIDER = "openai"` 1회 호출, Ollama 답변과 비교
-- [ ] step09\_compare.py 실행 → development01 생성 → practice08 12줄로 다시 읽기
 - [ ] practice06 실습 2(`payload["debug"] = True`)·실습 3(answer 바꾸기), practice07 실습 2(`LABEL_OVERRIDE = "refund"`)
 - [ ] step06, practice07, practice08에 붙인 퀴즈 코드를 별도 파일로 정리
-- [ ] step10 서버 실행 후 `/docs`에서 `/generate`, `/compare` 직접 요청
 - [ ] step08의 `prepared`, `result` 안에 무엇이 들어 있는지 출력해 보기
 
 ## 1. 업데이트: 복습 1일차 (project2-kit 09·01\~04)
@@ -402,7 +400,7 @@
 ### 2026-10-10 (토)
 
 1. 컨디션을 먼저 확인하고 학습 시간을 짧게 정함
-2. 복습 2일차 남은 실습 먼저: OpenAI 1회 호출 → step09 실행 → practice06 실습 2·3, practice07 실습 2
+2. 복습 2일차 선택 실습 먼저: practice06 실습 2·3, practice07 실습 2
 3. LangChain 1-2강 환경 설정을 실제로 완료 (`uv sync --locked --python 3.12` → `.venv` 인터프리터 선택 → `.env` 생성 → `ChatOpenAI` 1회 호출)
 4. 이어서 LangChain 1장 통합 실습 TODO 1\~3 완성 — 두 호출 방식의 답변과 `check_answers` 결과까지 확인
 5. 여유가 있으면 LLM 실전 10-1강 로컬 retry 함수를 API 없이 직접 작성 (`calculate_backoff_seconds` → `retry_call` → 가짜 `flaky_operation`)

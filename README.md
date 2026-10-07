@@ -17,7 +17,7 @@
 | --- | --- |
 | 현재 단계 | LangChain 마무리 → 프로젝트 전 복습(Review) |
 | 최근 학습 | **2026-10-07** · 복습 2일차 — 모델 선택, checkpoint 복원·예측, Ollama 생성 호출, FastAPI 서버 (교안 값 재현) |
-| 다음 할 일 | `.env`에 `OPENAI_API_KEY` 넣고 OpenAI 1회 호출 → step09 기록과 비교 실행 → 목요일 프로젝트 시작 |
+| 다음 할 일 | 목요일 프로젝트 시작 — 복습 2일차 선택 실습(practice06 실습 2·3, practice07 실습 2)은 주말에 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -125,7 +125,7 @@ flowchart LR
 | 일차 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./private-llm-review/day01-data-baseline-bert/) | 환경 준비, 데이터 읽기·점검, TF-IDF 기준 모델, BERT 분류기 학습과 gradient accumulation | ✅ 완료 |
-| [2](./private-llm-review/day02-model-select-generate-api/) | 모델 선택과 동점 처리, checkpoint 복원·예측, Ollama 생성 호출, FastAPI 서버(422·502) | 🧪 05\~07 완료 · ⏳ step09·OpenAI 호출 |
+| [2](./private-llm-review/day02-model-select-generate-api/) | 모델 선택과 동점 처리, checkpoint 복원·예측, 생성 호출, 기록·비교, FastAPI 서버(422·502) | ✅ 완료 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
@@ -149,7 +149,7 @@ flowchart LR
 
 ### 2026-10-07 · 복습 2일차: 모델 선택, 복원과 예측, 생성 호출, API
 
-- 프로젝트 전 복습 수업 2일차(교안 05\~08): step05 모델 선택 → step06 checkpoint 복원·예측 → step07 Ollama 생성 호출 → step10 API 코드 읽기와 실제 요청. 공통 문의 confidence 0.6360으로 교안 값과 일치
+- 프로젝트 전 복습 수업 2일차(교안 05\~08): step05 모델 선택 → step06 checkpoint 복원·예측 → step07 생성 호출 → step08 체인 → step09 기록·비교 → step10 API까지 모두 실행. 공통 문의 confidence 0.6360으로 교안 값과 일치
 - `selected.json`은 가중치가 아니라 "누구의 어느 실험을 무슨 기준으로 골랐는지"의 기록. `max(key=lambda …)`는 동점이면 **목록 앞 후보**(lr2e5)를 남기므로 점수와 동점 처리 기준을 함께 기록
 - confidence는 softmax 확률 중 가장 큰 값일 뿐 정답 확률이 아님. 띄어쓰기 한 칸만 달라도 토큰이 달라져 0.7210 vs 0.7126처럼 점수가 바뀜
 - 프롬프트에는 `json.dumps(원문)`으로 경계를 표시하고, Ollama는 `ollama run` 없이 서버만 켜져 있으면 `httpx`로 호출. 성공·실패 모두 같은 모양으로 반환하고 형식 검사는 필드·타입만, 내용은 사람이 판단

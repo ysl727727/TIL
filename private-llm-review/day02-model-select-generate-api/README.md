@@ -1,6 +1,6 @@
 # 2일차. 모델 선택 · 복원과 예측 · 생성 호출 · API
 
-> 2026-10-07 학습 기록. 프로젝트 전 복습 수업 2일차(교안 05\~08)입니다. 1일차에 학습한 BERT checkpoint를 골라 복원하고, 문의 → 라벨 → 프롬프트 → LLM 답변 → 웹 API로 이어지는 흐름을 step 파일 기준으로 실행했습니다. 실습·퀴즈를 직접 돌려 보고, 막힌 곳은 질문으로 풀었습니다.
+> 2026-10-07 학습 기록. 프로젝트 전 복습 수업 2일차(교안 05\~08)입니다. 1일차에 학습한 BERT checkpoint를 골라 복원하고, 문의 → 라벨 → 프롬프트 → LLM 답변 → 기록·비교 → 웹 API로 이어지는 흐름을 step05\~10까지 모두 실행했습니다. 실습·퀴즈를 직접 돌려 보고, 막힌 곳은 질문으로 풀었습니다.
 
 ## 학습 목표
 
@@ -16,9 +16,9 @@
 | --- | --- | --- |
 | 05 | `step05_select_model.py` — lr2e5 / lr5e5 검증 F1 비교 → `selected.json` | ✅ 완료 |
 | 05 | `step06_predict.py` — checkpoint 복원과 예측, 실습 1·3, 퀴즈 1-1·2-1 | ✅ 완료 (공통 문의 confidence 0.6360, 교안과 일치) |
-| 06 | `step07_call_models.py` — Ollama 생성 호출, `practice06` 실습 1 | ✅ 완료 · ⏳ OpenAI 호출, 실습 2·3 |
-| 07 | `step08` 체인 연결, `practice07` 실습 1, `step10_serve_api.py` 코드 읽기와 실제 요청 | ✅ 완료 · ⏳ 실습 2, `/docs` 직접 요청 |
-| 08 | `step09_compare.py` 기록과 비교, `practice08` | ⏳ step09 미실행 (`final_live01`로 대신 읽음) |
+| 06 | `step07_call_models.py` — Ollama 생성 호출, `practice06` 실습 1 | ✅ 완료 |
+| 07 | `step08` 체인 연결, `practice07` 실습 1, `step10_serve_api.py` 코드 읽기와 실제 요청 | ✅ 완료 |
+| 08 | `step09_compare.py` 기록과 비교, `practice08` | ✅ 완료 |
 
 실습 코드는 수업에서 받은 키트(`project2-kit`)라 올리지 않고, 실행 결과와 이해한 내용만 기록합니다.
 
@@ -28,7 +28,7 @@
 | --- | --- |
 | 언제 | 2026-10-07 07:00\~18:00 |
 | 어디서 | 노트북(RTX 5060), `project2-kit\project2-kit` |
-| 무엇을 | step05(모델 선택) → step06(복원·예측) → step07(생성 호출) → practice06·07·08, 퀴즈, step10 코드 읽기 |
+| 무엇을 | step05(모델 선택) → step06(복원·예측) → step07(생성 호출) → step08(체인) → step09(기록·비교) → step10(API), practice06·07·08, 퀴즈 |
 | 어떻게 | 파일 전체 코드를 먼저 보고 위에서부터 한 줄씩 읽기, 실행 결과를 교안 값과 대조 |
 | 왜 | 어제 학습한 BERT를 실제 문의 → 라벨 → 답변 흐름에 연결하기 위해 |
 | 결과 | 공통 문의 confidence 0.6360(교안과 일치), Ollama 생성 호출 성공, 실습 결과와 에러 원인 정리 |
@@ -238,7 +238,7 @@ def compare(body: TextRequest, request: Request):
 | 에러 | 원인 | 해결 |
 | --- | --- | --- |
 | practice08 실행 시 퀴즈 출력이 먼저 나옴 | step06 맨 아래(`__main__` 밖)에 붙인 퀴즈 코드가 import 체인(practice08 → step09 → step06)으로 실행됨 | 퀴즈를 별도 파일(`quiz06.py`)로 옮김 |
-| `FileNotFoundError: …\development01\results.jsonl` | step09\_compare.py를 아직 실행하지 않음 | practice08 12줄 주석 처리, 14줄(final\_live01) 사용 |
+| `FileNotFoundError: …\development01\results.jsonl` | step09\_compare.py를 실행하기 전에 practice08을 먼저 실행함 | 처음엔 14줄(final\_live01)로 대신 읽고, step09 실행 후 다시 확인 |
 | practice07 `KeyError: 'classification'` | 퀴즈 함수 이름 오타 `aplly_policy` → import한 step08의 `apply_policy`가 대신 불림 | 퀴즈를 `quiz07.py`로 옮기고 이름 수정 |
 | `TypeError: type list doesn't define __round__` | `round([값, 4])` | `round(값, 4)` |
 
@@ -319,11 +319,9 @@ notepad .env        # OPENAI_API_KEY=키 입력 후 저장
 
 ## 다음에 할 일
 
-- [ ] `.env`에 `OPENAI_API_KEY` 넣고 `check_environment.py`에서 True 확인
-- [ ] step07 `PROVIDER = "openai"`로 1회 호출, Ollama 답변과 비교
+step05\~10은 모두 실행했어요. 남은 건 선택 실습과 정리예요.
+
 - [ ] step06, practice07, practice08에 붙인 퀴즈 코드를 별도 파일로 정리
 - [ ] practice06 실습 2(`payload["debug"] = True`), 실습 3(answer 바꾸기)
 - [ ] practice07 실습 2(`LABEL_OVERRIDE = "refund"`)
-- [ ] step09\_compare.py 실행 → development01 생성 → practice08 12줄로 다시 읽기
-- [ ] step10 서버 실행 후 `/docs`에서 `/generate`, `/compare` 직접 요청
 - [ ] step08의 `prepared`, `result` 안에 정확히 뭐가 들어 있는지 출력해 보기

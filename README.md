@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LangChain 마무리 → 프로젝트 전 복습(Review) |
-| 최근 학습 | **2026-10-07** · 복습 2일차 — 모델 선택, checkpoint 복원·예측, Ollama·OpenAI 생성 호출과 최종 비교, FastAPI 서버 (교안 값 재현) |
-| 다음 할 일 | 목요일 프로젝트 시작 — 복습 2일차 선택 실습(practice06 실습 2·3, practice07 실습 2)은 주말에 |
+| 현재 단계 | 2차 프로젝트(러브코드) 발표 완료 → 회고 정리 |
+| 최근 학습 | **2026-10-16** · [러브코드 회고](./projects/01-lovecode-couple-type-classifier/) — 사주·MBTI 16유형 BERT 분류(test macro-F1 0.831)와 LangChain 해설 비교 |
+| 다음 할 일 | 복습 2일차 선택 실습(practice06 실습 2·3, practice07 실습 2)은 주말에 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -127,6 +127,12 @@ flowchart LR
 | [1](./private-llm-review/day01-data-baseline-bert/) | 환경 준비, 데이터 읽기·점검, TF-IDF 기준 모델, BERT 분류기 학습과 gradient accumulation | ✅ 완료 |
 | [2](./private-llm-review/day02-model-select-generate-api/) | 모델 선택과 동점 처리, checkpoint 복원·예측, 생성 호출, 기록·비교, FastAPI 서버(422·502) | ✅ 완료 |
 
+### 프로젝트 · [`projects/`](./projects/)
+
+| 번호 | 프로젝트 | 내 담당 | 결과 |
+| --- | --- | --- | --- |
+| [1](./projects/01-lovecode-couple-type-classifier/) | 러브코드 — 사주·MBTI로 커플 관계 스타일 16유형 분류 + LLM 해설 (2026-10-09 ~ 10-16) | BERT 분류 모델, LangChain 해설·생성 모델 비교 | test macro-F1 0.831, 해설 위반 0/24 |
+
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
 | 장 | 주제 | 상태 |
@@ -147,6 +153,16 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-10-16 · 2차 프로젝트 러브코드 회고: 16유형 분류(BERT)와 LangChain 해설
+
+- 내 담당: 사주·MBTI 커플 16유형 분류 모델(klue/bert-base 축별)과 LangChain 해설 체인·생성 모델 비교. test macro-F1 **0.831** / 정확도 0.858, 해설 규칙 위반 0/24 → [프로젝트 회고](./projects/01-lovecode-couple-type-classifier/)
+- 첫 점수 0.079의 원인은 모델이 아니라 **흔들리는 정답**. 판단 기준을 코드(규칙 라벨러)로 고정하고 판단 재료를 텍스트에 빠짐없이 넣자 데이터를 늘릴수록 점수가 오름(0.165 → 0.757)
+- 효과 큰 순서: 규칙 라벨 + 데이터 증가 > **어려운 사례 1,200쌍**(0.744 → 0.802) > 축별 분류(0.714 → 0.744). 규제는 과적합만 줄이고 점수는 유지 → 남은 오차는 과적합이 아님
+- 120쌍 validation 1위가 1,200쌍 dev에서 3위 → 작은 평가 세트로는 순위를 믿을 수 없어 dev를 따로 두고 test는 1회만 사용
+- TF-IDF(0.428)는 조각 개수만 세서 "중요도가 같으면 태그로 비교" 같은 조건을 못 따라 함. LLM에 규칙만 설명하면 축별 0.8 → 네 축 곱 0.41, 예시로 배운 BERT는 0.95⁴ ≈ 0.81
+- LangChain: `prompt | model | parser`로 모델 자리만 바꿔 같은 24건·같은 프롬프트로 비교. 반대 극 언급 3/24는 재작성으로 증상을 막고, 프롬프트에서 원인을 고쳐 첫 초안 0/24·비용 −21%
+- 발표 중 "잠시 후 다시 시도" 오류의 원인은 같은 IP 10분 5회 요청 제한. 강의실처럼 한 IP를 여럿이 쓰는 환경을 고려해야 함
+
 ### 2026-10-07 · 복습 2일차: 모델 선택, 복원과 예측, 생성 호출, API
 
 - 프로젝트 전 복습 수업 2일차(교안 05\~08): step05 모델 선택 → step06 checkpoint 복원·예측 → step07 생성 호출 → step08 체인 → step09 기록·비교 → step10 API까지 모두 실행. 공통 문의 confidence 0.6360으로 교안 값과 일치
@@ -165,15 +181,6 @@ flowchart LR
 - gradient accumulation: 4배치의 gradient가 각 가중치의 `.grad`에 **더해지므로** loss를 4로 나눠야 큰 배치 1번과 같은 크기가 됨. `optimizer.step()`·`zero_grad()`는 4배치마다 한 번
 - checkpoint 저장 조건 `>`와 `>=`의 차이: lr5e5는 epoch 2와 3이 모두 F1 1.0이라 `>`면 **epoch 2**가 남음 — 동점 처리 규칙을 미리 정해 두어야 함
 
-### 2026-10-01 · LangChain 6-2\~10장: Retriever, 대화 기억, 관찰, 실패 대응, 통합 Q&A 앱
-
-- 6-2·6-3강: Retriever는 `str → list[Document]` 계약, 0건도 빈 목록이라는 정상 결과. Prompt에는 문서 목록이 아니라 formatter가 만든 context 문자열을 넣고, `assign`으로 `documents`도 함께 남겨 출처 확인에 씀
-- 7장: 모델은 호출마다 기억이 없어서 앱이 `HumanMessage`·`AIMessage`를 session별로 저장했다가 `MessagesPlaceholder`에 **목록**으로 다시 넣음. 현재 질문은 모델 호출 **후에** 답변과 한 쌍으로 저장
-- 8장: 답은 `stream()` 반복문 한 곳에서 출력, Callback은 시작·조각·완료·오류를 **관찰만** 함. 토큰 정보가 없으면 0이 아니라 "제공되지 않음", `flush()` 완료 ≠ 원격 조회 가능
-- 9장: `stop_after_attempt`는 최초 호출 포함 횟수, Retry는 모델 호출 단계에만 붙이고 내부 재시도와 곱해지지 않게 `max_retries=0`. Fallback은 같은 출력 계약 + `status="degraded"`로 기능 저하를 솔직히 알림
-- 10장: 검색은 모델보다 먼저, 구조화 검증은 저장보다 먼저. 검색 0건이면 모델 호출 없이 `not_found`, `sources`는 실제 검색 ID와 `issubset`으로 다시 대조. LangGraph는 반복·재개·사람 승인·영속 상태가 필요할 때만 검토
-- 실습: 6\~10장은 이론 분량이 많아 **10장 통합 실습(`starter.py`) TODO 1\~3**만 진행 — Prompt(system → history → human), `history.messages[-4:]`로 `policy.invoke()` 1회, 출처 검증 뒤에만 질문·답변 저장
-
 ## 📂 폴더 구조
 
 <details>
@@ -191,6 +198,7 @@ TIL/
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
+├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강
 └── assignments/                   # 채점용 종합 과제
 ```

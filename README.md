@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | 2차 프로젝트(러브코드) 발표 완료 → 회고 정리 |
-| 최근 학습 | **2026-10-16** · [러브코드 회고](./projects/01-lovecode-couple-type-classifier/) — 사주·MBTI 16유형 BERT 분류(test macro-F1 0.831)와 LangChain 해설 비교 |
-| 다음 할 일 | 복습 2일차 선택 실습(practice06 실습 2·3, practice07 실습 2)은 주말에 |
+| 현재 단계 | RAG 과목 시작 — 1일차(1·2장) 완료 → 3장 청킹 예정 |
+| 최근 학습 | **2026-10-19** · [RAG 1장](./rag/01-why-rag-and-basic-pipeline/)·[2장](./rag/02-document-loading-and-cleaning/) — 검색 후보와 실제 Context 구분, 문서 로딩·metadata·정제·JSONL 검수 |
+| 다음 할 일 | RAG 3장 청킹(Chunk Size·Overlap, Recursive·Token, 문서 구조 기반) · 복습 2일차 선택 실습은 주말에 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -32,8 +32,8 @@ flowchart LR
     classDef now fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef next fill:#f3f4f6,stroke:#9ca3af,color:#374151
     class ML,DLB,DLA done
-    class LLM,DE,LC now
-    class RAG,AG,OPS next
+    class LLM,DE,LC,RAG now
+    class AG,OPS next
 ```
 
 <sub>초록: 이론 진도를 마친 구간 · 노랑: 진행 중 · 회색: 예정 (실습 완료 여부는 아래 목차의 상태를 기준으로 봅니다)</sub>
@@ -118,6 +118,13 @@ flowchart LR
 | [9](./langchain/09-retry-fallback-and-degradation/) | `with_retry`와 예외 유형별 처리, `with_fallbacks`, graceful degradation | 📘 이론 정리 |
 | [10](./langchain/10-integrated-document-qa-app/) | 통합 문서 Q&A 앱 설계·구현, 출처 검증, `RunRecord` 관측, LCEL vs LangGraph | 📘 이론 정리 · 🧪 통합 실습 진행 |
 
+### RAG · [`rag/`](./rag/)
+
+| 장 | 주제 | 상태 |
+| --- | --- | --- |
+| [1](./rag/01-why-rag-and-basic-pipeline/) | RAG가 필요한 이유, Indexing·Query와 역색인, 2-Step RAG 기준선(검색 후보 vs Context), RAG·Long Context·CAG 선택 | ✅ 완료 |
+| [2](./rag/02-document-loading-and-cleaning/) | TXT·HTML·PDF 로딩과 `Document`, 출처 metadata, 중복·Boilerplate 정제, JSONL 저장·검수 | ✅ 완료 |
+
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
 > 목요일 프로젝트 시작 전, 그동안 배운 내용을 `project2-kit`으로 다시 실행해 보는 복습 수업입니다. 일차 단위로 정리합니다.
@@ -153,6 +160,17 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-10-19 · RAG 1일차: RAG 기본 파이프라인(1장)과 문서 준비(2장)
+
+- RAG 1일차(오전 1장·오후 2장) 8개 강의를 `rag_day1` 키트로 실행하고 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [1장](./rag/01-why-rag-and-basic-pipeline/) · [2장](./rag/02-document-loading-and-cleaning/)
+- **검색 성공 ≠ 답변 가능**: `호텔비`는 표현이 달라 검색 실패, `개인 취미`는 검색은 됐지만 문서에 답이 없음 → 원인이 다르니 대응도 다름(임베딩 검색 vs "확인 불가" 안내)
+- 역색인은 단어 → 문서 ID 집합. OR = 합집합, AND = 교집합이고, `intersection_update`는 집합을 직접 고치므로 첫 집합을 `set()`으로 복사해야 원본 색인이 안 망가짐. 문서가 바뀌면 인덱스도 다시 만들어야 함
+- **오늘 배운 점: 검색 후보와 실제 입력은 다르다.** `retrieve`의 `rows`(후보 3개)와 `build_context`의 `context`/`sources`(예산 260 안에 들어간 2개)를 따로 보고, 출처는 Context에 실제로 들어간 것만 연결
+- 문서 예산 = 한도 − 지시문 − 질문·이력 − 출력 예약 − 여유(8192 → 6000). RAG(검색)·Long Context(긴 입력 능력)·CAG(계산 상태 재사용)는 같은 축이 아니고, KV cache는 답변이 아니라 입력 계산을 재사용
+- 2장: HTML은 태그 삭제보다 본문 범위 선택이 먼저, PDF 줄바꿈은 페이지 폭 때문. 현행은 게시일이 아니라 `status`로 고르고, 중복 키(version, category, 본문 해시)로 복사본만 빼고 구버전은 유지. 정제는 뜻(금액·부정 표현)을 바꾸지 않음
+- JSONL은 한 줄에 객체 하나, 본문 줄바꿈은 `\n`으로 이스케이프돼 한 행 유지. 저장 후 다시 읽어 문법 오류와 스키마 오류를 행 번호와 함께 구분
+- 실습 실수: `row`/`rows` 이름 불일치로 다른 검색 결과 사용, `assert`는 반환 문자열 글자까지 비교, `"category"`(글자) vs `category`(변수), `split()` vs `strip()`
+
 ### 2026-10-16 · 2차 프로젝트 러브코드 회고: 16유형 분류(BERT)와 LangChain 해설
 
 - 내 담당: 사주·MBTI 커플 16유형 분류 모델(klue/bert-base 축별)과 LangChain 해설 체인·생성 모델 비교. test macro-F1 **0.831** / 정확도 0.858, 해설 규칙 위반 0/24 → [프로젝트 회고](./projects/01-lovecode-couple-type-classifier/)
@@ -173,14 +191,6 @@ flowchart LR
 - `if __name__ == "__main__":` 밖의 코드는 import될 때도 실행됨 — step 파일에 붙인 퀴즈가 practice08 실행 때 먼저 출력된 원인. 퀴즈는 별도 파일로 분리
 - Python 보강 2장: 클래스(`self`, `return` vs `print`), 람다와 `sorted(key=…)`, 데코레이터(`@wrap` = 포장, `@app.get("/")` = 등록)
 
-### 2026-10-06 · 복습 1일차: 데이터 점검, 기준 모델, BERT 분류기 학습
-
-- 프로젝트 전 복습 수업 1일차: `project2-kit`으로 환경 준비(09) → step01\~03(데이터 읽기·점검·TF-IDF 기준 모델) → step04 BERT 학습 2회를 직접 실행. 검증 macro F1이 lr2e5 0.7827→0.9722→1.0, lr5e5 0.9441→1.0→1.0으로 교안 값과 일치
-- 트러블슈팅은 원인부터 구분: 명령은 `pyproject.toml`이 있는 폴더에서 실행, 다운로드 타임아웃은 `UV_HTTP_TIMEOUT=300`으로 해결. Traceback은 **맨 아랫줄**(예외 종류와 메시지)부터 읽음
-- `Path(__file__).resolve().parents[1]`로 실행 위치와 무관하게 프로젝트 루트를 계산하고, step 파일은 앞 단계 함수를 import해 하나의 파이프라인으로 이어짐
-- gradient accumulation: 4배치의 gradient가 각 가중치의 `.grad`에 **더해지므로** loss를 4로 나눠야 큰 배치 1번과 같은 크기가 됨. `optimizer.step()`·`zero_grad()`는 4배치마다 한 번
-- checkpoint 저장 조건 `>`와 `>=`의 차이: lr5e5는 epoch 2와 3이 모두 F1 1.0이라 `>`면 **epoch 2**가 남음 — 동점 처리 규칙을 미리 정해 두어야 함
-
 ## 📂 폴더 구조
 
 <details>
@@ -197,6 +207,7 @@ TIL/
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
+├── rag/                           # 1~2장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

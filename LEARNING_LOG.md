@@ -3,6 +3,17 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-20 · RAG 2일차: 청킹(3장)과 임베딩·Dense 검색(4장)
+
+- RAG 2일차(오전 3장·오후 4장)를 `rag_day2` 키트로 실행. 3·4장 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [3장](./rag/03-chunking-strategies/) · [4장](./rag/04-embedding-dense-retrieval/)
+- 청킹: 이동 간격 = `size − overlap`(80/20 → 0·60·120). 겹침을 늘려도 승인 문장 `[54:92]`는 80/20의 어느 청크에도 통째로 없고, 100/20에서만 온전함. 공통 기준은 최적값이 아니라 비교 출발점으로 80/20 `chunks.json`(28개)
+- Recursive는 `". "` → `" "` → `""` 순서로 문장 경계부터 자르고, 모델 한도는 문자가 아니라 **토큰**(문자÷토큰 1.41\~1.75). 토큰 50으로 잘라도 `passage:`를 붙이면 51 → 최종 입력을 다시 잼. Truncation은 오류 없이 조용히 조건을 지움
+- 문서 구조 청킹: `## 제목`으로 먼저 나누고 `metadata.update`로 원문 정보를 붙인 뒤 `split_documents`로 절 안에서만 다시 자름. metadata의 제목은 임베딩에 자동으로 안 들어감
+- 임베딩: 청크 28개 → `(28, 384)`, 정규화했으니 `vectors @ query` = 코사인. **공식을 NumPy 코드로 옮겨 값을 찍어 보니**(mask pooling, `axis`, norm, 코사인) 이해가 빨라짐
+- k·threshold: q06은 k=3에서 세 근거 완성, 하한 0.88이면 숙박 금액, 0.90(직접 실험)이면 식비 금액까지 사라짐. 점수 ≠ 답의 존재(매출 목표 질문도 0.7986)
+- 기준선: E5 small Hit@3·Recall@3 = 1.0이지만 base와 비교하면 5개 질문의 검색 문서가 다름 → 평균 뒤 질문별 결과와 원문을 같이 봄
+- 퀴즈에서 리스트 컴프리헨션 ↔ for문 변환, `setdefault`, `small_rows = {r["question_id"]: r …}`처럼 ID로 짝 맞추기를 정리. 4-2 `main.py`에 넣은 for문이 `cosines`를 리스트로 덮어써 `.tolist()` 오류
+
 ## 2026-10-19 · RAG 1일차: RAG 기본 파이프라인(1장)과 문서 준비(2장)
 
 - RAG 1일차(오전 1장·오후 2장) 8개 강의를 `rag_day1` 키트로 실행하고 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [1장](./rag/01-why-rag-and-basic-pipeline/) · [2장](./rag/02-document-loading-and-cleaning/)

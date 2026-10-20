@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 과목 시작 — 1일차(1·2장) 완료 → 3장 청킹 예정 |
-| 최근 학습 | **2026-10-19** · [RAG 1장](./rag/01-why-rag-and-basic-pipeline/)·[2장](./rag/02-document-loading-and-cleaning/) — 검색 후보와 실제 Context 구분, 문서 로딩·metadata·정제·JSONL 검수 |
-| 다음 할 일 | RAG 3장 청킹(Chunk Size·Overlap, Recursive·Token, 문서 구조 기반) · 복습 2일차 선택 실습은 주말에 |
+| 현재 단계 | RAG 2일차(3·4장) 완료 → 5장 Vector Store 예정 |
+| 최근 학습 | **2026-10-20** · [RAG 3장](./rag/03-chunking-strategies/)·[4장](./rag/04-embedding-dense-retrieval/) — 청킹 크기·경계·구조 비교, E5 임베딩과 코사인 Top-k·threshold, Dense 기준선 |
+| 다음 할 일 | RAG 5장 Vector Store(Qdrant) · 복습 2일차 선택 실습은 주말에 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -124,6 +124,8 @@ flowchart LR
 | --- | --- | --- |
 | [1](./rag/01-why-rag-and-basic-pipeline/) | RAG가 필요한 이유, Indexing·Query와 역색인, 2-Step RAG 기준선(검색 후보 vs Context), RAG·Long Context·CAG 선택 | ✅ 완료 |
 | [2](./rag/02-document-loading-and-cleaning/) | TXT·HTML·PDF 로딩과 `Document`, 출처 metadata, 중복·Boilerplate 정제, JSONL 저장·검수 | ✅ 완료 |
+| [3](./rag/03-chunking-strategies/) | Chunk Size·Overlap, Fixed·Recursive·Token 청킹, Markdown 제목 기반 청킹, 근거 보존 비교와 `chunks.json` | ✅ 완료 |
+| [4](./rag/04-embedding-dense-retrieval/) | E5 임베딩·pooling·정규화, 코사인 Top-k, k·threshold, Hit@k·Recall Dense 기준선 | ✅ 완료 |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -160,6 +162,17 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-10-20 · RAG 2일차: 청킹(3장)과 임베딩·Dense 검색(4장)
+
+- RAG 2일차(오전 3장·오후 4장)를 `rag_day2` 키트로 실행. 3·4장 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [3장](./rag/03-chunking-strategies/) · [4장](./rag/04-embedding-dense-retrieval/)
+- 청킹: 이동 간격 = `size − overlap`(80/20 → 0·60·120). 겹침을 늘려도 승인 문장 `[54:92]`는 80/20의 어느 청크에도 통째로 없고, 100/20에서만 온전함. 공통 기준은 최적값이 아니라 비교 출발점으로 80/20 `chunks.json`(28개)
+- Recursive는 `". "` → `" "` → `""` 순서로 문장 경계부터 자르고, 모델 한도는 문자가 아니라 **토큰**(문자÷토큰 1.41\~1.75). 토큰 50으로 잘라도 `passage:`를 붙이면 51 → 최종 입력을 다시 잼. Truncation은 오류 없이 조용히 조건을 지움
+- 문서 구조 청킹: `## 제목`으로 먼저 나누고 `metadata.update`로 원문 정보를 붙인 뒤 `split_documents`로 절 안에서만 다시 자름. metadata의 제목은 임베딩에 자동으로 안 들어감
+- 임베딩: 청크 28개 → `(28, 384)`, 정규화했으니 `vectors @ query` = 코사인. **공식을 NumPy 코드로 옮겨 값을 찍어 보니**(mask pooling, `axis`, norm, 코사인) 이해가 빨라짐
+- k·threshold: q06은 k=3에서 세 근거 완성, 하한 0.88이면 숙박 금액, 0.90(직접 실험)이면 식비 금액까지 사라짐. 점수 ≠ 답의 존재(매출 목표 질문도 0.7986)
+- 기준선: E5 small Hit@3·Recall@3 = 1.0이지만 base와 비교하면 5개 질문의 검색 문서가 다름 → 평균 뒤 질문별 결과와 원문을 같이 봄
+- 퀴즈에서 리스트 컴프리헨션 ↔ for문 변환, `setdefault`, `small_rows = {r["question_id"]: r …}`처럼 ID로 짝 맞추기를 정리. 4-2 `main.py`에 넣은 for문이 `cosines`를 리스트로 덮어써 `.tolist()` 오류
+
 ### 2026-10-19 · RAG 1일차: RAG 기본 파이프라인(1장)과 문서 준비(2장)
 
 - RAG 1일차(오전 1장·오후 2장) 8개 강의를 `rag_day1` 키트로 실행하고 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [1장](./rag/01-why-rag-and-basic-pipeline/) · [2장](./rag/02-document-loading-and-cleaning/)
@@ -181,16 +194,6 @@ flowchart LR
 - LangChain: `prompt | model | parser`로 모델 자리만 바꿔 같은 24건·같은 프롬프트로 비교. 반대 극 언급 3/24는 재작성으로 증상을 막고, 프롬프트에서 원인을 고쳐 첫 초안 0/24·비용 −21%
 - 발표 중 "잠시 후 다시 시도" 오류의 원인은 같은 IP 10분 5회 요청 제한. 강의실처럼 한 IP를 여럿이 쓰는 환경을 고려해야 함
 
-### 2026-10-07 · 복습 2일차: 모델 선택, 복원과 예측, 생성 호출, API
-
-- 프로젝트 전 복습 수업 2일차(교안 05\~08): step05 모델 선택 → step06 checkpoint 복원·예측 → step07 생성 호출 → step08 체인 → step09 기록·비교 → step10 API까지 모두 실행. 공통 문의 confidence 0.6360으로 교안 값과 일치
-- `selected.json`은 가중치가 아니라 "누구의 어느 실험을 무슨 기준으로 골랐는지"의 기록. `max(key=lambda …)`는 동점이면 **목록 앞 후보**(lr2e5)를 남기므로 점수와 동점 처리 기준을 함께 기록
-- confidence는 softmax 확률 중 가장 큰 값일 뿐 정답 확률이 아님. 띄어쓰기 한 칸만 달라도 토큰이 달라져 0.7210 vs 0.7126처럼 점수가 바뀜
-- 프롬프트에는 `json.dumps(원문)`으로 경계를 표시하고, Ollama는 `ollama run` 없이 서버만 켜져 있으면 `httpx`로 호출. 성공·실패 모두 같은 모양으로 반환하고 형식 검사는 필드·타입만, 내용은 사람이 판단
-- step10: 422는 함수 실행 **전** 요청 모델 검사, 502는 뒤쪽 LLM 실패, 200이어도 답의 정확성은 따로 확인. `/compare`는 분류 한 번 + 같은 프롬프트로 두 LLM을 같은 조건에서 비교
-- `if __name__ == "__main__":` 밖의 코드는 import될 때도 실행됨 — step 파일에 붙인 퀴즈가 practice08 실행 때 먼저 출력된 원인. 퀴즈는 별도 파일로 분리
-- Python 보강 2장: 클래스(`self`, `return` vs `print`), 람다와 `sorted(key=…)`, 데코레이터(`@wrap` = 포장, `@app.get("/")` = 등록)
-
 ## 📂 폴더 구조
 
 <details>
@@ -207,7 +210,7 @@ TIL/
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
-├── rag/                           # 1~2장
+├── rag/                           # 1~4장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

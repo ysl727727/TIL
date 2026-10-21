@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 2일차(3·4장) 완료 → 5장 Vector Store 예정 |
-| 최근 학습 | **2026-10-20** · [RAG 3장](./rag/03-chunking-strategies/)·[4장](./rag/04-embedding-dense-retrieval/) — 청킹 크기·경계·구조 비교, E5 임베딩과 코사인 Top-k·threshold, Dense 기준선 |
-| 다음 할 일 | RAG 5장 Vector Store(Qdrant) · 복습 2일차 선택 실습은 주말에 |
+| 현재 단계 | RAG 3일차 5장(Vector Store) 완료 → 6장 2-Step RAG 예정 |
+| 최근 학습 | **2026-10-21** · [RAG 5장](./rag/05-vector-store-qdrant/) — Qdrant Point·필터·갱신, Qdrant Cloud(Strict Mode)와 FAISS(정확·HNSW) 추가 과제 |
+| 다음 할 일 | RAG 6장 Retriever → Context → 2-Step RAG · Citation · 답변 보류 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -126,6 +126,7 @@ flowchart LR
 | [2](./rag/02-document-loading-and-cleaning/) | TXT·HTML·PDF 로딩과 `Document`, 출처 metadata, 중복·Boilerplate 정제, JSONL 저장·검수 | ✅ 완료 |
 | [3](./rag/03-chunking-strategies/) | Chunk Size·Overlap, Fixed·Recursive·Token 청킹, Markdown 제목 기반 청킹, 근거 보존 비교와 `chunks.json` | ✅ 완료 |
 | [4](./rag/04-embedding-dense-retrieval/) | E5 임베딩·pooling·정규화, 코사인 Top-k, k·threshold, Hit@k·Recall Dense 기준선 | ✅ 완료 |
+| [5](./rag/05-vector-store-qdrant/) | Qdrant Point·Collection·Upsert·Query, Metadata Filter, 갱신과 ANN, Qdrant Cloud·FAISS 추가 과제 | ✅ 완료 |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -162,6 +163,16 @@ flowchart LR
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
 
+### 2026-10-21 · RAG 3일차: Vector Store(Qdrant)와 Cloud·FAISS 추가 과제(5장)
+
+- RAG 3일차 오전 5장을 `rag_day3` 키트로 실행하고 강마다 q\_easy·q\_hard까지 확인. 수업 뒤 추가 과제로 5-2·5-3을 **Qdrant Cloud**로, 같은 검색을 **FAISS**로 다시 해 봄 → [5장](./rag/05-vector-store-qdrant/)
+- Point = `id + vector + payload`. `uuid5(chunk_id)`라 같은 청크는 항상 같은 ID → Upsert 두 번에도 1개. `chunks[i]`와 `vectors[i]`는 같은 인덱스로 꺼내야 짝이 맞음
+- 28개 Upsert 후 current 필터로 Top-3 = 4장 NumPy와 같은 `0.8945 · 0.875 · 0.8444`. 필터는 점수를 바꾸지 않고 **후보 자격**만 정함("8만원인가요?"에서 travel-old 0.9003이 빠짐)
+- 다시 청킹하면 청크 ID가 모두 바뀌어 이전 Point가 남음 → `old_ids - new_ids` 삭제(3 → 5 → 2). ANN은 일부만 탐색해서 놓칠 수 있음(겹침 0.5)
+- Qdrant Cloud: `:memory:`와 달리 데이터가 남고 **Strict Mode**라 필터 필드에 `create_payload_index`가 필수. 5-2는 `metadata.status`, 5-3은 status·category·start 인덱스 → 결과는 메모리와 같음
+- FAISS: `IndexFlatIP`(정규화 벡터라 내적 = 코사인)와 `IndexHNSWFlat`(ANN) 모두 같은 Top-3. 벡터만 저장해서 원문은 `chunks[i]`, 현행 필터는 직접 처리
+- 클래스·객체(속성은 `.이름`, 메서드는 `.이름()`), `query_points(...).points`·`count(...).count`처럼 Qdrant 결과는 "상자 → 점으로 꺼내기", `.tolist()`는 JSON으로 보내려고
+
 ### 2026-10-20 · RAG 2일차: 청킹(3장)과 임베딩·Dense 검색(4장)
 
 - RAG 2일차(오전 3장·오후 4장)를 `rag_day2` 키트로 실행. 3·4장 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [3장](./rag/03-chunking-strategies/) · [4장](./rag/04-embedding-dense-retrieval/)
@@ -184,16 +195,6 @@ flowchart LR
 - JSONL은 한 줄에 객체 하나, 본문 줄바꿈은 `\n`으로 이스케이프돼 한 행 유지. 저장 후 다시 읽어 문법 오류와 스키마 오류를 행 번호와 함께 구분
 - 실습 실수: `row`/`rows` 이름 불일치로 다른 검색 결과 사용, `assert`는 반환 문자열 글자까지 비교, `"category"`(글자) vs `category`(변수), `split()` vs `strip()`
 
-### 2026-10-16 · 2차 프로젝트 러브코드 회고: 16유형 분류(BERT)와 LangChain 해설
-
-- 내 담당: 사주·MBTI 커플 16유형 분류 모델(klue/bert-base 축별)과 LangChain 해설 체인·생성 모델 비교. test macro-F1 **0.831** / 정확도 0.858, 해설 규칙 위반 0/24 → [프로젝트 회고](./projects/01-lovecode-couple-type-classifier/)
-- 첫 점수 0.079의 원인은 모델이 아니라 **흔들리는 정답**. 판단 기준을 코드(규칙 라벨러)로 고정하고 판단 재료를 텍스트에 빠짐없이 넣자 데이터를 늘릴수록 점수가 오름(0.165 → 0.757)
-- 효과 큰 순서: 규칙 라벨 + 데이터 증가 > **어려운 사례 1,200쌍**(0.744 → 0.802) > 축별 분류(0.714 → 0.744). 규제는 과적합만 줄이고 점수는 유지 → 남은 오차는 과적합이 아님
-- 120쌍 validation 1위가 1,200쌍 dev에서 3위 → 작은 평가 세트로는 순위를 믿을 수 없어 dev를 따로 두고 test는 1회만 사용
-- TF-IDF(0.428)는 조각 개수만 세서 "중요도가 같으면 태그로 비교" 같은 조건을 못 따라 함. LLM에 규칙만 설명하면 축별 0.8 → 네 축 곱 0.41, 예시로 배운 BERT는 0.95⁴ ≈ 0.81
-- LangChain: `prompt | model | parser`로 모델 자리만 바꿔 같은 24건·같은 프롬프트로 비교. 반대 극 언급 3/24는 재작성으로 증상을 막고, 프롬프트에서 원인을 고쳐 첫 초안 0/24·비용 −21%
-- 발표 중 "잠시 후 다시 시도" 오류의 원인은 같은 IP 10분 5회 요청 제한. 강의실처럼 한 IP를 여럿이 쓰는 환경을 고려해야 함
-
 ## 📂 폴더 구조
 
 <details>
@@ -210,7 +211,7 @@ TIL/
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
-├── rag/                           # 1~4장
+├── rag/                           # 1~5장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

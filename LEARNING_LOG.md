@@ -3,6 +3,16 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-21 · RAG 3일차: Vector Store(Qdrant)와 Cloud·FAISS 추가 과제(5장)
+
+- RAG 3일차 오전 5장을 `rag_day3` 키트로 실행하고 강마다 q\_easy·q\_hard까지 확인. 수업 뒤 추가 과제로 5-2·5-3을 **Qdrant Cloud**로, 같은 검색을 **FAISS**로 다시 해 봄 → [5장](./rag/05-vector-store-qdrant/)
+- Point = `id + vector + payload`. `uuid5(chunk_id)`라 같은 청크는 항상 같은 ID → Upsert 두 번에도 1개. `chunks[i]`와 `vectors[i]`는 같은 인덱스로 꺼내야 짝이 맞음
+- 28개 Upsert 후 current 필터로 Top-3 = 4장 NumPy와 같은 `0.8945 · 0.875 · 0.8444`. 필터는 점수를 바꾸지 않고 **후보 자격**만 정함("8만원인가요?"에서 travel-old 0.9003이 빠짐)
+- 다시 청킹하면 청크 ID가 모두 바뀌어 이전 Point가 남음 → `old_ids - new_ids` 삭제(3 → 5 → 2). ANN은 일부만 탐색해서 놓칠 수 있음(겹침 0.5)
+- Qdrant Cloud: `:memory:`와 달리 데이터가 남고 **Strict Mode**라 필터 필드에 `create_payload_index`가 필수. 5-2는 `metadata.status`, 5-3은 status·category·start 인덱스 → 결과는 메모리와 같음
+- FAISS: `IndexFlatIP`(정규화 벡터라 내적 = 코사인)와 `IndexHNSWFlat`(ANN) 모두 같은 Top-3. 벡터만 저장해서 원문은 `chunks[i]`, 현행 필터는 직접 처리
+- 클래스·객체(속성은 `.이름`, 메서드는 `.이름()`), `query_points(...).points`·`count(...).count`처럼 Qdrant 결과는 "상자 → 점으로 꺼내기", `.tolist()`는 JSON으로 보내려고
+
 ## 2026-10-20 · RAG 2일차: 청킹(3장)과 임베딩·Dense 검색(4장)
 
 - RAG 2일차(오전 3장·오후 4장)를 `rag_day2` 키트로 실행. 3·4장 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [3장](./rag/03-chunking-strategies/) · [4장](./rag/04-embedding-dense-retrieval/)

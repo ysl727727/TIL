@@ -3,6 +3,16 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-26 · RAG 4일차: 근거로 답하기(6장)와 검색 개선(7장) · Python 보강 1주 1일
+
+- RAG 4일차 오전 6장·오후 7장을 `rag_day4` 키트로 실행하고 강마다 q\_hard 확인(7-4 q\_hard는 남음) → [6장](./rag/06-context-2step-rag-citation/) · [7장](./rag/07-hybrid-search-rerank-rewrite/)
+- 6장: 검색됐다 ≠ 답할 수 있다. `chunk_id`로 중복 제거 → `[S1] 제목+본문` → 문자 예산(120·200·300)에 들어가는 근거만 Context. k에서 빠진 근거와 예산에서 빠진 근거를 구분
+- `prepare → invoke_model → finish` 2-Step RAG, JSON Schema, Ollama 응답은 JSON 두 겹. `--generate`에서 gemma3가 보류인데 출처를 달아 `validate_answer`가 차단 → LLM 결과는 검사해야 함
+- Citation은 `bind_claim`(출처 → 발췌 → URL). "1박당 → 출장 전체" 같은 의미 오류는 `review_meaning`까지만, 판단은 사람. 보류는 무엇이 부족한지 적고 `citations: []`, `insufficient ≠ system_error ≠ invalid_output`
+- 7장: BM25는 조사 하나로 결과가 바뀌고(영수증 vs 영수증을), Dense는 상관없는 질문에도 Top-k를 냄. RRF `1/(60+rank)`로 순위를 합치고, Cross-Encoder로 쌍을 다시 매기고, Multi-Query로 q10 `[]` → education@60
+- 앞 단계에서 빠진 근거는 RRF·Re-ranking도 못 살림. 중복 제거 4가지(`chunk_id` dict, `setdefault`, `dict.fromkeys`, 문서 다양성) 비교
+- Python 보강 1주 1일: 연산자(`/` `//` `%`), 누적 패턴, 중첩 반복, f-string 서식 — q1~q5 통과 → [Python 3장](./python-basics/03-operators-conditionals-loops/)
+
 ## 2026-10-21 · RAG 3일차: Vector Store(Qdrant)와 Cloud·FAISS 추가 과제(5장)
 
 - RAG 3일차 오전 5장을 `rag_day3` 키트로 실행하고 강마다 q\_easy·q\_hard까지 확인. 수업 뒤 추가 과제로 5-2·5-3을 **Qdrant Cloud**로, 같은 검색을 **FAISS**로 다시 해 봄 → [5장](./rag/05-vector-store-qdrant/)

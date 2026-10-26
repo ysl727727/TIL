@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 3일차 5장(Vector Store) 완료 → 6장 2-Step RAG 예정 |
-| 최근 학습 | **2026-10-21** · [RAG 5장](./rag/05-vector-store-qdrant/) — Qdrant Point·필터·갱신, Qdrant Cloud(Strict Mode)와 FAISS(정확·HNSW) 추가 과제 |
-| 다음 할 일 | RAG 6장 Retriever → Context → 2-Step RAG · Citation · 답변 보류 |
+| 현재 단계 | RAG 4일차 6장(근거로 답하기)·7장(검색 개선) 완료 → 8장 평가 예정 |
+| 최근 학습 | **2026-10-26** · [RAG 6장](./rag/06-context-2step-rag-citation/) Context·2-Step RAG·Citation·보류 · [RAG 7장](./rag/07-hybrid-search-rerank-rewrite/) BM25·RRF·Re-ranking·Multi-Query · [Python 보강 3장](./python-basics/03-operators-conditionals-loops/) |
+| 다음 할 일 | RAG 7-4 q\_hard 마무리 → 8장 평가 · Python 보강 q6~q10 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -127,6 +127,8 @@ flowchart LR
 | [3](./rag/03-chunking-strategies/) | Chunk Size·Overlap, Fixed·Recursive·Token 청킹, Markdown 제목 기반 청킹, 근거 보존 비교와 `chunks.json` | ✅ 완료 |
 | [4](./rag/04-embedding-dense-retrieval/) | E5 임베딩·pooling·정규화, 코사인 Top-k, k·threshold, Hit@k·Recall Dense 기준선 | ✅ 완료 |
 | [5](./rag/05-vector-store-qdrant/) | Qdrant Point·Collection·Upsert·Query, Metadata Filter, 갱신과 ANN, Qdrant Cloud·FAISS 추가 과제 | ✅ 완료 |
+| [6](./rag/06-context-2step-rag-citation/) | Context 구성(`chunk_id` 중복 제거·문자 예산), 2-Step RAG 체인과 `validate_answer`, Citation `bind_claim`, 답변 보류 | ✅ 완료 |
+| [7](./rag/07-hybrid-search-rerank-rewrite/) | BM25 vs Dense, Hybrid·RRF, Cross-Encoder Re-ranking, Query Rewrite·Multi-Query | 🧪 진행 (7-4 q\_hard 남음) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -149,6 +151,7 @@ flowchart LR
 | --- | --- | --- |
 | [1](./python-basics/01-syntax-conditionals-collections/) | 변수·자료형·f-string, 조건문, 리스트·딕셔너리 메서드, 중첩 반복문 | ✅ 완료 |
 | [2](./python-basics/02-class-lambda-decorator/) | 클래스·`self`, 람다와 `sorted(key=…)`, 데코레이터, `@app.get("/")` | ✅ 완료 |
+| [3](./python-basics/03-operators-conditionals-loops/) | 보강 1주 1일 — 연산자, 조건문, 누적 패턴, 중첩 반복, 내장 함수, f-string 서식 | 🧪 진행 (q6~q10 남음) |
 
 ### 종합 과제 · [`assignments/`](./assignments/)
 
@@ -162,6 +165,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-10-26 · RAG 4일차: 근거로 답하기(6장)와 검색 개선(7장) · Python 보강 1주 1일
+
+- RAG 4일차 오전 6장·오후 7장을 `rag_day4` 키트로 실행하고 강마다 q\_hard 확인(7-4 q\_hard는 남음) → [6장](./rag/06-context-2step-rag-citation/) · [7장](./rag/07-hybrid-search-rerank-rewrite/)
+- 6장: 검색됐다 ≠ 답할 수 있다. `chunk_id`로 중복 제거 → `[S1] 제목+본문` → 문자 예산(120·200·300)에 들어가는 근거만 Context. k에서 빠진 근거와 예산에서 빠진 근거를 구분
+- `prepare → invoke_model → finish` 2-Step RAG, JSON Schema, Ollama 응답은 JSON 두 겹. `--generate`에서 gemma3가 보류인데 출처를 달아 `validate_answer`가 차단 → LLM 결과는 검사해야 함
+- Citation은 `bind_claim`(출처 → 발췌 → URL). "1박당 → 출장 전체" 같은 의미 오류는 `review_meaning`까지만, 판단은 사람. 보류는 무엇이 부족한지 적고 `citations: []`, `insufficient ≠ system_error ≠ invalid_output`
+- 7장: BM25는 조사 하나로 결과가 바뀌고(영수증 vs 영수증을), Dense는 상관없는 질문에도 Top-k를 냄. RRF `1/(60+rank)`로 순위를 합치고, Cross-Encoder로 쌍을 다시 매기고, Multi-Query로 q10 `[]` → education@60
+- 앞 단계에서 빠진 근거는 RRF·Re-ranking도 못 살림. 중복 제거 4가지(`chunk_id` dict, `setdefault`, `dict.fromkeys`, 문서 다양성) 비교
+- Python 보강 1주 1일: 연산자(`/` `//` `%`), 누적 패턴, 중첩 반복, f-string 서식 — q1~q5 통과 → [Python 3장](./python-basics/03-operators-conditionals-loops/)
 
 ### 2026-10-21 · RAG 3일차: Vector Store(Qdrant)와 Cloud·FAISS 추가 과제(5장)
 
@@ -184,17 +197,6 @@ flowchart LR
 - 기준선: E5 small Hit@3·Recall@3 = 1.0이지만 base와 비교하면 5개 질문의 검색 문서가 다름 → 평균 뒤 질문별 결과와 원문을 같이 봄
 - 퀴즈에서 리스트 컴프리헨션 ↔ for문 변환, `setdefault`, `small_rows = {r["question_id"]: r …}`처럼 ID로 짝 맞추기를 정리. 4-2 `main.py`에 넣은 for문이 `cosines`를 리스트로 덮어써 `.tolist()` 오류
 
-### 2026-10-19 · RAG 1일차: RAG 기본 파이프라인(1장)과 문서 준비(2장)
-
-- RAG 1일차(오전 1장·오후 2장) 8개 강의를 `rag_day1` 키트로 실행하고 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [1장](./rag/01-why-rag-and-basic-pipeline/) · [2장](./rag/02-document-loading-and-cleaning/)
-- **검색 성공 ≠ 답변 가능**: `호텔비`는 표현이 달라 검색 실패, `개인 취미`는 검색은 됐지만 문서에 답이 없음 → 원인이 다르니 대응도 다름(임베딩 검색 vs "확인 불가" 안내)
-- 역색인은 단어 → 문서 ID 집합. OR = 합집합, AND = 교집합이고, `intersection_update`는 집합을 직접 고치므로 첫 집합을 `set()`으로 복사해야 원본 색인이 안 망가짐. 문서가 바뀌면 인덱스도 다시 만들어야 함
-- **오늘 배운 점: 검색 후보와 실제 입력은 다르다.** `retrieve`의 `rows`(후보 3개)와 `build_context`의 `context`/`sources`(예산 260 안에 들어간 2개)를 따로 보고, 출처는 Context에 실제로 들어간 것만 연결
-- 문서 예산 = 한도 − 지시문 − 질문·이력 − 출력 예약 − 여유(8192 → 6000). RAG(검색)·Long Context(긴 입력 능력)·CAG(계산 상태 재사용)는 같은 축이 아니고, KV cache는 답변이 아니라 입력 계산을 재사용
-- 2장: HTML은 태그 삭제보다 본문 범위 선택이 먼저, PDF 줄바꿈은 페이지 폭 때문. 현행은 게시일이 아니라 `status`로 고르고, 중복 키(version, category, 본문 해시)로 복사본만 빼고 구버전은 유지. 정제는 뜻(금액·부정 표현)을 바꾸지 않음
-- JSONL은 한 줄에 객체 하나, 본문 줄바꿈은 `\n`으로 이스케이프돼 한 행 유지. 저장 후 다시 읽어 문법 오류와 스키마 오류를 행 번호와 함께 구분
-- 실습 실수: `row`/`rows` 이름 불일치로 다른 검색 결과 사용, `assert`는 반환 문자열 글자까지 비교, `"category"`(글자) vs `category`(변수), `split()` vs `strip()`
-
 ## 📂 폴더 구조
 
 <details>
@@ -211,7 +213,7 @@ TIL/
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
-├── rag/                           # 1~5장
+├── rag/                           # 1~7장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

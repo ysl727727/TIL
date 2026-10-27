@@ -120,3 +120,5 @@ def merge_heads(x):
 ```bash
 pip install -r requirements.txt
 ```
+
+> 다음 강의: [4강 Transformer 전체 구조](../09-transformer-architecture/) — Attention을 Embedding·FFN·Residual·LayerNorm과 엮은 전체 구조

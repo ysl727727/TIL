@@ -3,6 +3,17 @@
 > 최신 기록이 위에 옵니다. 목차와 진행 상태는 [README](./README.md), 밀린 실습은 [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 확인합니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-27 · RAG 5일차: 평가(8장)와 고급 RAG(9장) · Python 보강 1주 2일
+
+- RAG 5일차 오전 8장·오후 9장을 `rag_day5` 키트로 실행. q\_hard는 8-1·8-2·8-3·9-1 통과, 선택 실습으로 RAGAS `--execute`와 GraphRAG 색인·질의까지 실행 → [8장](./rag/08-evaluation-golden-hit-recall-ragas/) · [9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/)
+- 8장: 질문만 시스템에 보내고 `reference`·정답 문서 ID는 평가에만. dev ∩ test 근거 문서 `[]`. 검색은 청크로, 채점은 `document_id`로. q06 k=1은 Hit 1 · Recall 0.5 → Hit만 보면 숙박 근거가 빠진 걸 놓침
+- dev 10개 평균 0.9의 정체는 q10 하나(조사 때문에 BM25 0건). 청크 먼저 자르면 Recall 0.5, 문서 먼저 중복 제거하면 1.0 → 평가 단위를 같이 적기
+- RAGAS: Faithfulness(답 ↔ 근거)와 Answer Relevancy(답 ↔ 질문)는 다른 축. 직접 돌린 Relevancy는 교안과 조금 다르고 금액이 틀린 B가 A보다 높음 → 채점도 LLM이라 흔들리고, 지표 하나로 정확성을 판정하면 안 됨
+- 8-4: 하나만 바꾸고(BM25 → Dense → Hybrid) 같은 정답지로 비교. wins `['q10']` losses `[]`, test는 마지막에 한 번 기록만. 문서 Recall 1.0 ≠ 증빙 문장 확보
+- 9장: 80자 Child가 "서면"에서 끊겨 148자 Parent로 확장, 예산 70이면 승인 조건이 빠짐. `search_loop` 종료 3가지(`candidates_ready`·`repeated_query`·`search_limit`), `route`는 인용 검사로 근거 없는 answer를 막음
+- GraphRAG: 관계 8줄 → 노드 10·간선 8, 영수증 ← 3개 규정 → 승인자. 자동 색인은 엔티티 67·관계 57(교안 69·62, LLM 추출이라 달라짐). ColPali MaxSim A 2.0 > B 1.4142, 금액은 값·단위·출처를 함께
+- Python 보강 1주 2일: `return` vs `print`, 기본값·키워드 인자, 슬라이스, 딕셔너리로 세기, 두 수의 합, `sorted(key=…)`, `Counter` — 기초 q1~q3 통과 → [Python 4장](./python-basics/04-functions-lists-strings-dicts/)
+
 ## 2026-10-26 · RAG 4일차: 근거로 답하기(6장)와 검색 개선(7장) · Python 보강 1주 1일
 
 - RAG 4일차 오전 6장·오후 7장을 `rag_day4` 키트로 실행하고 강마다 q\_hard 확인(7-4 q\_hard는 남음) → [6장](./rag/06-context-2step-rag-citation/) · [7장](./rag/07-hybrid-search-rerank-rewrite/)

@@ -26,13 +26,13 @@
 
 ```mermaid
 flowchart LR
-    ML[머신러닝] --> DLB[딥러닝 기초] --> DLA[딥러닝 심화] --> LLM[LLM 실전]
+    PY[파이썬 베이직] --> BM[기초 수학] --> ML[머신러닝] --> DLB[딥러닝 기초] --> DLA[딥러닝 심화] --> LLM[LLM 실전]
     LLM --> DE[데이터 엔지니어링] --> LC[LangChain] --> RAG[RAG] --> AG[AI Agent] --> OPS[LLMOps·서빙]
 
     classDef done fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef now fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef next fill:#f3f4f6,stroke:#9ca3af,color:#374151
-    class ML,DLB,DLA done
+    class PY,BM,ML,DLB,DLA done
     class LLM,DE,LC,RAG now
     class AG,OPS next
 ```
@@ -42,6 +42,15 @@ flowchart LR
 ## 📖 학습 목차
 
 **상태 표시** ✅ 완료 · 🧪 실습 일부 완료 · 📘 이론 정리 · ⏳ 실습 대기 · 📭 실습 자료 없음 · ⬜ 미수강
+
+### 기초 수학 · [`basic-math/`](./basic-math/)
+
+| 장 | 주제 | 상태 |
+| --- | --- | --- |
+| [1](./basic-math/01-vectors-norms-dot-cosine/) | 벡터·행렬, 노름과 정규화, 내적과 코사인 유사도, 행렬곱과 선형층 (08-05) | 🧪 1-1·1-2 실습 |
+| [2](./basic-math/02-span-rank-linear-systems/) | 선형 변환, span·rank·영공간, `Ax = b`, `solve` vs `inv`, 조건수 (08-06) | 🧪 2-2 완료 · 2-3 일부 |
+| [3·4](./basic-math/03-eigen-pca-svd/) | 고유값·PCA, 직교성과 최소제곱, SVD와 저랭크 근사 (08-07) | 🧪 4-1 실습 · PCA 미실행 |
+| [5\~7](./basic-math/04-tensor-shape-attention-backprop/) | 텐서 shape, Attention `QKᵀ/√d_k`, Softmax·CE, 미분·역전파 (08-10) | 🧪 6-1 필수 실습 |
 
 ### 머신러닝 · [`machine-learning/`](./machine-learning/)
 
@@ -77,6 +86,7 @@ flowchart LR
 | [1](./deep-learning-advanced/01-transformer-motivation/) | RNN/LSTM의 한계와 Transformer 등장 배경, config hash 재현성 | ✅ 완료 |
 | [2](./deep-learning-advanced/02-data-schema-and-tokenization/) | 데이터 스키마 감사, subword tokenizer, 동적 padding, offset mapping | ✅ 완료 |
 | [3](./deep-learning-advanced/03-attention-and-multihead/) | Q·K·V, Scaled Dot-Product Attention, mask, Multi-Head, GQA KV Cache | ✅ 완료 |
+| [4강](./deep-learning-advanced/09-transformer-architecture/) | Transformer 전체 구조 — Encoder·Decoder 계열, 위치 정보, Causal Mask, FFN·Residual·LayerNorm, KV Cache (폴더 09) | 📘 이론 정리 |
 | [4](./deep-learning-advanced/04-pretrained-language-models/) | 사전학습 LM — Masked LM(BERT) vs Causal LM(GPT) | 📘 이론 정리 · ⏳ 실습 대기 |
 | [5](./deep-learning-advanced/05-huggingface-hub-and-automodel/) | Hugging Face Hub, Model Card, AutoClass, 저장·재로드 재현성 | 📘 이론 정리 · ⏳ 실습 대기 |
 | [6](./deep-learning-advanced/06-text-classification-finetuning/) | 텍스트 분류 Fine-tuning — 데이터 감사부터 Trainer, Error Analysis까지 | 🧪 7-1만 실습 완료 |
@@ -88,7 +98,8 @@ flowchart LR
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./llm-practical-foundations/01-logits-softmax-and-optimizers/) | Logit·Softmax 수치 안정성, MSE·BCE·CE, Gradient Descent, SGD·Momentum·Adam | 📘 이론 정리 · ⏳ 실습 TODO 미완 |
-| 2\~9 | Attention NumPy 실습, RLHF, LLM API와 Prompt 설계, Structured Output, Tool Calling, 멀티모달 | ⬜ 미수강 |
+| [3\~5](./llm-practical-foundations/03-attention-alignment-api-policy/) | Attention 복습, SFT·RLHF(PPO)·DPO, Responses API와 Developer Prompt | 📘 이론 정리 · 🧪 API 첫 요청 |
+| 6\~9 | Few-shot·Self-Consistency, JSON Schema·Pydantic 구조화 출력, Tool Calling, 멀티모달 | ⬜ 미정리 (받은 이론 PDF 본문이 비어 있음) |
 | [10](./llm-practical-foundations/10-stable-llm-api-calls/) | 안정적인 LLM API 호출 — 오류 분류, Backoff + Full Jitter, Fallback Ladder (10-1강 보강) | 📘 이론 정리 · 📭 |
 
 ### 데이터 엔지니어링 · [`data-engineering/`](./data-engineering/)
@@ -146,12 +157,14 @@ flowchart LR
 
 | 번호 | 프로젝트 | 내 담당 | 결과 |
 | --- | --- | --- | --- |
+| [프로젝트(1)](./projects/02-open-source-llm-selection/) | 오픈소스 LLM 선정 — 부동산 허위매물 탐지 어시스턴트 (2026-09-14 ~ 09-18) | 개인 수행: 기준 설계·실험·채점 | qwen3 4B 선정 (정확성 80.8% vs 57.0%) |
 | [1](./projects/01-lovecode-couple-type-classifier/) | 러브코드 — 사주·MBTI로 커플 관계 스타일 16유형 분류 + LLM 해설 (2026-10-09 ~ 10-16) | BERT 분류 모델, LangChain 해설·생성 모델 비교 | test macro-F1 0.831, 해설 위반 0/24 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
+| [0](./python-basics/00-basic-class-variables-io-strings-conditionals/) | 베이직반 (08-04~05) — 변수·입출력·문자열·조건문, 반복문 미니과제 | 🧪 반복문 미니과제 남음 |
 | [1](./python-basics/01-syntax-conditionals-collections/) | 변수·자료형·f-string, 조건문, 리스트·딕셔너리 메서드, 중첩 반복문 | ✅ 완료 |
 | [2](./python-basics/02-class-lambda-decorator/) | 클래스·`self`, 람다와 `sorted(key=…)`, 데코레이터, `@app.get("/")` | ✅ 완료 |
 | [3](./python-basics/03-operators-conditionals-loops/) | 보강 1주 1일 — 연산자, 조건문, 누적 패턴, 중첩 반복, 내장 함수, f-string 서식 | 🧪 진행 (q6~q10 남음) |
@@ -212,10 +225,11 @@ TIL/
 ├── LEARNING_LOG.md                # 전체 학습 기록
 ├── WEEKEND_PRACTICE_BACKLOG.md    # 밀린 실습과 주말 계획
 ├── daily/                         # 날짜별 TIL (YYMMDD.md)
+├── basic-math/                    # 기초 수학 1~7장
 ├── machine-learning/              # 1~5장
 ├── deep-learning-basics/          # 강의 1~9, 12, 13장
-├── deep-learning-advanced/        # 1~8장
-├── llm-practical-foundations/     # 1장, 10장
+├── deep-learning-advanced/        # 1~8장 + 4강 Transformer
+├── llm-practical-foundations/     # 1~5장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
 ├── rag/                           # 1~9장

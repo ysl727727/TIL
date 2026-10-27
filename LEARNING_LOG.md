@@ -149,6 +149,19 @@
 - 3장: `has_next` 종료 신호로 page 반복, 429에서 page를 올리지 않고 같은 page 재시도, `append` 대신 `extend`로 전체 목록 병합, 원본(`raw_response.json`)과 가공(`items.json`/`items.csv`) 분리 보존, 로그에는 출처·시각·건수·상태만 남기고 키·개인정보 제외
 - 3장 실습은 solution 파일만 확보하고 아직 실행하지 못해 주말로 이월
 
+## 2026-09-14\~18 · 프로젝트(1) 오픈소스 LLM 선정: 부동산 허위매물 탐지 어시스턴트
+
+- 개인 수행. "어떤 LLM을 써야 하는가"에 근거로 답하는 프로젝트 → [프로젝트(1) 회고](./projects/02-open-source-llm-selection/) · [보고서](https://github.com/ysl727727/real-estate-fake-listing-detector)
+- 국토교통부 고시 조항으로 매물 광고 위반을 판정하는 어시스턴트 가정, `gemma3:4b` vs `qwen3:4b-instruct-2507-q4_K_M`(4B·Q4_K_M 동일), 10문항 × 2회
+- 기준을 실험 전에 확정: 필수 통과(VRAM·License·context·자료 밖 내용 미생성) → 선호 순위(환각 회피 > 정확성 > 속도 > VRAM), 가중치 총점 미사용
+- temperature·seed 불일치로 3회 재실험(3차 temp 1 / seed 42 본 집계), 정확성 57.0% vs 80.8% → qwen3 선정. gemma3는 "확인되지 않음"을 "확인되었습니다"로 역독
+
+## 2026-09-11 · LLM 실전 3\~5장: Attention 복습, SFT와 Preference Alignment, LLM API
+
+- 3장 Q·K·V 재정리(causal mask는 `-inf`, 0으로는 부족), 4장 Base → SFT → RLHF(PPO)/DPO, `prompt`·`chosen`·`rejected`와 rubric, reward hacking → [LLM 실전 3\~5장](./llm-practical-foundations/03-attention-alignment-api-policy/)
+- SFT는 행동(형식·말투)을 바꾸고 최신 지식은 RAG·Tool이 맞다는 기준
+- 5장 Responses API 첫 요청: `model + input → output_text`, 운영에는 `id`·`status`·`usage`, Developer Prompt = 역할·맥락·범위·제약·출력 형식·성공 기준의 작은 계약서
+
 ## 2026-09-09\~10 · Logit, 손실 함수, Optimizer (실습 대기)
 
 - 1-1강: logit vs probability 구분, softmax의 max trick(수치 안정성), `axis=-1` 배치 계산, stable log-softmax
@@ -181,6 +194,12 @@
 - 5장(5-1,5-2,5-4강): 사전학습·LM Objective의 큰 그림, Masked LM(BERT, 양방향 문맥)과 Causal LM(GPT, 왼쪽 문맥) 비교, BERT의 special token·입력 표현 3요소, GPT의 Causal Self-Attention·한 칸 shift·Autoregressive Generation
 - 6장(6-1,6-3,6-4,6-5강): Hugging Face Hub 구조와 Model Card 체크리스트, AutoClass의 config 기반 자동 클래스 선택과 Base/Task-specific 출력 차이, Masked Mean Pooling, 모델+tokenizer 저장/재로드 재현성 검증 흐름
 - 두 챕터 모두 실습 노트북 없이 이론만 정리, 실습은 주말(2026-09-12\~13)로 이월
+
+## 2026-09-04 · 딥러닝 심화 4강: Transformer 전체 구조
+
+- 4-1\~4-6 이론: Self-Attention(부품) vs Block vs Model, Encoder-only·Decoder-only·Encoder-Decoder, hidden state `[B,L,D]` vs logits → [딥러닝 심화 4강](./deep-learning-advanced/09-transformer-architecture/)
+- 위치 정보(Learned·Sinusoidal·RoPE), Causal Mask `triu(diagonal=1)`와 label shift, FFN·Residual·LayerNorm(Pre-Norm, RMSNorm·SwiGLU)
+- 학습은 병렬·생성은 순차, Prefill/Decode, KV Cache는 과거 K·V만 저장(메모리 ∝ layers × length × kv_heads)
 
 ## Attention과 Multi-Head Attention 실습 (완료)
 
@@ -322,3 +341,29 @@
 - `requires_grad`, `backward()`, gradient 누적과 표준 step 순서
 - `grad is None`과 값이 0인 gradient의 의미 구분
 - `model.eval()`과 `torch.no_grad()`, 학습 Loss 경로와 metric용 `detach()` 구분
+
+
+## 2026-08-10 · 기초 수학 5\~7장: 텐서 shape, Attention과 Softmax, 역전파
+
+- 6-1 실습: "사내 비밀번호 재설정 방법"에서 "재설정"이 자기 자신 다음으로 "비밀번호"를 참고하는지 진단, `√d_k` scaling으로 표준편차 0.3773 → 0.2178 → [기초 수학 5\~7장](./basic-math/04-tensor-shape-attention-backprop/)
+- 3차원 배치에서 `.T`는 모든 축을 뒤집음 → `np.swapaxes(K, -1, -2)`로 마지막 두 축만
+
+## 2026-08-07 · 기초 수학 3·4장: 고유값, PCA, SVD
+
+- 고객×상품(60×40) SVD: 축소형 shape, 완전 복원 오차 7.8e-11, 특이값 = `MᵀM` 고유값의 제곱근 → [기초 수학 3·4장](./basic-math/03-eigen-pca-svd/)
+- 랭크 결손 행렬 `RᵀR`의 음수 고유값 18개 → 제곱근 전에 `clip`
+
+## 2026-08-06 · 기초 수학 2장: span, rank, 영공간, Ax = b
+
+- 센서 5개 + 종속 컬럼 2개 = rank 5, 난수 컬럼은 rank 6 → "컬럼 수 ≠ 정보량". 상관 0.876이어도 rank는 안 깎임(다중공선성은 별개) → [기초 수학 2장](./basic-math/02-span-rank-linear-systems/)
+- 영공간 벡터로 중복 관계 특정, `solve` vs `inv`, 조건수 5천만 행렬에서 b를 1e-7 바꾸면 해가 0.5 이동
+
+## 2026-08-05 · 기초 수학 1장: 노름, 내적, 코사인 / 파이썬 반복문
+
+- 노름·정규화, 고객 구매 행렬에서 내적 상위는 구매량 큰 고객 → 취향 비교는 코사인 → [기초 수학 1장](./basic-math/01-vectors-norms-dot-cosine/)
+- 파이썬 반복문 미니과제 수령(미착수)
+
+## 2026-08-04 · 파이썬 베이직반: 변수, 입출력, 문자열, 조건문
+
+- `input()`은 항상 문자열, 슬라이스 끝은 포함 안 됨, 조건은 위에서부터 하나만 → [Python 보강 0장](./python-basics/00-basic-class-variables-io-strings-conditionals/)
+- 삼각형 판정에서 직각 조건을 먼저 둬야 `3 4 5`가 직각삼각형, `bool(input())`은 항상 True

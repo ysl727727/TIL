@@ -19,6 +19,7 @@
 | 최근 학습 | **2026-10-27** · [RAG 8장](./rag/08-evaluation-golden-hit-recall-ragas/) Golden·Hit@k·Recall@k·RAGAS·전후 비교 · [RAG 9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) Parent-Child·Agentic·GraphRAG·ColPali · [Python 보강 4장](./python-basics/04-functions-lists-strings-dicts/) |
 | 다음 할 일 | RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · 9-4 ColPali · Python 보강 1주 1일 q6~q10 · 1주 2일 q4~q10 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
+| 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
 ## 🗺️ 학습 로드맵
@@ -210,6 +211,7 @@ TIL/
 ├── README.md                      # 목차 (이 문서)
 ├── LEARNING_LOG.md                # 전체 학습 기록
 ├── WEEKEND_PRACTICE_BACKLOG.md    # 밀린 실습과 주말 계획
+├── daily/                         # 날짜별 TIL (YYMMDD.md)
 ├── machine-learning/              # 1~5장
 ├── deep-learning-basics/          # 강의 1~9, 12, 13장
 ├── deep-learning-advanced/        # 1~8장

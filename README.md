@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 4일차 6장(근거로 답하기)·7장(검색 개선) 완료 → 8장 평가 예정 |
-| 최근 학습 | **2026-10-26** · [RAG 6장](./rag/06-context-2step-rag-citation/) Context·2-Step RAG·Citation·보류 · [RAG 7장](./rag/07-hybrid-search-rerank-rewrite/) BM25·RRF·Re-ranking·Multi-Query · [Python 보강 3장](./python-basics/03-operators-conditionals-loops/) |
-| 다음 할 일 | RAG 7-4 q\_hard 마무리 → 8장 평가 · Python 보강 q6~q10 |
+| 현재 단계 | RAG 5일차 8장(평가)·9장(고급 RAG)까지 수업 완료 → 남은 q\_hard·선택 실습 정리 |
+| 최근 학습 | **2026-10-27** · [RAG 8장](./rag/08-evaluation-golden-hit-recall-ragas/) Golden·Hit@k·Recall@k·RAGAS·전후 비교 · [RAG 9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) Parent-Child·Agentic·GraphRAG·ColPali · [Python 보강 4장](./python-basics/04-functions-lists-strings-dicts/) |
+| 다음 할 일 | RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · 9-4 ColPali · Python 보강 1주 1일 q6~q10 · 1주 2일 q4~q10 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
 
@@ -129,6 +129,8 @@ flowchart LR
 | [5](./rag/05-vector-store-qdrant/) | Qdrant Point·Collection·Upsert·Query, Metadata Filter, 갱신과 ANN, Qdrant Cloud·FAISS 추가 과제 | ✅ 완료 |
 | [6](./rag/06-context-2step-rag-citation/) | Context 구성(`chunk_id` 중복 제거·문자 예산), 2-Step RAG 체인과 `validate_answer`, Citation `bind_claim`, 답변 보류 | ✅ 완료 |
 | [7](./rag/07-hybrid-search-rerank-rewrite/) | BM25 vs Dense, Hybrid·RRF, Cross-Encoder Re-ranking, Query Rewrite·Multi-Query | 🧪 진행 (7-4 q\_hard 남음) |
+| [8](./rag/08-evaluation-golden-hit-recall-ragas/) | Golden Dataset·dev/test, Hit@k·Recall@k(청크 vs 문서), RAGAS 네 지표(실행까지), BM25·Dense·Hybrid 전후 비교 | 🧪 진행 (8-4 q\_hard 남음) |
+| [9](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) | Parent-Child·Context 압축, Agentic RAG 재검색과 종료, GraphRAG(NetworkX·색인 실행), Multimodal·ColPali MaxSim | 🧪 진행 (9-2~9-4 q\_hard·9-4 남음) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -152,6 +154,7 @@ flowchart LR
 | [1](./python-basics/01-syntax-conditionals-collections/) | 변수·자료형·f-string, 조건문, 리스트·딕셔너리 메서드, 중첩 반복문 | ✅ 완료 |
 | [2](./python-basics/02-class-lambda-decorator/) | 클래스·`self`, 람다와 `sorted(key=…)`, 데코레이터, `@app.get("/")` | ✅ 완료 |
 | [3](./python-basics/03-operators-conditionals-loops/) | 보강 1주 1일 — 연산자, 조건문, 누적 패턴, 중첩 반복, 내장 함수, f-string 서식 | 🧪 진행 (q6~q10 남음) |
+| [4](./python-basics/04-functions-lists-strings-dicts/) | 보강 1주 2일 — 함수 `return`, 기본값·키워드 인자, 슬라이스, 문자열 메서드, 딕셔너리, 두 수의 합, `sorted(key=…)`·`Counter` | 🧪 진행 (q4~q10 남음) |
 
 ### 종합 과제 · [`assignments/`](./assignments/)
 
@@ -165,6 +168,17 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-10-27 · RAG 5일차: 평가(8장)와 고급 RAG(9장) · Python 보강 1주 2일
+
+- RAG 5일차 오전 8장·오후 9장을 `rag_day5` 키트로 실행. q\_hard는 8-1·8-2·8-3·9-1 통과, 선택 실습으로 RAGAS `--execute`와 GraphRAG 색인·질의까지 실행 → [8장](./rag/08-evaluation-golden-hit-recall-ragas/) · [9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/)
+- 8장: 질문만 시스템에 보내고 `reference`·정답 문서 ID는 평가에만. dev ∩ test 근거 문서 `[]`. 검색은 청크로, 채점은 `document_id`로. q06 k=1은 Hit 1 · Recall 0.5 → Hit만 보면 숙박 근거가 빠진 걸 놓침
+- dev 10개 평균 0.9의 정체는 q10 하나(조사 때문에 BM25 0건). 청크 먼저 자르면 Recall 0.5, 문서 먼저 중복 제거하면 1.0 → 평가 단위를 같이 적기
+- RAGAS: Faithfulness(답 ↔ 근거)와 Answer Relevancy(답 ↔ 질문)는 다른 축. 직접 돌린 Relevancy는 교안과 조금 다르고 금액이 틀린 B가 A보다 높음 → 채점도 LLM이라 흔들리고, 지표 하나로 정확성을 판정하면 안 됨
+- 8-4: 하나만 바꾸고(BM25 → Dense → Hybrid) 같은 정답지로 비교. wins `['q10']` losses `[]`, test는 마지막에 한 번 기록만. 문서 Recall 1.0 ≠ 증빙 문장 확보
+- 9장: 80자 Child가 "서면"에서 끊겨 148자 Parent로 확장, 예산 70이면 승인 조건이 빠짐. `search_loop` 종료 3가지(`candidates_ready`·`repeated_query`·`search_limit`), `route`는 인용 검사로 근거 없는 answer를 막음
+- GraphRAG: 관계 8줄 → 노드 10·간선 8, 영수증 ← 3개 규정 → 승인자. 자동 색인은 엔티티 67·관계 57(교안 69·62, LLM 추출이라 달라짐). ColPali MaxSim A 2.0 > B 1.4142, 금액은 값·단위·출처를 함께
+- Python 보강 1주 2일: `return` vs `print`, 기본값·키워드 인자, 슬라이스, 딕셔너리로 세기, 두 수의 합, `sorted(key=…)`, `Counter` — 기초 q1~q3 통과 → [Python 4장](./python-basics/04-functions-lists-strings-dicts/)
 
 ### 2026-10-26 · RAG 4일차: 근거로 답하기(6장)와 검색 개선(7장) · Python 보강 1주 1일
 
@@ -186,17 +200,6 @@ flowchart LR
 - FAISS: `IndexFlatIP`(정규화 벡터라 내적 = 코사인)와 `IndexHNSWFlat`(ANN) 모두 같은 Top-3. 벡터만 저장해서 원문은 `chunks[i]`, 현행 필터는 직접 처리
 - 클래스·객체(속성은 `.이름`, 메서드는 `.이름()`), `query_points(...).points`·`count(...).count`처럼 Qdrant 결과는 "상자 → 점으로 꺼내기", `.tolist()`는 JSON으로 보내려고
 
-### 2026-10-20 · RAG 2일차: 청킹(3장)과 임베딩·Dense 검색(4장)
-
-- RAG 2일차(오전 3장·오후 4장)를 `rag_day2` 키트로 실행. 3·4장 강마다 q\_easy·q\_hard까지 풀어 정답 확인 → [3장](./rag/03-chunking-strategies/) · [4장](./rag/04-embedding-dense-retrieval/)
-- 청킹: 이동 간격 = `size − overlap`(80/20 → 0·60·120). 겹침을 늘려도 승인 문장 `[54:92]`는 80/20의 어느 청크에도 통째로 없고, 100/20에서만 온전함. 공통 기준은 최적값이 아니라 비교 출발점으로 80/20 `chunks.json`(28개)
-- Recursive는 `". "` → `" "` → `""` 순서로 문장 경계부터 자르고, 모델 한도는 문자가 아니라 **토큰**(문자÷토큰 1.41\~1.75). 토큰 50으로 잘라도 `passage:`를 붙이면 51 → 최종 입력을 다시 잼. Truncation은 오류 없이 조용히 조건을 지움
-- 문서 구조 청킹: `## 제목`으로 먼저 나누고 `metadata.update`로 원문 정보를 붙인 뒤 `split_documents`로 절 안에서만 다시 자름. metadata의 제목은 임베딩에 자동으로 안 들어감
-- 임베딩: 청크 28개 → `(28, 384)`, 정규화했으니 `vectors @ query` = 코사인. **공식을 NumPy 코드로 옮겨 값을 찍어 보니**(mask pooling, `axis`, norm, 코사인) 이해가 빨라짐
-- k·threshold: q06은 k=3에서 세 근거 완성, 하한 0.88이면 숙박 금액, 0.90(직접 실험)이면 식비 금액까지 사라짐. 점수 ≠ 답의 존재(매출 목표 질문도 0.7986)
-- 기준선: E5 small Hit@3·Recall@3 = 1.0이지만 base와 비교하면 5개 질문의 검색 문서가 다름 → 평균 뒤 질문별 결과와 원문을 같이 봄
-- 퀴즈에서 리스트 컴프리헨션 ↔ for문 변환, `setdefault`, `small_rows = {r["question_id"]: r …}`처럼 ID로 짝 맞추기를 정리. 4-2 `main.py`에 넣은 for문이 `cosines`를 리스트로 덮어써 `.tolist()` 오류
-
 ## 📂 폴더 구조
 
 <details>
@@ -213,7 +216,7 @@ TIL/
 ├── llm-practical-foundations/     # 1장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
-├── rag/                           # 1~7장
+├── rag/                           # 1~9장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

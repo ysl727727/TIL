@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 5일차 8장(평가)·9장(고급 RAG)까지 수업 완료 → 남은 q\_hard·선택 실습 정리 |
-| 최근 학습 | **2026-10-27** · [RAG 8장](./rag/08-evaluation-golden-hit-recall-ragas/) Golden·Hit@k·Recall@k·RAGAS·전후 비교 · [RAG 9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) Parent-Child·Agentic·GraphRAG·ColPali · [Python 보강 4장](./python-basics/04-functions-lists-strings-dicts/) |
-| 다음 할 일 | RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · 9-4 ColPali · Python 보강 1주 1일 q6~q10 · 1주 2일 q4~q10 |
+| 현재 단계 | Context Engineering 1일차 1\~4장 수업 완료 → 마무리 과제와 밀린 q\_hard 정리 |
+| 최근 학습 | **2026-10-28** · [Context Engineering](./context-engineering/) 입력 구성·우선순위·메모리(Mem0)·토큰 예산·압축·Prompt Caching·Injection · [Python 보강 5장](./python-basics/05-sorting-binary-search/) |
+| 다음 할 일 | CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 1주 1일 q6~q10 · 1주 2일 q4~q10 · 1주 3일 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -27,13 +27,13 @@
 ```mermaid
 flowchart LR
     PY[파이썬 베이직] --> BM[기초 수학] --> ML[머신러닝] --> DLB[딥러닝 기초] --> DLA[딥러닝 심화] --> LLM[LLM 실전]
-    LLM --> DE[데이터 엔지니어링] --> LC[LangChain] --> RAG[RAG] --> AG[AI Agent] --> OPS[LLMOps·서빙]
+    LLM --> DE[데이터 엔지니어링] --> LC[LangChain] --> RAG[RAG] --> CE[Context Engineering] --> AG[AI Agent] --> OPS[LLMOps·서빙]
 
     classDef done fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef now fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef next fill:#f3f4f6,stroke:#9ca3af,color:#374151
     class PY,BM,ML,DLB,DLA done
-    class LLM,DE,LC,RAG now
+    class LLM,DE,LC,RAG,CE now
     class AG,OPS next
 ```
 
@@ -144,6 +144,15 @@ flowchart LR
 | [8](./rag/08-evaluation-golden-hit-recall-ragas/) | Golden Dataset·dev/test, Hit@k·Recall@k(청크 vs 문서), RAGAS 네 지표(실행까지), BM25·Dense·Hybrid 전후 비교 | 🧪 진행 (8-4 q\_hard 남음) |
 | [9](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) | Parent-Child·Context 압축, Agentic RAG 재검색과 종료, GraphRAG(NetworkX·색인 실행), Multimodal·ColPali MaxSim | 🧪 진행 (9-2~9-4 q\_hard·9-4 남음) |
 
+### Context Engineering · [`context-engineering/`](./context-engineering/)
+
+| 장 | 주제 | 상태 |
+| --- | --- | --- |
+| [1](./context-engineering/01-context-types-priority-skills/) | 컨텍스트 종류와 역할 분리(`kind` vs `role`), 출처 표지, 범위 → 유효성 → 관련성 우선순위, Skills | ✅ 완료 |
+| [2](./context-engineering/02-short-long-term-memory-mem0/) | 단기·장기 메모리 설계(`decide_memory`, 만료), Mem0 저장·조회·ID로 수정·삭제 | ✅ 완료 |
+| [3](./context-engineering/03-token-budget-summary-compression/) | chat template 토큰 세기, 입력 예산과 Sliding Window, 구조화 상태·원문 추출 압축, Map/Reduce | ✅ 완료 |
+| [4](./context-engineering/04-prompt-caching-injection-filtering/) | Prompt Caching과 정적 Prefix, 캐시 지표, 컨텍스트 오염·Prompt Injection, 오탐·미탐, 실행 전 도구 검사 | ✅ 완료 |
+
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
 > 목요일 프로젝트 시작 전, 그동안 배운 내용을 `project2-kit`으로 다시 실행해 보는 복습 수업입니다. 일차 단위로 정리합니다.
@@ -169,6 +178,7 @@ flowchart LR
 | [2](./python-basics/02-class-lambda-decorator/) | 클래스·`self`, 람다와 `sorted(key=…)`, 데코레이터, `@app.get("/")` | ✅ 완료 |
 | [3](./python-basics/03-operators-conditionals-loops/) | 보강 1주 1일 — 연산자, 조건문, 누적 패턴, 중첩 반복, 내장 함수, f-string 서식 | 🧪 진행 (q6~q10 남음) |
 | [4](./python-basics/04-functions-lists-strings-dicts/) | 보강 1주 2일 — 함수 `return`, 기본값·키워드 인자, 슬라이스, 문자열 메서드, 딕셔너리, 두 수의 합, `sorted(key=…)`·`Counter` | 🧪 진행 (q4~q10 남음) |
+| [5](./python-basics/05-sorting-binary-search/) | 보강 1주 3일 — 순차·버블 정렬, 이진 탐색, `sorted()`·`bisect` | 📘 이론 정리 · ⏳ 문제 풀이 |
 
 ### 종합 과제 · [`assignments/`](./assignments/)
 
@@ -182,6 +192,17 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-10-28 · Context Engineering 1일차: 입력 구성·메모리(1·2장)와 토큰 예산·캐시·오염(3·4장) · Python 보강 1주 3일
+
+- Context Engineering 1일차 1\~4장 8강을 `context_engineering` 키트(공용 uv 환경 하나)로 실행하고 q\_hard 8개 모두 통과 → [CE 목차](./context-engineering/) · [1장](./context-engineering/01-context-types-priority-skills/) · [2장](./context-engineering/02-short-long-term-memory-mem0/) · [3장](./context-engineering/03-token-budget-summary-compression/) · [4장](./context-engineering/04-prompt-caching-injection-filtering/)
+- 프롬프트 엔지니어링 = content에 들어갈 글 잘 쓰기, 컨텍스트 엔지니어링 = 무엇을 얼마나 넣을지 고르기. `kind`(앱) vs `role`(API), `[id / kind / source]` 표지
+- 고르는 순서는 범위 → 유효성 → 일관성 → 관련성 → 예산. 점수 1.00·0.99 후보가 먼저 빠짐. Skills는 맞는 절차만, 없으면 질문 재확인
+- 메모리: `decide_memory`(결정 + 이유), bool은 int의 하위 타입이라 `type(ttl) is int`. Mem0는 add 응답 ID로 대상을 고정하고 `owned_record`로 소유자 확인 후 수정·삭제, 이력은 남을 수 있음
+- 토큰 예산 = 한도 − 출력 예약 − 여유분, Qwen3 chat template로 세고 최신 턴부터(256 → 1턴, 512 → 6턴). 압축은 현재·이전 값 + 출처, `missing_evidence`로 누락 확인
+- Prefix cache는 맨 앞부터 같은 토큰만 재사용(공통 A 11 · B 94 · 정책 변경 8), None ≠ 0. 오염은 범위 → 본문 → `validate_action` 순, 문구 필터의 오탐(security-guide)·미탐(paraphrased-note)
+- 키트의 grpcio 1.85.0이 스마트 앱 컨트롤에 막혀 2장 2강만 `--with grpcio==1.84.0`으로 실행, `printsection`은 `uv add`로 추가
+- Python 보강 1주 3일: 순차·버블 정렬(n²), 이진 탐색(log₂n, 전제는 정렬), `sorted()`·`bisect` — 이론까지 → [Python 5장](./python-basics/05-sorting-binary-search/)
 
 ### 2026-10-27 · RAG 5일차: 평가(8장)와 고급 RAG(9장) · Python 보강 1주 2일
 
@@ -204,16 +225,6 @@ flowchart LR
 - 앞 단계에서 빠진 근거는 RRF·Re-ranking도 못 살림. 중복 제거 4가지(`chunk_id` dict, `setdefault`, `dict.fromkeys`, 문서 다양성) 비교
 - Python 보강 1주 1일: 연산자(`/` `//` `%`), 누적 패턴, 중첩 반복, f-string 서식 — q1~q5 통과 → [Python 3장](./python-basics/03-operators-conditionals-loops/)
 
-### 2026-10-21 · RAG 3일차: Vector Store(Qdrant)와 Cloud·FAISS 추가 과제(5장)
-
-- RAG 3일차 오전 5장을 `rag_day3` 키트로 실행하고 강마다 q\_easy·q\_hard까지 확인. 수업 뒤 추가 과제로 5-2·5-3을 **Qdrant Cloud**로, 같은 검색을 **FAISS**로 다시 해 봄 → [5장](./rag/05-vector-store-qdrant/)
-- Point = `id + vector + payload`. `uuid5(chunk_id)`라 같은 청크는 항상 같은 ID → Upsert 두 번에도 1개. `chunks[i]`와 `vectors[i]`는 같은 인덱스로 꺼내야 짝이 맞음
-- 28개 Upsert 후 current 필터로 Top-3 = 4장 NumPy와 같은 `0.8945 · 0.875 · 0.8444`. 필터는 점수를 바꾸지 않고 **후보 자격**만 정함("8만원인가요?"에서 travel-old 0.9003이 빠짐)
-- 다시 청킹하면 청크 ID가 모두 바뀌어 이전 Point가 남음 → `old_ids - new_ids` 삭제(3 → 5 → 2). ANN은 일부만 탐색해서 놓칠 수 있음(겹침 0.5)
-- Qdrant Cloud: `:memory:`와 달리 데이터가 남고 **Strict Mode**라 필터 필드에 `create_payload_index`가 필수. 5-2는 `metadata.status`, 5-3은 status·category·start 인덱스 → 결과는 메모리와 같음
-- FAISS: `IndexFlatIP`(정규화 벡터라 내적 = 코사인)와 `IndexHNSWFlat`(ANN) 모두 같은 Top-3. 벡터만 저장해서 원문은 `chunks[i]`, 현행 필터는 직접 처리
-- 클래스·객체(속성은 `.이름`, 메서드는 `.이름()`), `query_points(...).points`·`count(...).count`처럼 Qdrant 결과는 "상자 → 점으로 꺼내기", `.tolist()`는 JSON으로 보내려고
-
 ## 📂 폴더 구조
 
 <details>
@@ -233,6 +244,7 @@ TIL/
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
 ├── rag/                           # 1~9장
+├── context-engineering/           # 1~4장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

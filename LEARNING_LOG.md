@@ -4,6 +4,17 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-28 · Context Engineering 1일차: 입력 구성·메모리(1·2장)와 토큰 예산·캐시·오염(3·4장) · Python 보강 1주 3일
+
+- Context Engineering 1일차 1\~4장 8강을 `context_engineering` 키트(공용 uv 환경 하나)로 실행하고 q\_hard 8개 모두 통과 → [CE 목차](./context-engineering/) · [1장](./context-engineering/01-context-types-priority-skills/) · [2장](./context-engineering/02-short-long-term-memory-mem0/) · [3장](./context-engineering/03-token-budget-summary-compression/) · [4장](./context-engineering/04-prompt-caching-injection-filtering/)
+- 프롬프트 엔지니어링 = content에 들어갈 글 잘 쓰기, 컨텍스트 엔지니어링 = 무엇을 얼마나 넣을지 고르기. `kind`(앱) vs `role`(API), `[id / kind / source]` 표지
+- 고르는 순서는 범위 → 유효성 → 일관성 → 관련성 → 예산. 점수 1.00·0.99 후보가 먼저 빠짐. Skills는 맞는 절차만, 없으면 질문 재확인
+- 메모리: `decide_memory`(결정 + 이유), bool은 int의 하위 타입이라 `type(ttl) is int`. Mem0는 add 응답 ID로 대상을 고정하고 `owned_record`로 소유자 확인 후 수정·삭제, 이력은 남을 수 있음
+- 토큰 예산 = 한도 − 출력 예약 − 여유분, Qwen3 chat template로 세고 최신 턴부터(256 → 1턴, 512 → 6턴). 압축은 현재·이전 값 + 출처, `missing_evidence`로 누락 확인
+- Prefix cache는 맨 앞부터 같은 토큰만 재사용(공통 A 11 · B 94 · 정책 변경 8), None ≠ 0. 오염은 범위 → 본문 → `validate_action` 순, 문구 필터의 오탐(security-guide)·미탐(paraphrased-note)
+- 키트의 grpcio 1.85.0이 스마트 앱 컨트롤에 막혀 2장 2강만 `--with grpcio==1.84.0`으로 실행, `printsection`은 `uv add`로 추가
+- Python 보강 1주 3일: 순차·버블 정렬(n²), 이진 탐색(log₂n, 전제는 정렬), `sorted()`·`bisect` — 이론까지 → [Python 5장](./python-basics/05-sorting-binary-search/)
+
 ## 2026-10-27 · RAG 5일차: 평가(8장)와 고급 RAG(9장) · Python 보강 1주 2일
 
 - RAG 5일차 오전 8장·오후 9장을 `rag_day5` 키트로 실행. q\_hard는 8-1·8-2·8-3·9-1 통과, 선택 실습으로 RAGAS `--execute`와 GraphRAG 색인·질의까지 실행 → [8장](./rag/08-evaluation-golden-hit-recall-ragas/) · [9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/)

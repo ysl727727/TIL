@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | Context Engineering 1일차 1\~4장 수업 완료 → 마무리 과제와 밀린 q\_hard 정리 |
-| 최근 학습 | **2026-10-28** · [Context Engineering](./context-engineering/) 입력 구성·우선순위·메모리(Mem0)·토큰 예산·압축·Prompt Caching·Injection · [Python 보강 5장](./python-basics/05-sorting-binary-search/) |
-| 다음 할 일 | CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 1주 1일 q6~q10 · 1주 2일 q4~q10 · 1주 3일 |
+| 현재 단계 | LLMOps 1일차 1장 수업 완료 → q1\_hard와 마무리 과제, 2장 평가 준비 |
+| 최근 학습 | **2026-10-30** · [LLMOps 1장](./llmops/01-tracing-failure-analysis/) Trace·observation·재조회·도구 추적·실패 분류 · [네트워크 스터디 2회차](./network-study/02-ip-subnetting/) IP·서브넷팅 |
+| 다음 할 일 | LLMOps q1\_hard · 1장 마무리 과제 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -33,8 +33,8 @@ flowchart LR
     classDef now fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef next fill:#f3f4f6,stroke:#9ca3af,color:#374151
     class PY,BM,ML,DLB,DLA done
-    class LLM,DE,LC,RAG,CE now
-    class AG,OPS next
+    class LLM,DE,LC,RAG,CE,OPS now
+    class AG next
 ```
 
 <sub>초록: 이론 진도를 마친 구간 · 노랑: 진행 중 · 회색: 예정 (실습 완료 여부는 아래 목차의 상태를 기준으로 봅니다)</sub>
@@ -153,6 +153,12 @@ flowchart LR
 | [3](./context-engineering/03-token-budget-summary-compression/) | chat template 토큰 세기, 입력 예산과 Sliding Window, 구조화 상태·원문 추출 압축, Map/Reduce | ✅ 완료 |
 | [4](./context-engineering/04-prompt-caching-injection-filtering/) | Prompt Caching과 정적 Prefix, 캐시 지표, 컨텍스트 오염·Prompt Injection, 오탐·미탐, 실행 전 도구 검사 | ✅ 완료 |
 
+### LLMOps · [`llmops/`](./llmops/)
+
+| 장 | 주제 | 상태 |
+| --- | --- | --- |
+| [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | 🧪 진행 (q1\_hard·마무리 과제 남음) |
+
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
 > 목요일 프로젝트 시작 전, 그동안 배운 내용을 `project2-kit`으로 다시 실행해 보는 복습 수업입니다. 일차 단위로 정리합니다.
@@ -180,6 +186,14 @@ flowchart LR
 | [4](./python-basics/04-functions-lists-strings-dicts/) | 보강 1주 2일 — 함수 `return`, 기본값·키워드 인자, 슬라이스, 문자열 메서드, 딕셔너리, 두 수의 합, `sorted(key=…)`·`Counter` | 🧪 진행 (q4~q10 남음) |
 | [5](./python-basics/05-sorting-binary-search/) | 보강 1주 3일 — 순차·버블 정렬, 이진 탐색, `sorted()`·`bisect` | 📘 이론 정리 · ⏳ 문제 풀이 |
 
+### 네트워크 스터디 · [`network-study/`](./network-study/)
+
+> 정규 과정과 별도로 하는 네트워크 스터디("TCP 한 잔 할래요?")예요.
+
+| 회차 | 주제 | 상태 |
+| --- | --- | --- |
+| [2](./network-study/02-ip-subnetting/) | IP와 IP 주소, IPv4/IPv6, 고정·유동 IP와 DHCP, 서브넷 마스크·CIDR, 서브넷 계산 4단계 (10-30) | 📘 정리 |
+
 ### 종합 과제 · [`assignments/`](./assignments/)
 
 정규 강의 실습과 분리해 채점용 과제를 보관합니다.
@@ -192,6 +206,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-10-30 · LLMOps 1일차: 실행 관측과 실패 원인 분석(1장) · CE 복습 · 네트워크 스터디 2회차
+
+- LLMOps 1장 4강을 `llmops_ch01` 키트(Langfuse Cloud + LangChain + OpenAI `gpt-5.6-luna`)로 실행. 00\~04 모두 실행, q\_hard는 2·3·4 통과(q1 남음) → [LLMOps 목차](./llmops/) · [1장](./llmops/01-tracing-failure-analysis/)
+- 질문 1개 = Trace 1개: `policy-qa` → `retrieve`(직접 span) / `generate-answer`(CallbackHandler) → ChatOpenAI GENERATION. 부모는 이름이 아니라 **기록 순간 열려 있는 with**
+- 호출 성공 ≠ 응답 완료(`completed` + 빈 답 아님) ≠ 품질 성공. `response_completed`·"서버 기록 확인"도 정답이라는 뜻이 아님
+- 재조회는 Trace ID + 시작 시각 ±1분(observation 5개, GENERATION 종료 확인), 조회가 비었다고 모델을 다시 부르지 않음
+- 규정 10만원 ≠ 승인 8만원(tool 구간), 부모 시간에 자식 포함(합 4185 ms vs 1500 ms). 판정 순서 status → 시각 → failed → 문서, `failure_category` 점수
+- CE 복습: prompt vs context engineering, question · instruction · context · messages · content 용어 정리와 1\~4장 코드 Q&A
+- 네트워크 스터디 2회차: IPv4/IPv6, DHCP·고정 IP, 서브넷 마스크·CIDR, 블록 계산 4단계 → [네트워크 스터디](./network-study/02-ip-subnetting/)
 
 ### 2026-10-28 · Context Engineering 1일차: 입력 구성·메모리(1·2장)와 토큰 예산·캐시·오염(3·4장) · Python 보강 1주 3일
 
@@ -215,16 +239,6 @@ flowchart LR
 - GraphRAG: 관계 8줄 → 노드 10·간선 8, 영수증 ← 3개 규정 → 승인자. 자동 색인은 엔티티 67·관계 57(교안 69·62, LLM 추출이라 달라짐). ColPali MaxSim A 2.0 > B 1.4142, 금액은 값·단위·출처를 함께
 - Python 보강 1주 2일: `return` vs `print`, 기본값·키워드 인자, 슬라이스, 딕셔너리로 세기, 두 수의 합, `sorted(key=…)`, `Counter` — 기초 q1~q3 통과 → [Python 4장](./python-basics/04-functions-lists-strings-dicts/)
 
-### 2026-10-26 · RAG 4일차: 근거로 답하기(6장)와 검색 개선(7장) · Python 보강 1주 1일
-
-- RAG 4일차 오전 6장·오후 7장을 `rag_day4` 키트로 실행하고 강마다 q\_hard 확인(7-4 q\_hard는 남음) → [6장](./rag/06-context-2step-rag-citation/) · [7장](./rag/07-hybrid-search-rerank-rewrite/)
-- 6장: 검색됐다 ≠ 답할 수 있다. `chunk_id`로 중복 제거 → `[S1] 제목+본문` → 문자 예산(120·200·300)에 들어가는 근거만 Context. k에서 빠진 근거와 예산에서 빠진 근거를 구분
-- `prepare → invoke_model → finish` 2-Step RAG, JSON Schema, Ollama 응답은 JSON 두 겹. `--generate`에서 gemma3가 보류인데 출처를 달아 `validate_answer`가 차단 → LLM 결과는 검사해야 함
-- Citation은 `bind_claim`(출처 → 발췌 → URL). "1박당 → 출장 전체" 같은 의미 오류는 `review_meaning`까지만, 판단은 사람. 보류는 무엇이 부족한지 적고 `citations: []`, `insufficient ≠ system_error ≠ invalid_output`
-- 7장: BM25는 조사 하나로 결과가 바뀌고(영수증 vs 영수증을), Dense는 상관없는 질문에도 Top-k를 냄. RRF `1/(60+rank)`로 순위를 합치고, Cross-Encoder로 쌍을 다시 매기고, Multi-Query로 q10 `[]` → education@60
-- 앞 단계에서 빠진 근거는 RRF·Re-ranking도 못 살림. 중복 제거 4가지(`chunk_id` dict, `setdefault`, `dict.fromkeys`, 문서 다양성) 비교
-- Python 보강 1주 1일: 연산자(`/` `//` `%`), 누적 패턴, 중첩 반복, f-string 서식 — q1~q5 통과 → [Python 3장](./python-basics/03-operators-conditionals-loops/)
-
 ## 📂 폴더 구조
 
 <details>
@@ -245,9 +259,11 @@ TIL/
 ├── langchain/                     # 1~10장
 ├── rag/                           # 1~9장
 ├── context-engineering/           # 1~4장
+├── llmops/                        # 1장~
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강
+├── network-study/                 # 네트워크 스터디 (회차별)
 └── assignments/                   # 채점용 종합 과제
 ```
 

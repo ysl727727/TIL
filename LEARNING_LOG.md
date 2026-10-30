@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-10-30 · LLMOps 1일차: 실행 관측과 실패 원인 분석(1장) · CE 복습 · 네트워크 스터디 2회차
+
+- LLMOps 1장 4강을 `llmops_ch01` 키트(Langfuse Cloud + LangChain + OpenAI `gpt-5.6-luna`)로 실행. 00\~04 모두 실행, q\_hard는 2·3·4 통과(q1 남음) → [LLMOps 목차](./llmops/) · [1장](./llmops/01-tracing-failure-analysis/)
+- 질문 1개 = Trace 1개: `policy-qa` → `retrieve`(직접 span) / `generate-answer`(CallbackHandler) → ChatOpenAI GENERATION. 부모는 이름이 아니라 **기록 순간 열려 있는 with**
+- 호출 성공 ≠ 응답 완료(`completed` + 빈 답 아님) ≠ 품질 성공. `response_completed`·"서버 기록 확인"도 정답이라는 뜻이 아님
+- 재조회는 Trace ID + 시작 시각 ±1분(observation 5개, GENERATION 종료 확인), 조회가 비었다고 모델을 다시 부르지 않음
+- 규정 10만원 ≠ 승인 8만원(tool 구간), 부모 시간에 자식 포함(합 4185 ms vs 1500 ms). 판정 순서 status → 시각 → failed → 문서, `failure_category` 점수
+- CE 복습: prompt vs context engineering, question · instruction · context · messages · content 용어 정리와 1\~4장 코드 Q&A
+- 네트워크 스터디 2회차: IPv4/IPv6, DHCP·고정 IP, 서브넷 마스크·CIDR, 블록 계산 4단계 → [네트워크 스터디](./network-study/02-ip-subnetting/)
+
 ## 2026-10-28 · Context Engineering 1일차: 입력 구성·메모리(1·2장)와 토큰 예산·캐시·오염(3·4장) · Python 보강 1주 3일
 
 - Context Engineering 1일차 1\~4장 8강을 `context_engineering` 키트(공용 uv 환경 하나)로 실행하고 q\_hard 8개 모두 통과 → [CE 목차](./context-engineering/) · [1장](./context-engineering/01-context-types-priority-skills/) · [2장](./context-engineering/02-short-long-term-memory-mem0/) · [3장](./context-engineering/03-token-budget-summary-compression/) · [4장](./context-engineering/04-prompt-caching-injection-filtering/)

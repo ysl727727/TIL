@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LLMOps 1일차 1장 수업 완료 → q1\_hard와 마무리 과제, 2장 평가 준비 |
-| 최근 학습 | **2026-10-30** · [LLMOps 1장](./llmops/01-tracing-failure-analysis/) Trace·observation·재조회·도구 추적·실패 분류 · [네트워크 스터디 2회차](./network-study/02-ip-subnetting/) IP·서브넷팅 |
-| 다음 할 일 | LLMOps q1\_hard · 1장 마무리 과제 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | LLMOps 2일차 2장 수업 완료 → q3·q4\_hard와 마무리 과제, 3장 운영 지표 준비 |
+| 최근 학습 | **2026-11-02** · [LLMOps 2장](./llmops/02-golden-dataset-prompt-regression/) Golden Dataset·프롬프트 버전·Python 평가·회귀 판정 · [Python 보강 2주 1일](./python-basics/06-classes/) 클래스 |
+| 다음 할 일 | LLMOps 3장 · 2장 q3·q4\_hard와 마무리 과제 · 1장 q1\_hard와 마무리 과제 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -158,6 +158,7 @@ flowchart LR
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | 🧪 진행 (q1\_hard·마무리 과제 남음) |
+| [2](./llmops/02-golden-dataset-prompt-regression/) | 평가 데이터와 변경 전후 검증 — Golden Dataset(dev·holdout), 프롬프트 버전 고정, `evaluate()` 규칙 점수 4개·오류 ≠ 0점, 질문 ID별 회귀 판정 BLOCK·REVIEW | 🧪 진행 (q3·q4\_hard·마무리 과제 남음) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -185,6 +186,7 @@ flowchart LR
 | [3](./python-basics/03-operators-conditionals-loops/) | 보강 1주 1일 — 연산자, 조건문, 누적 패턴, 중첩 반복, 내장 함수, f-string 서식 | 🧪 진행 (q6~q10 남음) |
 | [4](./python-basics/04-functions-lists-strings-dicts/) | 보강 1주 2일 — 함수 `return`, 기본값·키워드 인자, 슬라이스, 문자열 메서드, 딕셔너리, 두 수의 합, `sorted(key=…)`·`Counter` | 🧪 진행 (q4~q10 남음) |
 | [5](./python-basics/05-sorting-binary-search/) | 보강 1주 3일 — 순차·버블 정렬, 이진 탐색, `sorted()`·`bisect` | 📘 이론 정리 · ⏳ 문제 풀이 |
+| [6](./python-basics/06-classes/) | 보강 2주 1일 — 함수 인자 `*`·`**` 복습, 클래스·`__init__`·`self`, 던더 메서드, 상속·`super()`, `@dataclass` | 🧪 진행 (q5~q10 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -206,6 +208,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-02 · LLMOps 2일차: 평가 데이터와 변경 전후 검증(2장) · Python 보강 2주 1일
+
+- LLMOps 2장 4강을 `llmops_ch02` 키트로 실행. 01\~04 모두 실행, q\_hard는 1·2 통과(3·4 남음) → [LLMOps 목차](./llmops/) · [2장](./llmops/02-golden-dataset-prompt-regression/)
+- Golden Dataset은 기대 행동(terms · citations · abstain)으로, dev 4 · holdout 2. `input`(모델) · `expected_output`(채점기만) · `metadata`(사람) 분리
+- 프롬프트는 같은 이름에 버전 1 · 2, 비교에선 `latest`가 아니라 번호로 고정. 나머지는 모두 고정하고 프롬프트만 바꿈
+- `evaluate()` 규칙 점수 4개(대괄호 출처 set `==` 비교), `run_experiment`가 task → evaluate를 대신 돌림. 실패는 0점이 아니라 `INCOMPLETE_EVALUATION`
+- 질문 ID로 짝지어 `passed == 4 and min(delta) >= 0`일 때만 holdout. 내 결과: 기준선 출처 없음으로 d01\~d03 0점 → 후보 4/4 → holdout 2/2 → REVIEW
+- 파이썬 Q&A: 괄호 안/밖 `=`, `*` · `*args` · `**kwargs`, 이름표 필수 vs 기본값, 리스트 컴프리헨션
+- Python 보강 2주 1일: 클래스 · `self` · `__repr__`/`__eq__`/`__len__` · 상속 · `@dataclass` — 기초 q1\~q3 · 응용 q4 통과 → [Python 6장](./python-basics/06-classes/)
 
 ### 2026-10-30 · LLMOps 1일차: 실행 관측과 실패 원인 분석(1장) · CE 복습 · 네트워크 스터디 2회차
 
@@ -259,7 +271,7 @@ TIL/
 ├── langchain/                     # 1~10장
 ├── rag/                           # 1~9장
 ├── context-engineering/           # 1~4장
-├── llmops/                        # 1장~
+├── llmops/                        # 1~2장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

@@ -17,8 +17,8 @@
 
 ### 미완료
 
-- [ ] LLMOps 2장 q3\_hard(사라진 실패 행 찾기) · q4\_hard(6건 기준 compare)
-- [ ] 2장 마무리 과제: `result_03.json` d04 답변 비교, Experiments Compare 화면에서 d04 행 읽기, Prompt 버전 #1 · #2 비교
+> LLMOps 2장 q3 · q4\_hard와 마무리 과제는 선택이라 제외했어요.
+
 - [ ] Python 보강 2주 1일 응용 2 `Tally` · 응용 3 `Rectangle` · 심화 1\~3 · 실무 1 `@dataclass`
 
 ## 1. 업데이트: LLMOps 1일차 (1장) · 네트워크 스터디 2회차
@@ -31,9 +31,7 @@
 
 ### 미완료
 
-- [ ] LLMOps q1\_hard `locate` (A 검색 · B 입력 조립 · C 생성 · D 정상)
-- [ ] 1장 마무리 과제: `01_trace.py` 질문을 "출장 숙박비 증빙"으로 바꿔 retrieve `document_ids`와 ChatOpenAI 입력 대조
-- [ ] 1장 마무리 과제: Tracing에서 `simulated-failure-case`를 열어 `failure_category`와 입력을 사례별로 대응
+- 남은 항목 없음 (LLMOps q\_hard · 마무리 과제는 선택이라 제외)
 
 ## 2. 업데이트: Context Engineering 1일차 (1\~4장) · Python 보강 1주 3일
 

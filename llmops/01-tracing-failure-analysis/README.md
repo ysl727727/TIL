@@ -26,7 +26,7 @@
 | 파일 | 강 | 호출 | 실습 상태 |
 | --- | --- | --- | --- |
 | `00_start.py` | 준비 | 모델 1회 + `response_completed` 점수 | ✅ 실행 |
-| `01_trace.py` | 1-1 요청 단위 관측 | 모델 1회 | ✅ 실행 · q1\_hard ⏳ |
+| `01_trace.py` | 1-1 요청 단위 관측 | 모델 1회 | ✅ 실행 · q1\_hard 선택(안 함) |
 | `02_read_trace.py` | 1-2 Trace 재조회 | 조회만 | ✅ 실행(observation 5개) · q2\_hard 통과 |
 | `03_steps.py` | 1-3 업무 도구 추적 | 모델 1회 · 업무는 모의 DB | ✅ 실행 · q3\_hard 통과 |
 | `04_failures.py` | 1-4 실패 분류 | 모델 없음 · 모의 사례 6개 | ✅ 실행 · q4\_hard 통과 |
@@ -313,13 +313,15 @@ return "서버 기록 확인"
 - 완료 검사 = 평가할 답이 있는가 / 내용 평가 = 업무 조건을 지켰는가.
 - 2장으로 이어지는 질문: 프롬프트를 고쳤더니 좋아진 것 같을 때, 정말 좋아졌는지·다른 질문이 나빠지지 않았는지 어떻게 알까? → Golden Dataset · 프롬프트 버전 고정 · Python 평가 · 변경 전후 회귀 판정.
 
-## 마무리 과제
+## 마무리 과제 (선택)
 
-- [ ] `01_trace.py` 질문을 "출장 숙박비 증빙"으로 바꿔 실행
-- [ ] Trace에서 retrieve의 `document_ids`와 ChatOpenAI 입력을 대조
-- [ ] Tracing에서 `simulated-failure-case` 열기
-- [ ] `failure_category`와 입력을 사례별로 대응
-- [ ] q1\_hard `locate` 완성 (A 검색 · B 입력 조립 · C 생성 · D 정상)
+> 필수가 아니라서 하지 않았어요. 나중에 볼 때 참고용으로만 남겨요.
+
+- `01_trace.py` 질문을 "출장 숙박비 증빙"으로 바꿔 실행
+- Trace에서 retrieve의 `document_ids`와 ChatOpenAI 입력을 대조
+- Tracing에서 `simulated-failure-case` 열기
+- `failure_category`와 입력을 사례별로 대응
+- q1\_hard `locate` (A 검색 · B 입력 조립 · C 생성 · D 정상)
 
 ## 확인 문제
 

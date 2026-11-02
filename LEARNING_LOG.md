@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-02 · LLMOps 2일차: 평가 데이터와 변경 전후 검증(2장) · Python 보강 2주 1일
+
+- LLMOps 2장 4강을 `llmops_ch02` 키트로 실행. 01\~04 모두 실행, q\_hard는 1·2 통과(3·4 남음) → [LLMOps 목차](./llmops/) · [2장](./llmops/02-golden-dataset-prompt-regression/)
+- Golden Dataset 6개(d01\~d04 dev, t01·t02 holdout)를 `validate` 후 등록, 해시는 `sort_keys=True`로 질문지 지문
+- 프롬프트 버전 1(기준선) · 2(POLICY)를 번호로 고정, q2에서 `latest`가 팀원 v3으로 바뀌는 것 확인
+- `evaluate()`: completed 검사 → 공백·쉼표 정규화 → required\_terms · citation\_match · answer\_behavior → rule\_pass. `Evaluation` 4개를 SDK가 Trace에 붙임
+- 04: 질문 ID로 짝짓기, 평균이 올라도 하나라도 나빠지면 BLOCK, 통과 후보만 holdout → REVIEW. 토큰 72\~98 → 125\~165(3장으로)
+- 파이썬 Q&A: 괄호 안 `=` 이름표 / 밖 `=` 대입, `*` · `*args`(튜플) · `**kwargs`(dict), 이름표 필수 vs 기본값, `[r for r in rows if …]` 풀어 쓰기
+- Python 보강 2주 1일: 함수 인자 복습, 클래스 · `__init__` · `self`, 던더 메서드, 상속 · `super()`, `@dataclass` — q1\~q4 통과 → [Python 6장](./python-basics/06-classes/)
+
 ## 2026-10-30 · LLMOps 1일차: 실행 관측과 실패 원인 분석(1장) · CE 복습 · 네트워크 스터디 2회차
 
 - LLMOps 1장 4강을 `llmops_ch01` 키트(Langfuse Cloud + LangChain + OpenAI `gpt-5.6-luna`)로 실행. 00\~04 모두 실행, q\_hard는 2·3·4 통과(q1 남음) → [LLMOps 목차](./llmops/) · [1장](./llmops/01-tracing-failure-analysis/)

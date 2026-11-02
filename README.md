@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LLMOps 2일차 2장 수업 완료 → q3·q4\_hard와 마무리 과제, 3장 운영 지표 준비 |
+| 현재 단계 | LLMOps 2일차 2장 수업 완료 → 3장 운영 지표 준비 |
 | 최근 학습 | **2026-11-02** · [LLMOps 2장](./llmops/02-golden-dataset-prompt-regression/) Golden Dataset·프롬프트 버전·Python 평가·회귀 판정 · [Python 보강 2주 1일](./python-basics/06-classes/) 클래스 |
-| 다음 할 일 | LLMOps 3장 · 2장 q3·q4\_hard와 마무리 과제 · 1장 q1\_hard와 마무리 과제 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 다음 할 일 | LLMOps 3장 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -157,8 +157,8 @@ flowchart LR
 
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
-| [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | 🧪 진행 (q1\_hard·마무리 과제 남음) |
-| [2](./llmops/02-golden-dataset-prompt-regression/) | 평가 데이터와 변경 전후 검증 — Golden Dataset(dev·holdout), 프롬프트 버전 고정, `evaluate()` 규칙 점수 4개·오류 ≠ 0점, 질문 ID별 회귀 판정 BLOCK·REVIEW | 🧪 진행 (q3·q4\_hard·마무리 과제 남음) |
+| [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | ✅ 완료 (q1\_hard·마무리 과제는 선택) |
+| [2](./llmops/02-golden-dataset-prompt-regression/) | 평가 데이터와 변경 전후 검증 — Golden Dataset(dev·holdout), 프롬프트 버전 고정, `evaluate()` 규칙 점수 4개·오류 ≠ 0점, 질문 ID별 회귀 판정 BLOCK·REVIEW | ✅ 완료 (q3·q4\_hard·마무리 과제는 선택) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 

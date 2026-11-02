@@ -26,8 +26,8 @@
 | --- | --- | --- | --- |
 | `01_dataset.py` | 2-1 Golden Dataset 설계와 등록 | 0회 | ✅ 실행 · q1\_hard 통과 |
 | `02_prompts.py` | 2-2 프롬프트 버전과 비교 조건 고정 | 0회 | ✅ 실행 · q2\_hard 통과 |
-| `03_evaluate.py` + `evaluation.py` | 2-3 Python 평가와 Langfuse 실험 | 8회 | ✅ 실행 · q3\_hard ⏳ |
-| `04_compare.py` | 2-4 변경 전후 비교와 회귀 판정 | 0 또는 2회 | ✅ 실행 · q4\_hard ⏳ |
+| `03_evaluate.py` + `evaluation.py` | 2-3 Python 평가와 Langfuse 실험 | 8회 | ✅ 실행 · q3\_hard 선택(안 함) |
+| `04_compare.py` | 2-4 변경 전후 비교와 회귀 판정 | 0 또는 2회 | ✅ 실행 · q4\_hard 선택(안 함) |
 
 ## 전체 흐름
 
@@ -298,12 +298,14 @@ latest = lf.get_prompt(name, label="latest", cache_ttl_seconds=0)              #
 - 2장 결과물: **같은 질문 · 같은 규칙 · 질문별 판정.** 2-1 Golden Dataset(dev 4 · holdout 2, 기대 행동 고정), 2-2 프롬프트 버전(1 · 2, 나머지는 고정), 2-3 Python 평가(규칙 점수 4개, 오류 ≠ 0점), 2-4 회귀 판정(ID로 비교, BLOCK · REVIEW).
 - 3장으로 이어지는 질문: 점수는 같은데 더 비싸고 느려졌다면? 실제 사용자 요청의 오류와 불만은 어떻게 읽을까? → 운영 지표 · 토큰과 지연 측정 · 오류율과 피드백.
 
-## 마무리 과제
+## 마무리 과제 (선택)
 
-- [ ] `result_03.json`에서 d04 답변 두 개 비교 (기준선과 후보가 보류를 어떻게 표현했는지)
-- [ ] Experiments **Compare** 화면에서 d04 행을 찾아 기준선과 후보 답변을 나란히 읽기
-- [ ] Prompt Management에서 버전 #1 · #2를 열어 추가된 지시가 어떤 실패를 줄이려는지 읽기
-- [ ] q3\_hard (사라진 실패 행 찾기) · q4\_hard (6건 기준 compare: 중요 질문 악화 BLOCK, 통과율 ≥ min\_rate)
+> 필수가 아니라서 하지 않았어요. 나중에 볼 때 참고용으로만 남겨요.
+
+- `result_03.json`에서 d04 답변 두 개 비교 (기준선과 후보가 보류를 어떻게 표현했는지)
+- Experiments **Compare** 화면에서 d04 행을 찾아 기준선과 후보 답변을 나란히 읽기
+- Prompt Management에서 버전 #1 · #2를 열어 추가된 지시가 어떤 실패를 줄이려는지 읽기
+- q3\_hard (사라진 실패 행 찾기) · q4\_hard (6건 기준 compare: 중요 질문 악화 BLOCK, 통과율 ≥ min\_rate)
 
 ## 확인 문제
 

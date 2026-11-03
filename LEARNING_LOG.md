@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-03 · LLMOps 3일차: 운영 지표 분석과 개선(3장) · Python 보강 2주 2일
+
+- LLMOps 3장 4강을 `llmops_ch03` 키트로 실행. 01\~04 모두 실행, q1\~q4\_hard 모두 통과 → [LLMOps 목차](./llmops/) · [3장](./llmops/03-operational-metrics-cost-feedback/)
+- 3-1 `summarize`: error\_rate(분모 전체) · p50/p95(nearest-rank, 완료 + 지연 값) · known\_cost\_usd · cost\_coverage · total\_cost\_usd(전부 알 때만). q1에서 timeout 장애가 p95를 좋아 보이게 만드는 것 확인
+- 3-2 문맥 길이만 바꿔 before / after 번갈아 4회: 입력 토큰 858 → 138, 지연은 q1 감소 · q2 증가. q2에서 전체 규정을 넣으면 규정 밖 질문에도 출처가 생김
+- 3-3 피드백을 `trace_id`에 BOOLEAN 점수로, 응답률 0.5 · 긍정 비율 0.5. q3 `score_id=trace_id-user`로 중복 클릭 덮어쓰기
+- 3-4 `get_many`로 GENERATION 비용만 합산(부모 SPAN 더하면 두 배), 버전별 dict 컴프리헨션 집계, 비용 약 71% 감소지만 버전당 2건이라 REVIEW
+- 파이썬 Q&A: `{**r, ...}` 풀기와 순서, `*args`(튜플) vs `**kwargs`(dict), 따옴표 유무, Langfuse가 정한 메서드 이름
+- Python 보강 2주 2일: 모듈 · 패키지(`__init__.py` 끌어올리기, 상대 import) · `__name__` · `try/except` · 내 예외 · pytest · logging — 0단계 · 기초 1\~3 통과 → [Python 7장](./python-basics/07-modules-exceptions-pytest-logging/)
+
 ## 2026-11-02 · LLMOps 2일차: 평가 데이터와 변경 전후 검증(2장) · Python 보강 2주 1일
 
 - LLMOps 2장 4강을 `llmops_ch02` 키트로 실행. 01\~04 모두 실행, q\_hard는 1·2 통과(3·4 남음) → [LLMOps 목차](./llmops/) · [2장](./llmops/02-golden-dataset-prompt-regression/)

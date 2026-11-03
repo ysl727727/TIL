@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LLMOps 2일차 2장 수업 완료 → 3장 운영 지표 준비 |
-| 최근 학습 | **2026-11-02** · [LLMOps 2장](./llmops/02-golden-dataset-prompt-regression/) Golden Dataset·프롬프트 버전·Python 평가·회귀 판정 · [Python 보강 2주 1일](./python-basics/06-classes/) 클래스 |
-| 다음 할 일 | LLMOps 3장 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | LLMOps 3일차 3장 수업 완료 → 4장 마스킹·보안 검사 준비 |
+| 최근 학습 | **2026-11-03** · [LLMOps 3장](./llmops/03-operational-metrics-cost-feedback/) 운영 지표·토큰과 지연·피드백·비용 판단 · [Python 보강 2주 2일](./python-basics/07-modules-exceptions-pytest-logging/) 모듈·예외·pytest·logging |
+| 다음 할 일 | LLMOps 4장 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -159,6 +159,7 @@ flowchart LR
 | --- | --- | --- |
 | [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | ✅ 완료 (q1\_hard·마무리 과제는 선택) |
 | [2](./llmops/02-golden-dataset-prompt-regression/) | 평가 데이터와 변경 전후 검증 — Golden Dataset(dev·holdout), 프롬프트 버전 고정, `evaluate()` 규칙 점수 4개·오류 ≠ 0점, 질문 ID별 회귀 판정 BLOCK·REVIEW | ✅ 완료 (q3·q4\_hard·마무리 과제는 선택) |
+| [3](./llmops/03-operational-metrics-cost-feedback/) | 운영 지표 분석과 개선 — 지표별 분모·None ≠ 0, p95와 timeout 장애, 문맥 길이 측정(토큰·지연), Trace 피드백 응답률 vs 긍정 비율, GENERATION 비용·판정 순서 | ✅ 완료 (q1\~q4\_hard 통과) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -187,6 +188,7 @@ flowchart LR
 | [4](./python-basics/04-functions-lists-strings-dicts/) | 보강 1주 2일 — 함수 `return`, 기본값·키워드 인자, 슬라이스, 문자열 메서드, 딕셔너리, 두 수의 합, `sorted(key=…)`·`Counter` | 🧪 진행 (q4~q10 남음) |
 | [5](./python-basics/05-sorting-binary-search/) | 보강 1주 3일 — 순차·버블 정렬, 이진 탐색, `sorted()`·`bisect` | 📘 이론 정리 · ⏳ 문제 풀이 |
 | [6](./python-basics/06-classes/) | 보강 2주 1일 — 함수 인자 `*`·`**` 복습, 클래스·`__init__`·`self`, 던더 메서드, 상속·`super()`, `@dataclass` | 🧪 진행 (q5~q10 남음) |
+| [7](./python-basics/07-modules-exceptions-pytest-logging/) | 보강 2주 2일 — 모듈·패키지·`__init__.py`·상대 import, `__name__`, `try/except`·내 예외·`raise`, pytest·`pytest.raises`, logging | 🧪 진행 (응용 1~실무 1 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -208,6 +210,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-03 · LLMOps 3일차: 운영 지표 분석과 개선(3장) · Python 보강 2주 2일
+
+- LLMOps 3장 4강을 `llmops_ch03` 키트로 실행. 01\~04 모두 실행, q1\~q4\_hard 모두 통과 → [LLMOps 목차](./llmops/) · [3장](./llmops/03-operational-metrics-cost-feedback/)
+- 지표마다 분모가 다름: error\_rate는 전체 요청, p50 · p95는 완료 + 지연 값 있는 요청. None = 모름, 0 = 확인된 무료 → 모르는 비용이 있으면 total\_cost\_usd는 None
+- 장애로 느린 요청이 timeout이 되면 p95가 좋아 보임 → 완료율을 같이 봐서 "장애 의심" 판독
+- 문맥 길이만 바꿔 before / after 번갈아 4회 측정: 입력 토큰 858 → 138, 비용 약 71% 감소, 지연은 q2에서 오히려 늘어 REVIEW
+- 피드백은 `trace_id`에 `create_score`, 응답률(전체 요청) ≠ 긍정 비율(응답자). 비용은 `get_many`로 GENERATION만 합산, 판정은 표본 → 비용 미확인 → 비용 증가 순서
+- 파이썬 Q&A: `{**r, ...}` 풀기와 덮어쓰기 순서, `*args` vs `**kwargs`, `ALL_DOCS` vs `"ALL_DOCS"`
+- Python 보강 2주 2일: 모듈 · 패키지 · `__name__` · 예외 · pytest · logging — 0단계 · 기초 1\~3 통과 → [Python 7장](./python-basics/07-modules-exceptions-pytest-logging/)
 
 ### 2026-11-02 · LLMOps 2일차: 평가 데이터와 변경 전후 검증(2장) · Python 보강 2주 1일
 

@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LLMOps 3일차 3장 수업 완료 → 4장 마스킹·보안 검사 준비 |
-| 최근 학습 | **2026-11-03** · [LLMOps 3장](./llmops/03-operational-metrics-cost-feedback/) 운영 지표·토큰과 지연·피드백·비용 판단 · [Python 보강 2주 2일](./python-basics/07-modules-exceptions-pytest-logging/) 모듈·예외·pytest·logging |
-| 다음 할 일 | LLMOps 4장 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | LLMOps 3일차 4장 수업 완료(LLMOps 1\~4장 마침) → RAG 프로젝트 준비 |
+| 최근 학습 | **2026-11-04** · [LLMOps 4장](./llmops/04-trust-boundary-privacy-output-security/) 권한·마스킹·출력 검증·보안 평가 · [RAG 스타터 복습](./rag/10-project-starter-pipeline-review/) · [Python 보강 2주 3일](./python-basics/08-git-gitflow-github/) git·Git Flow·GitHub |
+| 다음 할 일 | RAG 프로젝트 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -143,6 +143,7 @@ flowchart LR
 | [7](./rag/07-hybrid-search-rerank-rewrite/) | BM25 vs Dense, Hybrid·RRF, Cross-Encoder Re-ranking, Query Rewrite·Multi-Query | 🧪 진행 (7-4 q\_hard 남음) |
 | [8](./rag/08-evaluation-golden-hit-recall-ragas/) | Golden Dataset·dev/test, Hit@k·Recall@k(청크 vs 문서), RAGAS 네 지표(실행까지), BM25·Dense·Hybrid 전후 비교 | 🧪 진행 (8-4 q\_hard 남음) |
 | [9](./rag/09-advanced-rag-parent-agentic-graph-multimodal/) | Parent-Child·Context 압축, Agentic RAG 재검색과 종료, GraphRAG(NetworkX·색인 실행), Multimodal·ColPali MaxSim | 🧪 진행 (9-2~9-4 q\_hard·9-4 남음) |
+| [10](./rag/10-project-starter-pipeline-review/) | 프로젝트 대비 스타터 파이프라인 복습(자습) — PII·세션·캐시, 쿼리 재작성 vs 후속 질문 풀기, Context와 S 번호, 간접 인젝션·문서 가드, 출력 검증 kind, canary·근거 없는 숫자, 에스컬레이션 route, LLM judge·RAGAS | 📘 정리 |
 
 ### Context Engineering · [`context-engineering/`](./context-engineering/)
 
@@ -160,6 +161,7 @@ flowchart LR
 | [1](./llmops/01-tracing-failure-analysis/) | 실행 관측과 실패 원인 분석 — Langfuse Trace·observation, 완료 ≠ 정답, Trace ID 재조회, 도구 추적과 부모·자식 시간, 실패 판정 순서·`failure_category` | ✅ 완료 (q1\_hard·마무리 과제는 선택) |
 | [2](./llmops/02-golden-dataset-prompt-regression/) | 평가 데이터와 변경 전후 검증 — Golden Dataset(dev·holdout), 프롬프트 버전 고정, `evaluate()` 규칙 점수 4개·오류 ≠ 0점, 질문 ID별 회귀 판정 BLOCK·REVIEW | ✅ 완료 (q3·q4\_hard·마무리 과제는 선택) |
 | [3](./llmops/03-operational-metrics-cost-feedback/) | 운영 지표 분석과 개선 — 지표별 분모·None ≠ 0, p95와 timeout 장애, 문맥 길이 측정(토큰·지연), Trace 피드백 응답률 vs 긍정 비율, GENERATION 비용·판정 순서 | ✅ 완료 (q1\~q4\_hard 통과) |
+| [4](./llmops/04-trust-boundary-privacy-output-security/) | 신뢰 경계와 권한 통제·개인정보 마스킹·출력 검증·보안 평가 — `principal`·`read_ids` 읽기 전 차단, `redact`·`mask_spans`, pydantic `Answer`·출처 범위, 직접·간접 주입과 정상 대조군, `run_tool` 도구 통제 | ✅ 완료 (q2·q3\_hard 통과) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -189,6 +191,7 @@ flowchart LR
 | [5](./python-basics/05-sorting-binary-search/) | 보강 1주 3일 — 순차·버블 정렬, 이진 탐색, `sorted()`·`bisect` | 📘 이론 정리 · ⏳ 문제 풀이 |
 | [6](./python-basics/06-classes/) | 보강 2주 1일 — 함수 인자 `*`·`**` 복습, 클래스·`__init__`·`self`, 던더 메서드, 상속·`super()`, `@dataclass` | 🧪 진행 (q5~q10 남음) |
 | [7](./python-basics/07-modules-exceptions-pytest-logging/) | 보강 2주 2일 — 모듈·패키지·`__init__.py`·상대 import, `__name__`, `try/except`·내 예외·`raise`, pytest·`pytest.raises`, logging | 🧪 진행 (응용 1~실무 1 남음) |
+| [8](./python-basics/08-git-gitflow-github/) | 보강 2주 3일 — git config, 작업 폴더·스테이지·커밋, Git Flow(main·develop·feature·release·hotfix), reset vs revert, push·PR(base develop)·fork, 충돌 해결 | 🧪 진행 (기초 3·응용 3·심화 1~3 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -210,6 +213,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-04 · LLMOps 3일차: 신뢰 경계 · 마스킹 · 출력 검증 · 보안 평가(4장) · RAG 스타터 복습 · Python 보강 2주 3일
+
+- LLMOps 4장 4강을 `llmops_ch04` 키트로 실행. 01\~04 모두 실행, q2 · q3\_hard 통과 → [LLMOps 목차](./llmops/) · [4장](./llmops/04-trust-boundary-privacy-output-security/)
+- 4-1 권한은 서버의 `principal`로만, 본문 읽기 전에 검사하고 `read_ids`로 실제 읽기 확인. 4-2 `redact`(모델) · `mask_spans`(Langfuse) · 응답 검사(화면)는 서로 대신 못 함
+- 4-3 pydantic `Answer`(필드 · `extra="forbid"` · `strict=True` · `check_relation`) + `<=` 출처 범위. `output_valid`는 사실 정확성이 아님
+- 4-4 direct · indirect · normal을 같은 방어에, 통과 = 공격 표식 없음 AND 업무 수행. 모델의 도구 제안 ≠ 실행 허가(`run_tool` 허용 목록 + 문서 권한)
+- 질문: JWT 서명 확인(서버는 비밀 키만), Redis(세션 · 캐시) vs Mem0(장기 기억), 3장 피드백 응답률 vs 긍정 비율
+- RAG 프로젝트 스타터 파이프라인 복습: 입력 가드 → 세션 → 캐시 → 검색 · 리랭크 → 문서 가드 → Context → 출력 검증 → 출력 가드 → 에스컬레이션 → [RAG 10](./rag/10-project-starter-pipeline-review/)
+- Python 보강 2주 3일: git config · add/commit · Git Flow 가지 · reset vs revert · PR(base develop) · 충돌 해결. 팀 저장소에 `feature/ysl` PR → [Python 8장](./python-basics/08-git-gitflow-github/)
 
 ### 2026-11-03 · LLMOps 3일차: 운영 지표 분석과 개선(3장) · Python 보강 2주 2일
 
@@ -281,9 +294,9 @@ TIL/
 ├── llm-practical-foundations/     # 1~5장, 10장
 ├── data-engineering/              # 1~8장
 ├── langchain/                     # 1~10장
-├── rag/                           # 1~9장
+├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
-├── llmops/                        # 1~2장
+├── llmops/                        # 1~4장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

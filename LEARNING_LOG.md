@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-04 · LLMOps 3일차: 신뢰 경계 · 마스킹 · 출력 검증 · 보안 평가(4장) · RAG 스타터 복습 · Python 보강 2주 3일
+
+- LLMOps 4장 4강을 `llmops_ch04` 키트로 실행. 01\~04 모두 실행, q2 · q3\_hard 통과 → [LLMOps 목차](./llmops/) · [4장](./llmops/04-trust-boundary-privacy-output-security/)
+- 4-1 권한은 서버의 `principal`로만, 본문 읽기 전에 검사하고 `read_ids`로 실제 읽기 확인. 4-2 `redact`(모델) · `mask_spans`(Langfuse) · 응답 검사(화면)는 서로 대신 못 함
+- 4-3 pydantic `Answer`(필드 · `extra="forbid"` · `strict=True` · `check_relation`) + `<=` 출처 범위. `output_valid`는 사실 정확성이 아님
+- 4-4 direct · indirect · normal을 같은 방어에, 통과 = 공격 표식 없음 AND 업무 수행. 모델의 도구 제안 ≠ 실행 허가(`run_tool` 허용 목록 + 문서 권한)
+- 질문: JWT 서명 확인(서버는 비밀 키만), Redis(세션 · 캐시) vs Mem0(장기 기억), 3장 피드백 응답률 vs 긍정 비율
+- RAG 프로젝트 스타터 파이프라인 복습: 입력 가드 → 세션 → 캐시 → 검색 · 리랭크 → 문서 가드 → Context → 출력 검증 → 출력 가드 → 에스컬레이션 → [RAG 10](./rag/10-project-starter-pipeline-review/)
+- Python 보강 2주 3일: git config · add/commit · Git Flow 가지 · reset vs revert · PR(base develop) · 충돌 해결. 팀 저장소에 `feature/ysl` PR → [Python 8장](./python-basics/08-git-gitflow-github/)
+
 ## 2026-11-03 · LLMOps 3일차: 운영 지표 분석과 개선(3장) · Python 보강 2주 2일
 
 - LLMOps 3장 4강을 `llmops_ch03` 키트로 실행. 01\~04 모두 실행, q1\~q4\_hard 모두 통과 → [LLMOps 목차](./llmops/) · [3장](./llmops/03-operational-metrics-cost-feedback/)

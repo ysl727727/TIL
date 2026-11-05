@@ -4,6 +4,15 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-05 · RAG 프로젝트(3) 1일차: 데이터 분석 · 해운 Basic 색인 · Naive 검색
+
+- 발제 확인: RAG 3종(Naive / Hybrid / Hybrid + Reranker) 비교, FastAPI + LangChain + Langfuse, 문서명 · 페이지 표시, clarify · abstain → [RAG 프로젝트(3)](./projects/03-rag-qa-service/)
+- 팀 ADEN에서 A 데이터 · 검색 담당. `feat/basic-data-search` 브랜치로 PDF 추출 → 문단 800자 청킹 → E5 임베딩 → Qdrant Cloud 색인 → Naive `retrieve()` (PR #2)
+- 청킹 비교(정답 인용 258개): 페이지 통째는 106쪽이 512토큰 초과, 글자 500/overlap 100은 84.1%, 문단 800자 98.1% → 360쪽 · 청크 620개
+- `PageDocument` → `Chunk` → `RetrievedChunk` dataclass 계약, `frozen=True`, `asdict` / `Chunk(**payload)`
+- Naive k=5: development Hit 0.929 · Recall 0.564 · Recall@20 0.867, additional Hit 0.929 · Recall 0.641 → 근거 문서가 여럿인 질문에서 절반을 놓침, Reranker 여지 큼
+- Qdrant Cloud 무료 티어 · 클러스터별 키, `WinError 10054`는 클러스터 재생성으로 해결, push한 커밋 메시지는 `--force-with-lease`로 정리
+
 ## 2026-11-04 · LLMOps 3일차: 신뢰 경계 · 마스킹 · 출력 검증 · 보안 평가(4장) · RAG 스타터 복습 · Python 보강 2주 3일
 
 - LLMOps 4장 4강을 `llmops_ch04` 키트로 실행. 01\~04 모두 실행, q2 · q3\_hard 통과 → [LLMOps 목차](./llmops/) · [4장](./llmops/04-trust-boundary-privacy-output-security/)

@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | LLMOps 3일차 4장 수업 완료(LLMOps 1\~4장 마침) → RAG 프로젝트 준비 |
-| 최근 학습 | **2026-11-04** · [LLMOps 4장](./llmops/04-trust-boundary-privacy-output-security/) 권한·마스킹·출력 검증·보안 평가 · [RAG 스타터 복습](./rag/10-project-starter-pipeline-review/) · [Python 보강 2주 3일](./python-basics/08-git-gitflow-github/) git·Git Flow·GitHub |
-| 다음 할 일 | RAG 프로젝트 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | RAG 프로젝트(3) 진행 중 — 데이터 · 검색 담당, Naive 검색 완료 → Hybrid · Reranker |
+| 최근 학습 | **2026-11-05** · [RAG 프로젝트(3)](./projects/03-rag-qa-service/) 해운 Basic 색인 · 문단 800자 청킹 · Qdrant Cloud · Naive Hit@5 0.929 / Recall@5 0.564 |
+| 다음 할 일 | RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -178,6 +178,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | [프로젝트(1)](./projects/02-open-source-llm-selection/) | 오픈소스 LLM 선정 — 부동산 허위매물 탐지 어시스턴트 (2026-09-14 ~ 09-18) | 개인 수행: 기준 설계·실험·채점 | qwen3 4B 선정 (정확성 80.8% vs 57.0%) |
 | [1](./projects/01-lovecode-couple-type-classifier/) | 러브코드 — 사주·MBTI로 커플 관계 스타일 16유형 분류 + LLM 해설 (2026-10-09 ~ 10-16) | BERT 분류 모델, LangChain 해설·생성 모델 비교 | test macro-F1 0.831, 해설 위반 0/24 |
+| [3](./projects/03-rag-qa-service/) | RAG 기반 Q&A 서비스 — 해운 문서 근거 답변, Naive · Hybrid · Reranker 비교 (2026-11-05 ~ 진행 중) | A 데이터 · 검색: PDF 추출 · 청킹 · Qdrant Cloud 색인 · `retrieve()` · 검색 평가 | 🧪 진행 — Naive Hit@5 0.929 · Recall@5 0.564 |
 
 ### Python 보강 · [`python-basics/`](./python-basics/)
 
@@ -213,6 +214,15 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-05 · RAG 프로젝트(3) 1일차: 데이터 분석 · 해운 Basic 색인 · Naive 검색
+
+- 발제 확인: RAG 3종(Naive / Hybrid / Hybrid + Reranker) 비교, FastAPI + LangChain + Langfuse, 문서명 · 페이지 표시, clarify · abstain → [RAG 프로젝트(3)](./projects/03-rag-qa-service/)
+- 팀 ADEN에서 A 데이터 · 검색 담당. `feat/basic-data-search` 브랜치로 PDF 추출 → 문단 800자 청킹 → E5 임베딩 → Qdrant Cloud 색인 → Naive `retrieve()` (PR #2)
+- 청킹 비교(정답 인용 258개): 페이지 통째는 106쪽이 512토큰 초과, 글자 500/overlap 100은 84.1%, 문단 800자 98.1% → 360쪽 · 청크 620개
+- `PageDocument` → `Chunk` → `RetrievedChunk` dataclass 계약, `frozen=True`, `asdict` / `Chunk(**payload)`
+- Naive k=5: development Hit 0.929 · Recall 0.564 · Recall@20 0.867, additional Hit 0.929 · Recall 0.641 → 근거 문서가 여럿인 질문에서 절반을 놓침, Reranker 여지 큼
+- Qdrant Cloud 무료 티어 · 클러스터별 키, `WinError 10054`는 클러스터 재생성으로 해결, push한 커밋 메시지는 `--force-with-lease`로 정리
 
 ### 2026-11-04 · LLMOps 3일차: 신뢰 경계 · 마스킹 · 출력 검증 · 보안 평가(4장) · RAG 스타터 복습 · Python 보강 2주 3일
 

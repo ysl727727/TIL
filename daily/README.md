@@ -12,6 +12,7 @@
 
 | 날짜 | 주제 |
 | --- | --- |
+| [11-05](./261105.md) | RAG 프로젝트(3) 1일차 데이터 분석 · 해운 Basic 색인 · 문단 800자 청킹 · Naive 검색 Hit / Recall |
 | [11-04](./261104.md) | LLMOps 4장 권한·마스킹·출력 검증·보안 평가 · RAG 스타터 파이프라인 복습 · Python 보강 2주 3일 git·Git Flow·GitHub |
 | [11-03](./261103.md) | LLMOps 3장 운영 지표·토큰과 지연·피드백·비용 판단 · Python 보강 2주 2일 모듈·예외·pytest·logging |
 | [11-02](./261102.md) | LLMOps 2장 Golden Dataset·프롬프트 버전·회귀 판정 · Python 보강 2주 1일 클래스 |

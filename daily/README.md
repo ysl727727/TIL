@@ -12,6 +12,7 @@
 
 | 날짜 | 주제 |
 | --- | --- |
+| [11-16](./261116.md) | 파인튜닝 1장 학습 전 기준 응답 · 토큰 · `p − y` · 형식 ≠ 의미 · 직접 구현 BPE · 템플릿 · train\_step · generate · Python 보강 3주 1회차 NumPy |
 | [11-05](./261105.md) | RAG 프로젝트(3) 1일차 데이터 분석 · 해운 Basic 색인 · 문단 800자 청킹 · Naive 검색 Hit / Recall |
 | [11-04](./261104.md) | LLMOps 4장 권한·마스킹·출력 검증·보안 평가 · RAG 스타터 파이프라인 복습 · Python 보강 2주 3일 git·Git Flow·GitHub |
 | [11-03](./261103.md) | LLMOps 3장 운영 지표·토큰과 지연·피드백·비용 판단 · Python 보강 2주 2일 모듈·예외·pytest·logging |

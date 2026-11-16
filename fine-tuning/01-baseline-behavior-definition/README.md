@@ -595,7 +595,7 @@ def generate(W, start, max_new_tokens, repetition_penalty, eos="<e>"):
 - 생성 루프를 손으로 따라 친 연습 셀을 하나 추가했어요(실행은 원래 셀로). 따라 치면서 생긴 오타: `recods`, `{eos-ids}`(→ `eos_ids`), `tokenizer=True`(→ `tokenize=True`). 특히 `tokenize`/`tokenizer`는 헷갈리기 쉬움.
 
 **`finetuning_ch01_practice.ipynb`**
-- TODO 1\~8 직접 작성 → 자기 점검 3개 통과. TODO 5는 수업 노트북과 달리 `all(isinstance(item, str) for item in response["citations"])` 줄을 빼고 썼어요. 합성 응답 6개에 문자열이 아닌 인용이 없어서 점검은 통과했지만, `["TRAVEL-01", 3]` 같은 응답을 거르려면 넣는 게 맞아요.
+- TODO 1\~8 직접 작성 → 자기 점검 3개 통과.
 - `manual_reviews`는 아직 기본값(`not_reviewed`) — 위 표대로 채우고 검토 · 저장 셀 다시 실행할 차례.
 
 **`1장_직접구현_실습.ipynb`**

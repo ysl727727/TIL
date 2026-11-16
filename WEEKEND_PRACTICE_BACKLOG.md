@@ -20,7 +20,7 @@
 
 > 직접 구현 실습 Hard는 Easy만 하기로 해서 제외했어요.
 
-- [ ] 통합 실습 `manual_reviews` 8개 채우기 → 검토 · 저장 셀 재실행 (TODO 5에 `all(isinstance(item, str) ...)` 줄도 추가)
+- [ ] 통합 실습 `manual_reviews` 8개 채우기 → 검토 · 저장 셀 재실행
 - [ ] `baseline.json` · `practice_result.json` Colab에서 내려받아 보관
 - [ ] Python 보강 3주 1회차 심화 1 `standardize` · 심화 2 `softmax_rows` · 심화 3 `pairwise_distances` · 실무 1 `fake_scores`
 

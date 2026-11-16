@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | RAG 프로젝트(3) 진행 중 — 데이터 · 검색 담당, Naive 검색 완료 → Hybrid · Reranker |
-| 최근 학습 | **2026-11-05** · [RAG 프로젝트(3)](./projects/03-rag-qa-service/) 해운 Basic 색인 · 문단 800자 청킹 · Qdrant Cloud · Naive Hit@5 0.929 / Recall@5 0.564 |
-| 다음 할 일 | RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | 파인튜닝 시작 — 1장 학습 전 기준 응답 완료 → 2장 학습 데이터 72개 |
+| 최근 학습 | **2026-11-16** · [파인튜닝 1장](./fine-tuning/01-baseline-behavior-definition/) Qwen2.5-0.5B 학습 전 응답 8개 · 형식 0/4 · 0/4 · 직접 구현 Easy 4개 · [NumPy 보강](./python-basics/09-numpy-arrays/) |
+| 다음 할 일 | 파인튜닝 2장 · 1장 `manual_reviews` 채우기 · NumPy 심화 1\~3 · 실무 1 · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -27,13 +27,13 @@
 ```mermaid
 flowchart LR
     PY[파이썬 베이직] --> BM[기초 수학] --> ML[머신러닝] --> DLB[딥러닝 기초] --> DLA[딥러닝 심화] --> LLM[LLM 실전]
-    LLM --> DE[데이터 엔지니어링] --> LC[LangChain] --> RAG[RAG] --> CE[Context Engineering] --> AG[AI Agent] --> OPS[LLMOps·서빙]
+    LLM --> DE[데이터 엔지니어링] --> LC[LangChain] --> RAG[RAG] --> CE[Context Engineering] --> AG[AI Agent] --> OPS[LLMOps·서빙] --> FT[파인튜닝]
 
     classDef done fill:#dcfce7,stroke:#16a34a,color:#14532d
     classDef now fill:#fef3c7,stroke:#d97706,color:#78350f
     classDef next fill:#f3f4f6,stroke:#9ca3af,color:#374151
     class PY,BM,ML,DLB,DLA done
-    class LLM,DE,LC,RAG,CE,OPS now
+    class LLM,DE,LC,RAG,CE,OPS,FT now
     class AG next
 ```
 
@@ -163,6 +163,12 @@ flowchart LR
 | [3](./llmops/03-operational-metrics-cost-feedback/) | 운영 지표 분석과 개선 — 지표별 분모·None ≠ 0, p95와 timeout 장애, 문맥 길이 측정(토큰·지연), Trace 피드백 응답률 vs 긍정 비율, GENERATION 비용·판정 순서 | ✅ 완료 (q1\~q4\_hard 통과) |
 | [4](./llmops/04-trust-boundary-privacy-output-security/) | 신뢰 경계와 권한 통제·개인정보 마스킹·출력 검증·보안 평가 — `principal`·`read_ids` 읽기 전 차단, `redact`·`mask_spans`, pydantic `Answer`·출처 범위, 직접·간접 주입과 정상 대조군, `run_tool` 도구 통제 | ✅ 완료 (q2·q3\_hard 통과) |
 
+### 파인튜닝 · [`fine-tuning/`](./fine-tuning/)
+
+| 장 | 주제 | 상태 |
+| --- | --- | --- |
+| [1](./fine-tuning/01-baseline-behavior-definition/) | 학습할 행동과 기준 응답 정의 — 지식은 문서로 · 행동은 학습으로, `cases` vs `review_criteria`, SFT · LoRA · QLoRA · DPO 지도, 채팅 템플릿 · 기울기 `p − y`, greedy 기준 응답 8개, 형식 ≠ 의미, `baseline.json` · 직접 구현(BPE · 템플릿 · `train_step` · `generate`) | ✅ 완료 (통합 실습 `manual_reviews` 남음 · 직접 구현 Hard는 선택) |
+
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
 > 목요일 프로젝트 시작 전, 그동안 배운 내용을 `project2-kit`으로 다시 실행해 보는 복습 수업입니다. 일차 단위로 정리합니다.
@@ -193,6 +199,7 @@ flowchart LR
 | [6](./python-basics/06-classes/) | 보강 2주 1일 — 함수 인자 `*`·`**` 복습, 클래스·`__init__`·`self`, 던더 메서드, 상속·`super()`, `@dataclass` | 🧪 진행 (q5~q10 남음) |
 | [7](./python-basics/07-modules-exceptions-pytest-logging/) | 보강 2주 2일 — 모듈·패키지·`__init__.py`·상대 import, `__name__`, `try/except`·내 예외·`raise`, pytest·`pytest.raises`, logging | 🧪 진행 (응용 1~실무 1 남음) |
 | [8](./python-basics/08-git-gitflow-github/) | 보강 2주 3일 — git config, 작업 폴더·스테이지·커밋, Git Flow(main·develop·feature·release·hotfix), reset vs revert, push·PR(base develop)·fork, 충돌 해결 | 🧪 진행 (기초 3·응용 3·심화 1~3 남음) |
+| [9](./python-basics/09-numpy-arrays/) | 보강 3주 1회차 — `np.array` 벡터화, shape · axis, 인덱싱 · 마스크 · `np.where`, 브로드캐스팅 · `keepdims`, 평균 · 분산 · 표준편차, softmax · temperature, `default_rng` | 🧪 진행 (심화 1~3 · 실무 1 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -214,6 +221,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-16 · 파인튜닝 1일차: 학습할 행동과 기준 응답 정의(1장) · Python 보강 3주 1회차
+
+- 파인튜닝 1장 4강을 Colab CPU(transformers 5.22.2, Qwen2.5-0.5B-Instruct revision 고정)로 실행. 수업 노트북 · 통합 실습 TODO 1\~8 · 직접 구현 Easy 4개 통과 → [파인튜닝 목차](./fine-tuning/) · [1장](./fine-tuning/01-baseline-behavior-definition/)
+- 지식(금액)은 문서로, 행동(근거 읽기 · JSON · 보류)은 학습으로. `cases`는 모델로 · `review_criteria`는 사람에게(정답 누수 방지). SFT · DPO = 학습 목표, LoRA · QLoRA = 학습 대상
+- 채팅 템플릿 input\_ids (1, 289), 세 점수 예제 기울기 `p − y` = [0.333, 0.333, −0.667], 확률 0.333 → 0.403 · 손실 1.099 → 0.909, `backward` ≠ `step`
+- greedy · 192토큰으로 응답 8개: 전부 `json_object` 실패(앞말 · 코드 펜스 · `answered` 한 단어), simple/updated 잘림, 형식 0/4 · 0/4, 의미도 전부 틀림 → 학습할 행동 · `baseline.json`
+- 통합 실습에서 `ensure_ascii=False`를 빼먹어 생성이 엉망 → 자기 점검은 통과(검사 통과 ≠ 모델이 받은 입력). 고친 뒤 수업 노트북과 같은 응답 재현
+- 직접 구현: BPE("숙박비 지원 한도" 1토큰 · "통신비" 9바이트), 템플릿, `train_step` 손실 2.178 → 0.371, greedy "이하 → 승인 필요"(손실이 낮다 ≠ 업무 판단이 맞다)
+- Python 보강 3주 1회차: NumPy 벡터화 · shape · axis · 마스크 · 브로드캐스팅 · 분산 · softmax — 기초 1\~3 · 응용 1\~3 통과 → [Python 9장](./python-basics/09-numpy-arrays/)
 
 ### 2026-11-05 · RAG 프로젝트(3) 1일차: 데이터 분석 · 해운 Basic 색인 · Naive 검색
 
@@ -275,17 +292,6 @@ flowchart LR
 - 키트의 grpcio 1.85.0이 스마트 앱 컨트롤에 막혀 2장 2강만 `--with grpcio==1.84.0`으로 실행, `printsection`은 `uv add`로 추가
 - Python 보강 1주 3일: 순차·버블 정렬(n²), 이진 탐색(log₂n, 전제는 정렬), `sorted()`·`bisect` — 이론까지 → [Python 5장](./python-basics/05-sorting-binary-search/)
 
-### 2026-10-27 · RAG 5일차: 평가(8장)와 고급 RAG(9장) · Python 보강 1주 2일
-
-- RAG 5일차 오전 8장·오후 9장을 `rag_day5` 키트로 실행. q\_hard는 8-1·8-2·8-3·9-1 통과, 선택 실습으로 RAGAS `--execute`와 GraphRAG 색인·질의까지 실행 → [8장](./rag/08-evaluation-golden-hit-recall-ragas/) · [9장](./rag/09-advanced-rag-parent-agentic-graph-multimodal/)
-- 8장: 질문만 시스템에 보내고 `reference`·정답 문서 ID는 평가에만. dev ∩ test 근거 문서 `[]`. 검색은 청크로, 채점은 `document_id`로. q06 k=1은 Hit 1 · Recall 0.5 → Hit만 보면 숙박 근거가 빠진 걸 놓침
-- dev 10개 평균 0.9의 정체는 q10 하나(조사 때문에 BM25 0건). 청크 먼저 자르면 Recall 0.5, 문서 먼저 중복 제거하면 1.0 → 평가 단위를 같이 적기
-- RAGAS: Faithfulness(답 ↔ 근거)와 Answer Relevancy(답 ↔ 질문)는 다른 축. 직접 돌린 Relevancy는 교안과 조금 다르고 금액이 틀린 B가 A보다 높음 → 채점도 LLM이라 흔들리고, 지표 하나로 정확성을 판정하면 안 됨
-- 8-4: 하나만 바꾸고(BM25 → Dense → Hybrid) 같은 정답지로 비교. wins `['q10']` losses `[]`, test는 마지막에 한 번 기록만. 문서 Recall 1.0 ≠ 증빙 문장 확보
-- 9장: 80자 Child가 "서면"에서 끊겨 148자 Parent로 확장, 예산 70이면 승인 조건이 빠짐. `search_loop` 종료 3가지(`candidates_ready`·`repeated_query`·`search_limit`), `route`는 인용 검사로 근거 없는 answer를 막음
-- GraphRAG: 관계 8줄 → 노드 10·간선 8, 영수증 ← 3개 규정 → 승인자. 자동 색인은 엔티티 67·관계 57(교안 69·62, LLM 추출이라 달라짐). ColPali MaxSim A 2.0 > B 1.4142, 금액은 값·단위·출처를 함께
-- Python 보강 1주 2일: `return` vs `print`, 기본값·키워드 인자, 슬라이스, 딕셔너리로 세기, 두 수의 합, `sorted(key=…)`, `Counter` — 기초 q1~q3 통과 → [Python 4장](./python-basics/04-functions-lists-strings-dicts/)
-
 ## 📂 폴더 구조
 
 <details>
@@ -307,6 +313,7 @@ TIL/
 ├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
 ├── llmops/                        # 1~4장
+├── fine-tuning/                   # 1장~
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

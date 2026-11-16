@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-16 · 파인튜닝 1일차: 학습할 행동과 기준 응답 정의(1장) · Python 보강 3주 1회차
+
+- 파인튜닝 1장 4강을 Colab CPU(transformers 5.22.2, Qwen2.5-0.5B-Instruct revision 고정)로 실행. 수업 노트북 · 통합 실습 TODO 1\~8 · 직접 구현 Easy 4개 통과 → [파인튜닝 목차](./fine-tuning/) · [1장](./fine-tuning/01-baseline-behavior-definition/)
+- 지식(금액)은 문서로, 행동(근거 읽기 · JSON · 보류)은 학습으로. `cases`는 모델로 · `review_criteria`는 사람에게(정답 누수 방지). SFT · DPO = 학습 목표, LoRA · QLoRA = 학습 대상
+- 채팅 템플릿 input\_ids (1, 289), 세 점수 예제 기울기 `p − y` = [0.333, 0.333, −0.667], 확률 0.333 → 0.403 · 손실 1.099 → 0.909, `backward` ≠ `step`
+- greedy · 192토큰으로 응답 8개: 전부 `json_object` 실패(앞말 · 코드 펜스 · `answered` 한 단어), simple/updated 잘림, 형식 0/4 · 0/4, 의미도 전부 틀림 → 학습할 행동 · `baseline.json`
+- 통합 실습에서 `ensure_ascii=False`를 빼먹어 생성이 엉망 → 자기 점검은 통과(검사 통과 ≠ 모델이 받은 입력). 고친 뒤 수업 노트북과 같은 응답 재현
+- 직접 구현: BPE("숙박비 지원 한도" 1토큰 · "통신비" 9바이트), 템플릿, `train_step` 손실 2.178 → 0.371, greedy "이하 → 승인 필요"(손실이 낮다 ≠ 업무 판단이 맞다)
+- Python 보강 3주 1회차: NumPy 벡터화 · shape · axis · 마스크 · 브로드캐스팅 · 분산 · softmax — 기초 1\~3 · 응용 1\~3 통과 → [Python 9장](./python-basics/09-numpy-arrays/)
+
 ## 2026-11-05 · RAG 프로젝트(3) 1일차: 데이터 분석 · 해운 Basic 색인 · Naive 검색
 
 - 발제 확인: RAG 3종(Naive / Hybrid / Hybrid + Reranker) 비교, FastAPI + LangChain + Langfuse, 문서명 · 페이지 표시, clarify · abstain → [RAG 프로젝트(3)](./projects/03-rag-qa-service/)

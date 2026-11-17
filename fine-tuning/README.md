@@ -11,7 +11,13 @@
   1-3  실제 응답    revision 고정 · float32 · greedy · 192토큰 → 응답 8개 (잘림 1)
   1-4  나눠 읽기    json_object → schema_ok → citation_ids_ok, 형식 0/4 · 0/4, baseline.json
       ↓  "학습할 행동: JSON · 보류 · 인용 · 근거 읽기"
-2장 학습 예제 72개 → 3장 SFT → 4장 LoRA → 5장 QLoRA → 6장 DPO → 7장 평가 · API → 8장 검증 · 인계
+2장 학습 데이터 구성과 품질 검증   (학습 안 함 · 토크나이저만 · CPU)
+  2-1  모범답안     12그룹 × 6사례 = 72, reference_answer 규칙 함수 (모델 출력 복사 X)
+  2-2  대화 · 토큰  메타데이터 vs messages, 두 번 토큰화 299 / 376 → 답변 77, 257~380 ≤ 512
+  2-3  품질 검사    validate_record 5단계 72/72, 일부러 틀린 복사본 2/2 탐지
+  2-4  그룹 분할    8 / 2 / 2 그룹 = 48 / 12 / 12행, JSONL · SHA-256 · training_data.zip
+      ↓  "labels = −100 마스킹으로 답변 토큰만 학습"
+3장 SFT → 4장 LoRA → 5장 QLoRA → 6장 DPO → 7장 평가 · API → 8장 검증 · 인계
 ```
 
 ## 장별 한 줄과 중요 개념
@@ -19,6 +25,7 @@
 | 장 | 한 줄 | 중요 개념 | 상태 |
 | --- | --- | --- | --- |
 | [1장](./01-baseline-behavior-definition/) | 학습 전 같은 입력 · 같은 설정의 응답을 기준으로 남긴다 | **지식은 문서로 · 행동은 학습으로**, 정답 누수, 학습 목표(SFT · DPO) vs 학습 대상(LoRA · QLoRA), `ensure_ascii=False`, `add_generation_prompt`, **기울기 = p − y**, `backward` vs `step`, revision 고정 · greedy 명시, 새 토큰만 읽기 · 잘림 먼저, **형식 ≠ 의미 ≠ 참조 일치**, 재현의 네 가지 | ✅ 수업 · 통합 실습 · 직접 구현 Easy (`manual_reviews` 남음) |
+| [2장](./02-training-data-quality-split/) | 모범답안은 규칙이 만들고, 자료와 검사 함수를 함께 시험하고, 행이 아니라 그룹으로 나눈다 | **규칙 함수 모범답안**, `below` · `irrelevant`, 메타데이터 vs messages · 정답 누수, 두 번 토큰화 · **답변 경계 assert**, 토큰 상한 512(자르지 않음), `validate_record` 5단계 · **검사 함수의 테스트**, `copy.deepcopy`, **그룹 단위 분할** · `random.Random(SEED)`, JSONL · `dataset_info` · SHA-256 | ✅ 수업 노트북 (Colab · 로컬 재실행, 해시 일치) |
 
 ## 오늘의 교훈
 
@@ -28,6 +35,9 @@
 4. **검사 통과 ≠ 모델이 받은 입력이 맞다.** `\uXXXX`로 바뀐 한글도 `json.loads` 비교는 통과했어요.
 5. **형식 통과 ≠ 업무 의미.** 의미는 사람이 원문을 읽고, 그 판단을 학습 행동으로 연결해요.
 6. **손실이 낮다 ≠ 업무 판단이 맞다.** 앞 토큰 하나만 보는 모델은 손실 0.37에서도 "이하 → 승인 필요"를 말해요.
+7. **데이터가 곧 결과다.** 정답 · 경계 · 길이 · 분할 중 하나만 틀려도 학습은 에러 없이 돌고, 틀린 걸 배우거나 점수가 부풀어요.
+8. **검사 함수도 틀린 예로 시험한다.** "항상 통과"하는 검사가 가장 위험해요.
+9. **행이 아니라 같은 문제 단위로 나눈다.** 행 단위로 섞으면 test 12행 모두 형제가 train에 있어요.
 
 ## 앞 과목과 이어지는 부분
 
@@ -42,3 +52,8 @@
 | 1장 형식 검사 `inspect_response` | LLMOps 4장 pydantic `Answer` · 출처 범위, RAG 6장 `validate_answer` |
 | 1장 분모를 같이 쓰는 지표(0/4) | LLMOps 3장 지표마다 분모가 다름 |
 | 1장 SFT · DPO 지도 | LLM 실전 3\~5장 SFT · RLHF · DPO, 딥러닝 심화 7장 PEFT(LoRA) |
+| 2장 `case_type`은 모델 입력에 안 넣음 | 1장 `cases` vs `review_criteria`, LLMOps 2장 `metadata` |
+| 2장 두 번 토큰화 · `add_generation_prompt` | 1장 직접 구현 ② 채팅 템플릿의 답변 시작 위치 |
+| 2장 일부러 틀린 복사본으로 검사 함수 시험 | LLMOps 4장 "막는 코드 vs 막았다고 말하는 코드" |
+| 2장 그룹 단위 분할 · 데이터 누수 | 머신러닝 4장 데이터 누수 · GroupKFold, LLMOps 2장 dev · holdout |
+| 2장 `copy.deepcopy` | 1장 `.detach().clone()` |

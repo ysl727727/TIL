@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-17 · 파인튜닝 2일차: 학습 데이터 구성과 품질 검증(2장) · Python 보강 3주 2회차
+
+- 파인튜닝 2장 4강을 Colab CPU로 실행(토크나이저만, 가중치는 안 불러옴)하고, 로컬(transformers 5.22.2)에서 다시 돌려 JSONL 해시까지 슬라이드와 일치 → [파인튜닝 목차](./fine-tuning/) · [2장](./fine-tuning/02-training-data-quality-split/)
+- 2-1 규정 12그룹 × 사례 6종 = 72개, 정답은 `reference_answer` 규칙 함수가 만든다(모델 출력 복사 X). `below` · `irrelevant` 추가로 "문서가 있다 ≠ 답할 수 있다"
+- 2-2 메타데이터(`id` · `group_id` · `case_type`)와 messages 분리, 두 번 토큰화 299 / 376 → `full_ids[:299] == prompt_ids` assert, 답변 77개, 길이 257\~380 ≤ 512(넘으면 자르지 않고 멈춤)
+- 2-3 `validate_record` 5단계 72/72 통과, 일부러 틀린 복사본 2/2 탐지(검사 함수의 테스트), `copy.deepcopy`로 원본 보호
+- 2-4 행이 아니라 그룹으로: 정렬 → `random.Random(42)` → 8/2/2그룹 = 48/12/12행, 겹침 0, JSONL · `dataset_info.json` · SHA-256 · `training_data.zip`
+- Colab에서 transformers가 5.22.1로 찍힘(설치 뒤 재시작 안 함) → 결과는 같았지만 3장부터는 설치 → 재시작 → 버전 확인
+- Python 보강 3주 2회차: 내적 · norm · 코사인 유사도 · 행렬 × 벡터(행마다 내적) · `X @ w + b` — 기초 1\~3 · 응용 1\~3 통과 → [Python 10장](./python-basics/10-dot-product-matmul/)
+
 ## 2026-11-16 · 파인튜닝 1일차: 학습할 행동과 기준 응답 정의(1장) · Python 보강 3주 1회차
 
 - 파인튜닝 1장 4강을 Colab CPU(transformers 5.22.2, Qwen2.5-0.5B-Instruct revision 고정)로 실행. 수업 노트북 · 통합 실습 TODO 1\~8 · 직접 구현 Easy 4개 통과 → [파인튜닝 목차](./fine-tuning/) · [1장](./fine-tuning/01-baseline-behavior-definition/)

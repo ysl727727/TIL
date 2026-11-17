@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | 파인튜닝 시작 — 1장 학습 전 기준 응답 완료 → 2장 학습 데이터 72개 |
-| 최근 학습 | **2026-11-16** · [파인튜닝 1장](./fine-tuning/01-baseline-behavior-definition/) Qwen2.5-0.5B 학습 전 응답 8개 · 형식 0/4 · 0/4 · 직접 구현 Easy 4개 · [NumPy 보강](./python-basics/09-numpy-arrays/) |
-| 다음 할 일 | 파인튜닝 2장 · 1장 `manual_reviews` 채우기 · NumPy 심화 1\~3 · 실무 1 · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | 파인튜닝 — 2장 학습 데이터 72개 완료 → 3장 전체 가중치 SFT |
+| 최근 학습 | **2026-11-17** · [파인튜닝 2장](./fine-tuning/02-training-data-quality-split/) 규칙 모범답안 72개 · 답변 경계 299 · 검사 72/72 · 오류 2/2 · 그룹 분할 48/12/12 · `training_data.zip` · [내적과 행렬곱 보강](./python-basics/10-dot-product-matmul/) |
+| 다음 할 일 | 파인튜닝 3장 SFT · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -168,6 +168,7 @@ flowchart LR
 | 장 | 주제 | 상태 |
 | --- | --- | --- |
 | [1](./fine-tuning/01-baseline-behavior-definition/) | 학습할 행동과 기준 응답 정의 — 지식은 문서로 · 행동은 학습으로, `cases` vs `review_criteria`, SFT · LoRA · QLoRA · DPO 지도, 채팅 템플릿 · 기울기 `p − y`, greedy 기준 응답 8개, 형식 ≠ 의미, `baseline.json` · 직접 구현(BPE · 템플릿 · `train_step` · `generate`) | ✅ 완료 (통합 실습 `manual_reviews` 남음 · 직접 구현 Hard는 선택) |
+| [2](./fine-tuning/02-training-data-quality-split/) | 학습 데이터 구성과 품질 검증 — 규칙 함수 모범답안 72개(12그룹 × 6사례), 메타데이터 vs messages, 두 번 토큰화로 답변 경계 299 · 길이 512, `validate_record` 5단계 · 의도한 오류 2/2, 그룹 단위 분할 48/12/12 · SHA-256 · `training_data.zip` | ✅ 완료 |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -200,6 +201,7 @@ flowchart LR
 | [7](./python-basics/07-modules-exceptions-pytest-logging/) | 보강 2주 2일 — 모듈·패키지·`__init__.py`·상대 import, `__name__`, `try/except`·내 예외·`raise`, pytest·`pytest.raises`, logging | 🧪 진행 (응용 1~실무 1 남음) |
 | [8](./python-basics/08-git-gitflow-github/) | 보강 2주 3일 — git config, 작업 폴더·스테이지·커밋, Git Flow(main·develop·feature·release·hotfix), reset vs revert, push·PR(base develop)·fork, 충돌 해결 | 🧪 진행 (기초 3·응용 3·심화 1~3 남음) |
 | [9](./python-basics/09-numpy-arrays/) | 보강 3주 1회차 — `np.array` 벡터화, shape · axis, 인덱싱 · 마스크 · `np.where`, 브로드캐스팅 · `keepdims`, 평균 · 분산 · 표준편차, softmax · temperature, `default_rng` | 🧪 진행 (심화 1~3 · 실무 1 남음) |
+| [10](./python-basics/10-dot-product-matmul/) | 보강 3주 2회차 — 내적, 노름, 곱의 모양, 코사인 유사도, 행렬 × 벡터(행마다 내적), 선형 예측 `X @ w + b` | 🧪 진행 (심화 1~3 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -221,6 +223,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-17 · 파인튜닝 2일차: 학습 데이터 구성과 품질 검증(2장) · Python 보강 3주 2회차
+
+- 파인튜닝 2장 4강을 Colab CPU로 실행(토크나이저만, 가중치는 안 불러옴)하고, 로컬(transformers 5.22.2)에서 다시 돌려 JSONL 해시까지 슬라이드와 일치 → [파인튜닝 목차](./fine-tuning/) · [2장](./fine-tuning/02-training-data-quality-split/)
+- 2-1 규정 12그룹 × 사례 6종 = 72개, 정답은 `reference_answer` 규칙 함수가 만든다(모델 출력 복사 X). `below` · `irrelevant` 추가로 "문서가 있다 ≠ 답할 수 있다"
+- 2-2 메타데이터(`id` · `group_id` · `case_type`)와 messages 분리, 두 번 토큰화 299 / 376 → `full_ids[:299] == prompt_ids` assert, 답변 77개, 길이 257\~380 ≤ 512(넘으면 자르지 않고 멈춤)
+- 2-3 `validate_record` 5단계 72/72 통과, 일부러 틀린 복사본 2/2 탐지(검사 함수의 테스트), `copy.deepcopy`로 원본 보호
+- 2-4 행이 아니라 그룹으로: 정렬 → `random.Random(42)` → 8/2/2그룹 = 48/12/12행, 겹침 0, JSONL · `dataset_info.json` · SHA-256 · `training_data.zip`
+- Colab에서 transformers가 5.22.1로 찍힘(설치 뒤 재시작 안 함) → 결과는 같았지만 3장부터는 설치 → 재시작 → 버전 확인
+- Python 보강 3주 2회차: 내적 · norm · 코사인 유사도 · 행렬 × 벡터(행마다 내적) · `X @ w + b` — 기초 1\~3 · 응용 1\~3 통과 → [Python 10장](./python-basics/10-dot-product-matmul/)
 
 ### 2026-11-16 · 파인튜닝 1일차: 학습할 행동과 기준 응답 정의(1장) · Python 보강 3주 1회차
 
@@ -281,17 +293,6 @@ flowchart LR
 - CE 복습: prompt vs context engineering, question · instruction · context · messages · content 용어 정리와 1\~4장 코드 Q&A
 - 네트워크 스터디 2회차: IPv4/IPv6, DHCP·고정 IP, 서브넷 마스크·CIDR, 블록 계산 4단계 → [네트워크 스터디](./network-study/02-ip-subnetting/)
 
-### 2026-10-28 · Context Engineering 1일차: 입력 구성·메모리(1·2장)와 토큰 예산·캐시·오염(3·4장) · Python 보강 1주 3일
-
-- Context Engineering 1일차 1\~4장 8강을 `context_engineering` 키트(공용 uv 환경 하나)로 실행하고 q\_hard 8개 모두 통과 → [CE 목차](./context-engineering/) · [1장](./context-engineering/01-context-types-priority-skills/) · [2장](./context-engineering/02-short-long-term-memory-mem0/) · [3장](./context-engineering/03-token-budget-summary-compression/) · [4장](./context-engineering/04-prompt-caching-injection-filtering/)
-- 프롬프트 엔지니어링 = content에 들어갈 글 잘 쓰기, 컨텍스트 엔지니어링 = 무엇을 얼마나 넣을지 고르기. `kind`(앱) vs `role`(API), `[id / kind / source]` 표지
-- 고르는 순서는 범위 → 유효성 → 일관성 → 관련성 → 예산. 점수 1.00·0.99 후보가 먼저 빠짐. Skills는 맞는 절차만, 없으면 질문 재확인
-- 메모리: `decide_memory`(결정 + 이유), bool은 int의 하위 타입이라 `type(ttl) is int`. Mem0는 add 응답 ID로 대상을 고정하고 `owned_record`로 소유자 확인 후 수정·삭제, 이력은 남을 수 있음
-- 토큰 예산 = 한도 − 출력 예약 − 여유분, Qwen3 chat template로 세고 최신 턴부터(256 → 1턴, 512 → 6턴). 압축은 현재·이전 값 + 출처, `missing_evidence`로 누락 확인
-- Prefix cache는 맨 앞부터 같은 토큰만 재사용(공통 A 11 · B 94 · 정책 변경 8), None ≠ 0. 오염은 범위 → 본문 → `validate_action` 순, 문구 필터의 오탐(security-guide)·미탐(paraphrased-note)
-- 키트의 grpcio 1.85.0이 스마트 앱 컨트롤에 막혀 2장 2강만 `--with grpcio==1.84.0`으로 실행, `printsection`은 `uv add`로 추가
-- Python 보강 1주 3일: 순차·버블 정렬(n²), 이진 탐색(log₂n, 전제는 정렬), `sorted()`·`bisect` — 이론까지 → [Python 5장](./python-basics/05-sorting-binary-search/)
-
 ## 📂 폴더 구조
 
 <details>
@@ -313,7 +314,7 @@ TIL/
 ├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
 ├── llmops/                        # 1~4장
-├── fine-tuning/                   # 1장~
+├── fine-tuning/                   # 1~2장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | 파인튜닝 — 2장 학습 데이터 72개 완료 → 3장 전체 가중치 SFT |
-| 최근 학습 | **2026-11-17** · [파인튜닝 2장](./fine-tuning/02-training-data-quality-split/) 규칙 모범답안 72개 · 답변 경계 299 · 검사 72/72 · 오류 2/2 · 그룹 분할 48/12/12 · `training_data.zip` · [내적과 행렬곱 보강](./python-basics/10-dot-product-matmul/) |
-| 다음 할 일 | 파인튜닝 3장 SFT · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | 파인튜닝 — 3장 전체 가중치 SFT · 재개 완료 → 4장 LoRA |
+| 최근 학습 | **2026-11-18** · [파인튜닝 3장](./fine-tuning/03-full-sft-and-resume/) 답변 토큰만 손실(370 = 299 + 71) · 전체 가중치 4.94억 개 24갱신 · 12에서 멈추고 재개 · dev loss 0.9167 → 0.0003 · 손실 ≠ 업무 정답 |
+| 다음 할 일 | 파인튜닝 4장 LoRA · 3장 `sft_model.zip` · `sft_report.json` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -169,6 +169,7 @@ flowchart LR
 | --- | --- | --- |
 | [1](./fine-tuning/01-baseline-behavior-definition/) | 학습할 행동과 기준 응답 정의 — 지식은 문서로 · 행동은 학습으로, `cases` vs `review_criteria`, SFT · LoRA · QLoRA · DPO 지도, 채팅 템플릿 · 기울기 `p − y`, greedy 기준 응답 8개, 형식 ≠ 의미, `baseline.json` · 직접 구현(BPE · 템플릿 · `train_step` · `generate`) | ✅ 완료 (통합 실습 `manual_reviews` 남음 · 직접 구현 Hard는 선택) |
 | [2](./fine-tuning/02-training-data-quality-split/) | 학습 데이터 구성과 품질 검증 — 규칙 함수 모범답안 72개(12그룹 × 6사례), 메타데이터 vs messages, 두 번 토큰화로 답변 경계 299 · 길이 512, `validate_record` 5단계 · 의도한 오류 2/2, 그룹 단위 분할 48/12/12 · SHA-256 · `training_data.zip` | ✅ 완료 |
+| [3](./fine-tuning/03-full-sft-and-resume/) | 전체 가중치 SFT와 학습 재개 — `encode_example` labels −100 마스킹(370 = 299 + 71), `collate` 패딩 세 값 · (2, 379), shift는 모델 내부에서 한 번, 전체 = 학습 대상 4.94억 개, `TrainingArguments` 유효 배치 4 · 24갱신 · `StopAtTwelve`, 손실 ≠ 업무 정답, `resume_from_checkpoint` 12 → 24, 체크포인트 vs 추론용 모델 · `sft_model.zip` | ✅ 수업 노트북 (Colab T4 · FP32, ZIP 내려받기 남음) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -223,6 +224,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-18 · 파인튜닝 3일차: 전체 가중치 SFT와 학습 재개(3장)
+
+- 파인튜닝 3장 4강을 Colab Tesla T4(BF16 미지원 → FP32, transformers 5.22.2 · 재시작 후 확인)로 끝까지 실행. 처음으로 가중치를 바꾼 날 → [파인튜닝 목차](./fine-tuning/) · [3장](./fine-tuning/03-full-sft-and-resume/)
+- 3-1 `encode_example`: 두 번 토큰화 → EOS까지 자르고 뒤 `\n`만 버림 → labels = −100 × 299 + 답변 · EOS 71 (입력 370). `collate`는 input pad ID / attention 0 / labels −100으로 (2, 379), toy loss `logits[:, :-1]` ↔ `labels[:, 1:]` = log 6
+- 3-2 전체 = 학습 대상 494,032,768, 학습 전 dev 12문항 응답 · 가중치 표본 256개 보관, `TrainingArguments` 유효 배치 4 · 24갱신(2 epoch) · `StopAtTwelve`로 12에서 멈춤 → `checkpoint-12`
+- 3-3 dev loss 0.9167 → 0.0158(12갱신), train은 구간 평균 · dev는 한 번 계산, grad\_norm은 NaN · 폭증만. 슬라이드(BF16)는 dev 0.0049인데 over\_limit 2문항 틀림 → **손실 ≠ 업무 정답**
+- 3-4 `resume_from_checkpoint`로 12 → 24, 최종 dev loss 0.000303, 표본 256/256 변화(FP32라 BF16 24/256보다 많음), 관찰 문항 policy01-over\_limit은 내 실행에서 "초과 → 서면 승인"으로 맞음, 저장 전후 같은 응답 True
+- 사이드 질문: −100 vs 슬라이싱 vs attention 0, teacher forcing · exposure bias, SDPA, gradient checkpointing ≠ 학습 체크포인트, `eval_steps` = 16문항마다, 체크포인트 vs 추론용 모델
+- 남은 것: `ARCHIVE_FOLDER`로 `sft_model.zip` · `sft_report.json` 내려받기, dev 12문항 학습 전후 원문 비교
 
 ### 2026-11-17 · 파인튜닝 2일차: 학습 데이터 구성과 품질 검증(2장) · Python 보강 3주 2회차
 
@@ -283,16 +294,6 @@ flowchart LR
 - 파이썬 Q&A: 괄호 안/밖 `=`, `*` · `*args` · `**kwargs`, 이름표 필수 vs 기본값, 리스트 컴프리헨션
 - Python 보강 2주 1일: 클래스 · `self` · `__repr__`/`__eq__`/`__len__` · 상속 · `@dataclass` — 기초 q1\~q3 · 응용 q4 통과 → [Python 6장](./python-basics/06-classes/)
 
-### 2026-10-30 · LLMOps 1일차: 실행 관측과 실패 원인 분석(1장) · CE 복습 · 네트워크 스터디 2회차
-
-- LLMOps 1장 4강을 `llmops_ch01` 키트(Langfuse Cloud + LangChain + OpenAI `gpt-5.6-luna`)로 실행. 00\~04 모두 실행, q\_hard는 2·3·4 통과(q1 남음) → [LLMOps 목차](./llmops/) · [1장](./llmops/01-tracing-failure-analysis/)
-- 질문 1개 = Trace 1개: `policy-qa` → `retrieve`(직접 span) / `generate-answer`(CallbackHandler) → ChatOpenAI GENERATION. 부모는 이름이 아니라 **기록 순간 열려 있는 with**
-- 호출 성공 ≠ 응답 완료(`completed` + 빈 답 아님) ≠ 품질 성공. `response_completed`·"서버 기록 확인"도 정답이라는 뜻이 아님
-- 재조회는 Trace ID + 시작 시각 ±1분(observation 5개, GENERATION 종료 확인), 조회가 비었다고 모델을 다시 부르지 않음
-- 규정 10만원 ≠ 승인 8만원(tool 구간), 부모 시간에 자식 포함(합 4185 ms vs 1500 ms). 판정 순서 status → 시각 → failed → 문서, `failure_category` 점수
-- CE 복습: prompt vs context engineering, question · instruction · context · messages · content 용어 정리와 1\~4장 코드 Q&A
-- 네트워크 스터디 2회차: IPv4/IPv6, DHCP·고정 IP, 서브넷 마스크·CIDR, 블록 계산 4단계 → [네트워크 스터디](./network-study/02-ip-subnetting/)
-
 ## 📂 폴더 구조
 
 <details>
@@ -314,7 +315,7 @@ TIL/
 ├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
 ├── llmops/                        # 1~4장
-├── fine-tuning/                   # 1~2장
+├── fine-tuning/                   # 1~3장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

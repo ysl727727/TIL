@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-18 · 파인튜닝 3일차: 전체 가중치 SFT와 학습 재개(3장)
+
+- 파인튜닝 3장 4강을 Colab Tesla T4(BF16 미지원 → FP32, transformers 5.22.2 · 재시작 후 확인)로 끝까지 실행. 처음으로 가중치를 바꾼 날 → [파인튜닝 목차](./fine-tuning/) · [3장](./fine-tuning/03-full-sft-and-resume/)
+- 3-1 `encode_example`: 두 번 토큰화 → EOS까지 자르고 뒤 `\n`만 버림 → labels = −100 × 299 + 답변 · EOS 71 (입력 370). `collate`는 input pad ID / attention 0 / labels −100으로 (2, 379), toy loss `logits[:, :-1]` ↔ `labels[:, 1:]` = log 6
+- 3-2 전체 = 학습 대상 494,032,768, 학습 전 dev 12문항 응답 · 가중치 표본 256개 보관, `TrainingArguments` 유효 배치 4 · 24갱신(2 epoch) · `StopAtTwelve`로 12에서 멈춤 → `checkpoint-12`
+- 3-3 dev loss 0.9167 → 0.0158(12갱신), train은 구간 평균 · dev는 한 번 계산, grad\_norm은 NaN · 폭증만. 슬라이드(BF16)는 dev 0.0049인데 over\_limit 2문항 틀림 → **손실 ≠ 업무 정답**
+- 3-4 `resume_from_checkpoint`로 12 → 24, 최종 dev loss 0.000303, 표본 256/256 변화(FP32라 BF16 24/256보다 많음), 관찰 문항 policy01-over\_limit은 내 실행에서 "초과 → 서면 승인"으로 맞음, 저장 전후 같은 응답 True
+- 사이드 질문: −100 vs 슬라이싱 vs attention 0, teacher forcing · exposure bias, SDPA, gradient checkpointing ≠ 학습 체크포인트, `eval_steps` = 16문항마다, 체크포인트 vs 추론용 모델
+- 남은 것: `ARCHIVE_FOLDER`로 `sft_model.zip` · `sft_report.json` 내려받기, dev 12문항 학습 전후 원문 비교
+
 ## 2026-11-17 · 파인튜닝 2일차: 학습 데이터 구성과 품질 검증(2장) · Python 보강 3주 2회차
 
 - 파인튜닝 2장 4강을 Colab CPU로 실행(토크나이저만, 가중치는 안 불러옴)하고, 로컬(transformers 5.22.2)에서 다시 돌려 JSONL 해시까지 슬라이드와 일치 → [파인튜닝 목차](./fine-tuning/) · [2장](./fine-tuning/02-training-data-quality-split/)

@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-20 · 파인튜닝 4일차: LoRA 어댑터 학습과 모델 복원(4장)
+
+- 파인튜닝 4장 4강을 Colab Tesla T4(FP32, transformers 5.22.2 · peft 0.21.2 · accelerate 1.15.0)로 실행. 2장 `training_data.zip` + 3장 `sft_report.json`을 올려 같은 데이터 · 같은 조건인지 대조 → [파인튜닝 목차](./fine-tuning/) · [4장](./fine-tuning/04-lora-adapter-restore/)
+- 4-1 h = Wx + (α/r)·B(Ax): W (m, n) · A (r, n) · B (m, r), 작은 예제 두 경로의 합 [3, 0] = 병합한 W. 파라미터 = r × (입력 + 출력) → q · v r 8에 540,672개(0.11%)
+- 4-2 B = 0에서 시작 → 첫 기울기는 B에만(A 0 · B [−2, 2]), `LoraConfig`(r 8 · α 16) · `get_peft_model` → 학습 대상은 `lora_` 이름뿐 · 학습 뒤 W 그대로 · B ≠ 0
+- 4-3 `save_pretrained`로 어댑터만 저장 → 같은 기반 + `PeftModel.from_pretrained` → logits 오차 0.0 · 원문 일치, FP32 `merge_and_unload` 오차 6.39e-05 (수치 확인 ≠ 품질)
+- 4-4 같은 lr 2e-5에선 LoRA가 안 움직임(내 실행 dev 0.9167 → 0.8466, 슬라이드 형식 0/12). 보강 lr 2e-4 + all-linear(4,399,104개)로 dev 0.0140 · 형식 12/12, 다만 "한도와 같으므로"처럼 이유가 틀린 문장
+- 3장 `sft_report.json` 확인: 내 FP32 전체 SFT는 dev 형식 12/12 · 판단 12/12(슬라이드 BF16 10/12), 최고 메모리 9.23 GiB
+- 남은 것: `lora_report.json` config를 실제 설정(2e-4 · all-linear)으로 고치고 `lora_adapter/`와 함께 내려받기, 통합 실습 TODO 1\~8
+
 ## 2026-11-18 · 파인튜닝 3일차: 전체 가중치 SFT와 학습 재개(3장)
 
 - 파인튜닝 3장 4강을 Colab Tesla T4(BF16 미지원 → FP32, transformers 5.22.2 · 재시작 후 확인)로 끝까지 실행. 처음으로 가중치를 바꾼 날 → [파인튜닝 목차](./fine-tuning/) · [3장](./fine-tuning/03-full-sft-and-resume/)

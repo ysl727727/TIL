@@ -23,7 +23,13 @@
   3-3  곡선 읽기    train(구간 평균) vs dev(한 번), grad_norm은 NaN · 폭증만, 손실 ≠ 업무 정답
   3-4  재개 · 저장  resume_from_checkpoint 12 → 24, 표본 변화 · save_pretrained · 다시 읽기 · sft_model.zip
       ↓  "같은 SFT 목표를 A · B만 학습하면?"
-4장 LoRA → 5장 QLoRA → 6장 DPO → 7장 평가 · API → 8장 검증 · 인계
+4장 LoRA 어댑터 학습과 모델 복원   (W 고정 · A · B만 학습 · GPU)
+  4-1  저랭크 업데이트  h = Wx + (α/r)·BAx, W (m, n) · A (r, n) · B (m, r), 두 경로의 합 = 병합 [3, 0]
+  4-2  PEFT 학습        B = 0 첫 기울기는 B에만, LoraConfig r 8 · α 16 · q · v → 540,672개(0.11%) · lora_만 학습
+  4-3  저장 · 복원       어댑터만 save_pretrained · PeftModel.from_pretrained 오차 0.0 · merge_and_unload 6.39e-05
+  4-4  같은 조건 비교    check_comparison_inputs, lr 2e-5면 안 움직임 → lr 2e-4 · all-linear로 형식 12/12
+      ↓  "고정한 W를 4비트로 줄이면?"
+5장 QLoRA → 6장 DPO → 7장 평가 · API → 8장 검증 · 인계
 ```
 
 ## 장별 한 줄과 중요 개념
@@ -33,6 +39,7 @@
 | [1장](./01-baseline-behavior-definition/) | 학습 전 같은 입력 · 같은 설정의 응답을 기준으로 남긴다 | **지식은 문서로 · 행동은 학습으로**, 정답 누수, 학습 목표(SFT · DPO) vs 학습 대상(LoRA · QLoRA), `ensure_ascii=False`, `add_generation_prompt`, **기울기 = p − y**, `backward` vs `step`, revision 고정 · greedy 명시, 새 토큰만 읽기 · 잘림 먼저, **형식 ≠ 의미 ≠ 참조 일치**, 재현의 네 가지 | ✅ 수업 · 통합 실습 · 직접 구현 Easy (`manual_reviews` 남음) |
 | [2장](./02-training-data-quality-split/) | 모범답안은 규칙이 만들고, 자료와 검사 함수를 함께 시험하고, 행이 아니라 그룹으로 나눈다 | **규칙 함수 모범답안**, `below` · `irrelevant`, 메타데이터 vs messages · 정답 누수, 두 번 토큰화 · **답변 경계 assert**, 토큰 상한 512(자르지 않음), `validate_record` 5단계 · **검사 함수의 테스트**, `copy.deepcopy`, **그룹 단위 분할** · `random.Random(SEED)`, JSONL · `dataset_info` · SHA-256 | ✅ 수업 노트북 (Colab · 로컬 재실행, 해시 일치) |
 | [3장](./03-full-sft-and-resume/) | 답변 토큰만 채점해서 전체 가중치를 바꾸고, 손실이 내려가도 업무 답은 따로 읽고, 재개 상태와 쓸 모델은 나눠 저장한다 | **labels −100** · EOS까지 자르기, 패딩 세 값 · 위치 기준, **shift는 한 곳에서 한 번**, teacher forcing · exposure bias, 전체 = 학습 대상 4.94억, 유효 배치 · epoch, warmup · linear, gradient checkpointing ≠ 학습 체크포인트, `StopAtTwelve`, **손실 ≠ 업무 정답**, `resume_from_checkpoint`, 체크포인트 vs 추론용 모델, BF16 vs FP32 | ✅ 수업 노트북 (Colab T4 · FP32, `sft_model.zip` 내려받기 남음) |
+| [4장](./04-lora-adapter-restore/) | W는 고정하고 변화량 (α/r)·BA만 배우고, 어댑터만 저장 · 복원 · 병합한 뒤, 조건을 맞춰 숫자와 원문을 함께 읽는다 | **SFT(무엇) vs LoRA(어느 파라미터)**, BA 순서 · rank(ΔW) ≤ r, 파라미터 r × (입력 + 출력), **B = 0 첫 기울기**, `q_proj` · `v_proj` · all-linear, `lora_`만 학습 검사, 어댑터 저장 · `is_trainable=False`, `allclose` atol · rtol, `merge_and_unload` = 수치 확인, **같은 조건 비교 · 한 가지만 바꾸기**, 보고서 config 맞추기 | ✅ 수업 노트북 (Colab T4 · FP32, 보강 lr 2e-4 · all-linear · 통합 실습 남음) |
 
 ## 오늘의 교훈
 
@@ -47,6 +54,8 @@
 9. **행이 아니라 같은 문제 단위로 나눈다.** 행 단위로 섞으면 test 12행 모두 형제가 train에 있어요.
 10. **손실은 토큰 평균이다.** dev loss 0.0049에서도 "이하/초과" 몇 토큰이 틀리면 업무 답은 오답이에요. 생성 원문을 같은 조건으로 비교해요.
 11. **이어서 학습할 상태와 쓸 모델은 다르다.** 재개엔 optimizer · scheduler · 난수 · step까지, 추론엔 가중치 · 설정 · 토크나이저만.
+12. **SFT는 무엇을, LoRA는 어느 파라미터로.** 같은 목표를 0.11%의 A · B로 배우고, 결과물은 기반 모델 없이 몇 MB.
+13. **"같은 조건"도 한쪽에 안 맞을 수 있다.** SFT용 lr 2e-5에선 LoRA가 안 움직였어요. 조건 대조 → 한 가지씩 바꾸기 → 원문 읽기, 그리고 바꾼 설정은 보고서에도.
 
 ## 앞 과목과 이어지는 부분
 
@@ -72,3 +81,8 @@
 | 3장 `weight_decay` | 머신러닝 3장 Ridge 규제 |
 | 3장 체크포인트 · 재개 (`optimizer.pt` · `rng_state.pth`) | 딥러닝 기초 9장 `state_dict` · checkpoint · 재개 |
 | 3장 dev loss ≠ 업무 정답 | 1장 형식 ≠ 의미, LLMOps 3장 지표마다 분모가 다름 |
+| 4장 W · A · B 모양 · `A @ x` | 기초 수학 1장 행렬곱과 선형층, Python 보강 10장 행렬 × 벡터 |
+| 4장 rank(ΔW) ≤ r · 저랭크 | 기초 수학 2장 rank, 3 · 4장 SVD와 저랭크 근사 |
+| 4장 LoRA · PEFT | 딥러닝 심화 7장 PEFT(LoRA) |
+| 4장 `q_proj` · `k_proj` · `v_proj` | 기초 수학 5\~7장 Attention `QKᵀ/√d_k`, 딥러닝 심화 Transformer |
+| 4장 어댑터 저장 · 복원 · 버전 대조 | 3장 `save_pretrained` · 재로딩, LLMOps 2장 프롬프트 버전 · 회귀 판정 |

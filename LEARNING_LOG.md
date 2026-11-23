@@ -13,7 +13,7 @@
 - 5-3 슬라이드 0.5B: LoRA 1.615 GiB · 18.5초 vs QLoRA 1.637 GiB · 25.3초, 형식 둘 다 0/12(실패 이유는 다름). 추가 실습 L4 실측: 4B QLoRA −41%, 14B는 QLoRA만 들어감
 - 5-4 같은 revision NF4 + 같은 prepare + `is_trainable=False`로 복원 → logits atol 1e-4 · 원문 일치. ZIP엔 어댑터 · 보고서만
 - 사이드 질문: 임베딩을 FP32로 키우는 건 양자화 오차 보정이 아니라 학습 중 수치 안정성 때문. Unsloth는 새 학습법이 아니라 LoRA · QLoRA 가속 도구
-- 받은 4장 `lora_report.json`은 L4 · BF16 → T4에서 돌리면 셀 14에서 멈춤. `qlora.ipynb` · 통합 실습 내 실행 결과는 아직 기록 안 함
+- 받은 4장 `lora_report.json`은 L4 · BF16 → T4에서 돌리면 셀 14에서 멈춤. 그래서 `qlora.ipynb` · 통합 실습은 Colab L4로 실행 · 결과 ZIP 내려받음
 - Python 보강 4주 1회차: 미분 Δy/Δx · 중앙 차분 · 기울기 부호 = 방향 · 도함수 규칙 · 편미분 · 연쇄법칙 · sympy — day9 기초 1 \~ 실무 1 풀이 → [Python 11장](./python-basics/11-derivatives-chain-rule/)
 
 ## 2026-11-20 · 파인튜닝 4일차: LoRA 어댑터 학습과 모델 복원(4장)

@@ -55,10 +55,10 @@
 
 | 파일 | 하는 일 | 상태 |
 |---|---|---|
-| `qlora.ipynb` | 5-1 양자화 예제 → 5-2 NF4 + LoRA 24갱신 → 5-3 비교 → 5-4 ZIP · 새 세션 복원 | 📘 수업 · 5-1 코드 질문 정리 (내 실행 결과는 아직 기록 안 함) |
-| `finetuning_ch05_practice.ipynb` | 통합 실습 TODO 1\~8 (NF4 설정 · prepare + LoRA · 같은 단위 비교) | 📘 TODO 답과 이유 정리 (실행 결과 미기록) |
+| `qlora.ipynb` | 5-1 양자화 예제 → 5-2 NF4 + LoRA 24갱신 → 5-3 비교 → 5-4 ZIP · 새 세션 복원 | ✅ Colab L4 실행 · 5-1 코드 질문 정리 |
+| `finetuning_ch05_practice.ipynb` | 통합 실습 TODO 1\~8 (NF4 설정 · prepare + LoRA · 같은 단위 비교) | ✅ Colab 실행 · TODO 답과 이유 정리 |
 | `5장_추가_Unsloth.ipynb` | 1부 모델 크기별 SFT · LoRA · QLoRA 메모리 · 2부 Unsloth | 📘 노트북 참고 실측으로 정리 |
-| `qlora_result.zip` · `qlora_report.json` | 어댑터 + 보고서 (7장 평가 입력) | ⏳ 실행 후 내려받기 남음 |
+| `qlora_result.zip` · `qlora_report.json` | 어댑터 + 보고서 (7장 평가 입력) | ✅ 내려받음 |
 
 ---
 

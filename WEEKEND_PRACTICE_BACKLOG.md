@@ -18,10 +18,10 @@
 
 > 받은 4장 `lora_report.json`은 L4 · BF16이라 T4에선 셀 14에서 멈춰요. 런타임을 L4로.
 
-- [ ] `qlora.ipynb` L4에서 끝까지 실행 → 내 숫자(dev loss · 최대 메모리 · 시간 · 형식) 기록
-- [ ] `qlora_result.zip` · `qlora_report.json` 내려받기 (7장 평가 입력, 원본 · 변경 실행 따로 보관)
+- [x] `qlora.ipynb` L4에서 끝까지 실행 (Colab, 2026-11-23)
+- [x] `qlora_result.zip` · `qlora_report.json` 내려받기 (7장 평가 입력, 원본 · 변경 실행 따로 보관)
 - [ ] 설정 바꿔 보기 (lr 2e-4 · all-linear · atol 1e-4) — 바꾸면 보고서 config도 같이
-- [ ] 통합 실습 `finetuning_ch05_practice.ipynb` TODO 1\~8 실행 → `practice_result.json`
+- [x] 통합 실습 `finetuning_ch05_practice.ipynb` TODO 1\~8 실행 → `practice_result.json` (Colab)
 - [ ] (선택) `5장_추가_Unsloth.ipynb` 직접 실행해서 노트북 참고 실측과 비교
 
 ## 1. 업데이트: 파인튜닝 4일차 (4장)
@@ -36,10 +36,10 @@
 
 > Colab 런타임을 끄면 `/content`의 결과가 사라져요. 끄기 전에 먼저 내려받기.
 
-- [ ] `lora_report.json`의 config를 실제 설정(learning\_rate 2e-4 · target\_modules all-linear)으로 고치고, `check_comparison_inputs`에서 learning\_rate 키만 빼서 다시 저장
-- [ ] `lora_adapter/`(adapter\_config.json · adapter\_model.safetensors) · `lora_report.json` 내려받기 (5장 입력)
+- [x] `lora_report.json`의 config를 실제 설정(learning\_rate 2e-4 · target\_modules all-linear)으로 고치고, `check_comparison_inputs`에서 learning\_rate 키만 빼서 다시 저장
+- [x] `lora_adapter/`(adapter\_config.json · adapter\_model.safetensors) · `lora_report.json` 내려받기 (5장 입력)
 - [ ] `lora_report.json`의 `comparison`으로 LoRA dev 12문항 원문 읽기 ("한도와 같으므로" 개수)
-- [ ] 통합 실습 `finetuning_ch04_practice.ipynb` TODO 1\~8 실행
+- [x] 통합 실습 `finetuning_ch04_practice.ipynb` TODO 1\~8 실행 (Colab)
 
 ## 2. 업데이트: 파인튜닝 3일차 (3장)
 

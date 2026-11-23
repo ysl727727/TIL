@@ -17,7 +17,7 @@
 | --- | --- |
 | 현재 단계 | 파인튜닝 — 5장 QLoRA 수업 · 양자화 정리 → 6장 DPO |
 | 최근 학습 | **2026-11-23** · [파인튜닝 5장](./fine-tuning/05-qlora-quantization-resources/) 양자화 = 번호 + scale · NF4 16칸 · 4.5 → 4.127비트 · 저장 NF4 / 계산 BF16 / 임베딩 · A · B FP32 · prepare → LoRA · 0.5B는 메모리 이득 없음 · Unsloth · [Python 11장](./python-basics/11-derivatives-chain-rule/) 미분 · 연쇄법칙 |
-| 다음 할 일 | 파인튜닝 5장 `qlora.ipynb` L4 실행 · `qlora_result.zip` 내려받기 · 5장 통합 실습 TODO 1\~8 · 6장 DPO · 4장 `lora_report.json` config 고치고 `lora_adapter` 내려받기 · 4장 통합 실습 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 다음 할 일 | 파인튜닝 6장 DPO · 보강 4주 2회차 경사하강법 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -170,8 +170,8 @@ flowchart LR
 | [1](./fine-tuning/01-baseline-behavior-definition/) | 학습할 행동과 기준 응답 정의 — 지식은 문서로 · 행동은 학습으로, `cases` vs `review_criteria`, SFT · LoRA · QLoRA · DPO 지도, 채팅 템플릿 · 기울기 `p − y`, greedy 기준 응답 8개, 형식 ≠ 의미, `baseline.json` · 직접 구현(BPE · 템플릿 · `train_step` · `generate`) | ✅ 완료 (통합 실습 `manual_reviews` 남음 · 직접 구현 Hard는 선택) |
 | [2](./fine-tuning/02-training-data-quality-split/) | 학습 데이터 구성과 품질 검증 — 규칙 함수 모범답안 72개(12그룹 × 6사례), 메타데이터 vs messages, 두 번 토큰화로 답변 경계 299 · 길이 512, `validate_record` 5단계 · 의도한 오류 2/2, 그룹 단위 분할 48/12/12 · SHA-256 · `training_data.zip` | ✅ 완료 |
 | [3](./fine-tuning/03-full-sft-and-resume/) | 전체 가중치 SFT와 학습 재개 — `encode_example` labels −100 마스킹(370 = 299 + 71), `collate` 패딩 세 값 · (2, 379), shift는 모델 내부에서 한 번, 전체 = 학습 대상 4.94억 개, `TrainingArguments` 유효 배치 4 · 24갱신 · `StopAtTwelve`, 손실 ≠ 업무 정답, `resume_from_checkpoint` 12 → 24, 체크포인트 vs 추론용 모델 · `sft_model.zip` | ✅ 수업 노트북 (Colab T4 · FP32, ZIP 내려받기 남음) |
-| [4](./fine-tuning/04-lora-adapter-restore/) | LoRA 어댑터 학습과 모델 복원 — h = Wx + (α/r)·BAx, W · A · B 모양 · 파라미터 r × (입력 + 출력), B = 0 시작과 첫 기울기, `LoraConfig` · `get_peft_model` · `lora_`만 학습 검사, `save_pretrained` · `PeftModel.from_pretrained` · `allclose` · `merge_and_unload`, `check_comparison_inputs`, 보강 lr 2e-4 · all-linear | ✅ 수업 노트북 (Colab T4 · FP32, 보강 설정까지 · 통합 실습 남음) |
-| [5](./fine-tuning/05-qlora-quantization-resources/) | QLoRA 학습과 자원 비교 — 양자화 = 대표값 번호 + scale(2비트 [0, 1, 2, 2, 3] · 오차 0.633), NF4 16칸, 블록 64 · 이중 양자화 4.5 → 4.127비트, 저장 NF4 · 계산 BF16/FP32 · 임베딩 · A · B FP32, `BitsAndBytesConfig` · `prepare_model_for_kbit_training` → `get_peft_model`, 451 → 726 MB, 0.5B LoRA 1.615 vs QLoRA 1.637 GiB, 새 세션 복원, Unsloth | 📘 수업 · 양자화 질문 정리 (`qlora.ipynb` · 통합 실습 실행 기록 남음) |
+| [4](./fine-tuning/04-lora-adapter-restore/) | LoRA 어댑터 학습과 모델 복원 — h = Wx + (α/r)·BAx, W · A · B 모양 · 파라미터 r × (입력 + 출력), B = 0 시작과 첫 기울기, `LoraConfig` · `get_peft_model` · `lora_`만 학습 검사, `save_pretrained` · `PeftModel.from_pretrained` · `allclose` · `merge_and_unload`, `check_comparison_inputs`, 보강 lr 2e-4 · all-linear | ✅ 수업 노트북 · 통합 실습 (Colab T4 · FP32, 보강 설정까지) |
+| [5](./fine-tuning/05-qlora-quantization-resources/) | QLoRA 학습과 자원 비교 — 양자화 = 대표값 번호 + scale(2비트 [0, 1, 2, 2, 3] · 오차 0.633), NF4 16칸, 블록 64 · 이중 양자화 4.5 → 4.127비트, 저장 NF4 · 계산 BF16/FP32 · 임베딩 · A · B FP32, `BitsAndBytesConfig` · `prepare_model_for_kbit_training` → `get_peft_model`, 451 → 726 MB, 0.5B LoRA 1.615 vs QLoRA 1.637 GiB, 새 세션 복원, Unsloth | ✅ 수업 노트북 · 통합 실습 (Colab L4) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -237,7 +237,7 @@ flowchart LR
 - 5-3 슬라이드 0.5B: LoRA 1.615 GiB · 18.5초 vs QLoRA 1.637 GiB · 25.3초, 형식 둘 다 0/12(실패 이유는 다름). 추가 실습 L4 실측: 4B QLoRA −41%, 14B는 QLoRA만 들어감
 - 5-4 같은 revision NF4 + 같은 prepare + `is_trainable=False`로 복원 → logits atol 1e-4 · 원문 일치. ZIP엔 어댑터 · 보고서만
 - 사이드 질문: 임베딩을 FP32로 키우는 건 양자화 오차 보정이 아니라 학습 중 수치 안정성 때문. Unsloth는 새 학습법이 아니라 LoRA · QLoRA 가속 도구
-- 받은 4장 `lora_report.json`은 L4 · BF16 → T4에서 돌리면 셀 14에서 멈춤. `qlora.ipynb` · 통합 실습 내 실행 결과는 아직 기록 안 함
+- 받은 4장 `lora_report.json`은 L4 · BF16 → T4에서 돌리면 셀 14에서 멈춤. 그래서 `qlora.ipynb` · 통합 실습은 Colab L4로 실행 · 결과 ZIP 내려받음
 - Python 보강 4주 1회차: 미분 Δy/Δx · 중앙 차분 · 기울기 부호 = 방향 · 도함수 규칙 · 편미분 · 연쇄법칙 · sympy — day9 기초 1 \~ 실무 1 풀이 → [Python 11장](./python-basics/11-derivatives-chain-rule/)
 
 ### 2026-11-20 · 파인튜닝 4일차: LoRA 어댑터 학습과 모델 복원(4장)

@@ -4,6 +4,18 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-23 · 파인튜닝 5일차: QLoRA 학습과 자원 비교(5장) · Python 보강 4주 1회차
+
+- 파인튜닝 5장 4강 수업 + 통합 실습 · 추가 실습(Unsloth) 정리. 5-1 양자화 코드를 집중적으로 질문해서 뜯어봄 → [파인튜닝 목차](./fine-tuning/) · [5장](./fine-tuning/05-qlora-quantization-resources/)
+- 5-1 양자화 = 가까운 대표값의 **번호 + scale** 저장: 2비트 예제 번호 [0, 1, 2, 2, 3] · 최대 오차 0.633, 4비트로 바꾸면 균등 0.1 · NF4 0.146(값이 바깥쪽이라). 64개마다 FP32 scale 4.5비트 → 이중 양자화(scale 8비트 + 256개마다 기준값) 4.127비트
+- 저장 NF4(`uint8` 상자) · 계산 BF16/FP32 · 임베딩 · Norm · A · B는 FP32. 양자화는 고정 가중치 저장, LoRA는 기울기 · AdamW 상태를 줄임
+- 5-2 `BitsAndBytesConfig` → `prepare_model_for_kbit_training` → `get_peft_model`(순서 반대면 A · B도 얼어요). 451 MB → 726 MB, 늘어난 양의 272 MB가 FP32 임베딩. 슬라이드 dev 1.0459 → 0.9745
+- 5-3 슬라이드 0.5B: LoRA 1.615 GiB · 18.5초 vs QLoRA 1.637 GiB · 25.3초, 형식 둘 다 0/12(실패 이유는 다름). 추가 실습 L4 실측: 4B QLoRA −41%, 14B는 QLoRA만 들어감
+- 5-4 같은 revision NF4 + 같은 prepare + `is_trainable=False`로 복원 → logits atol 1e-4 · 원문 일치. ZIP엔 어댑터 · 보고서만
+- 사이드 질문: 임베딩을 FP32로 키우는 건 양자화 오차 보정이 아니라 학습 중 수치 안정성 때문. Unsloth는 새 학습법이 아니라 LoRA · QLoRA 가속 도구
+- 받은 4장 `lora_report.json`은 L4 · BF16 → T4에서 돌리면 셀 14에서 멈춤. `qlora.ipynb` · 통합 실습 내 실행 결과는 아직 기록 안 함
+- Python 보강 4주 1회차: 미분 Δy/Δx · 중앙 차분 · 기울기 부호 = 방향 · 도함수 규칙 · 편미분 · 연쇄법칙 · sympy — day9 기초 1 \~ 실무 1 풀이 → [Python 11장](./python-basics/11-derivatives-chain-rule/)
+
 ## 2026-11-20 · 파인튜닝 4일차: LoRA 어댑터 학습과 모델 복원(4장)
 
 - 파인튜닝 4장 4강을 Colab Tesla T4(FP32, transformers 5.22.2 · peft 0.21.2 · accelerate 1.15.0)로 실행. 2장 `training_data.zip` + 3장 `sft_report.json`을 올려 같은 데이터 · 같은 조건인지 대조 → [파인튜닝 목차](./fine-tuning/) · [4장](./fine-tuning/04-lora-adapter-restore/)

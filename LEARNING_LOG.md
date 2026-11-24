@@ -4,6 +4,17 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-24 · 파인튜닝 6일차: DPO 선호 학습과 응답 변화 분석(6장) · Python 보강 4주 2회차
+
+- 파인튜닝 6장 4강 수업 + W&B 보강 정리. `response_logps` · `dpo_terms`와 손실 식 −log σ(m)을 한 줄씩 질문해서 뜯어봄 → [파인튜닝 목차](./fine-tuning/) · [6장](./fine-tuning/06-dpo-preference-optimization/)
+- 6-1 같은 질문 · 같은 규정에 chosen + 판단 하나만 틀린 rejected → train 48행 = 48쌍(6유형 × 8). 과잉 보류와 근거 없는 단정을 둘 다
+- 6-2 계산 순서: CE로 토큰 log p 꺼내기 → 응답별 합 → (policy − reference) × β = reward → chosen − rejected = margin → σ → −log = loss. 시작 0.6931(ln 2). 마이너스 두 번(CE 되돌리기 · 손실로 뒤집기), β 0.1(채점 기준) ≠ lr 2e-5(보폭)
+- 6-3 reference는 학습 전 SFT 점수 [48, 2]를 숫자로 얼림 · 4쌍마다 1번 = 24갱신 · 16초 · 4.49 GiB(슬라이드)
+- 6-4 lr 2e-5: loss 0.00004 · margin 48/48 양수인데 chosen logp −0.44 → −73.65 · dev 형식 2/12, "과잉 보류 0/8"은 못 읽어서 0. lr 2e-6이면 chosen 유지 · 12/12. 저장 재로딩은 정확, 학습 재현은 흔들림
+- 질문: SFT · DPO(무엇을) vs 풀 · LoRA · QLoRA(어디를) 두 축, LoRA DPO는 어댑터 끄면 reference, 열이 필요 없는 이유(scatter\_add), mask 이름의 함정, 이어 학습 · 재개 · 재학습
+- `dpo.ipynb` Colab 실행 결과 · 통합 실습은 아직 기록 안 함 (받은 `sft_model.zip`이 BF16이라 L4)
+- Python 보강 4주 2회차: 경사하강법 x − lr × 기울기 · 학습률 수렴 · 진동 · 발산 · 2차원 · MSE와 w, b 기울기 · train / test · minimize · LinearRegression — day10 기초 1 \~ 응용 3 통과 → [Python 12장](./python-basics/12-gradient-descent/)
+
 ## 2026-11-23 · 파인튜닝 5일차: QLoRA 학습과 자원 비교(5장) · Python 보강 4주 1회차
 
 - 파인튜닝 5장 4강 수업 + 통합 실습 · 추가 실습(Unsloth) 정리. 5-1 양자화 코드를 집중적으로 질문해서 뜯어봄 → [파인튜닝 목차](./fine-tuning/) · [5장](./fine-tuning/05-qlora-quantization-resources/)

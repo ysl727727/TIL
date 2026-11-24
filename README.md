@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | 파인튜닝 — 5장 QLoRA 수업 · 양자화 정리 → 6장 DPO |
-| 최근 학습 | **2026-11-23** · [파인튜닝 5장](./fine-tuning/05-qlora-quantization-resources/) 양자화 = 번호 + scale · NF4 16칸 · 4.5 → 4.127비트 · 저장 NF4 / 계산 BF16 / 임베딩 · A · B FP32 · prepare → LoRA · 0.5B는 메모리 이득 없음 · Unsloth · [Python 11장](./python-basics/11-derivatives-chain-rule/) 미분 · 연쇄법칙 |
-| 다음 할 일 | 파인튜닝 6장 DPO · 보강 4주 2회차 경사하강법 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | 파인튜닝 — 6장 DPO 수업 · 손실 계산 순서 정리 → 7장 평가 · API |
+| 최근 학습 | **2026-11-24** · [파인튜닝 6장](./fine-tuning/06-dpo-preference-optimization/) 선호쌍 48 · log p 합 → reward → margin → −log σ · 마이너스 두 번 · β ≠ lr · loss 0인데 chosen 붕괴(2e-5) vs 유지(2e-6) · SFT · DPO × 풀 · LoRA · QLoRA · [Python 12장](./python-basics/12-gradient-descent/) 경사하강법 |
+| 다음 할 일 | 파인튜닝 6장 `dpo.ipynb` L4 실행 · `dpo_report.json` · `dpo_model.zip` 내려받기 · lr 2e-6 비교 · 6장 통합 실습 · 7장 평가 · API · 보강 4주 2회차 심화 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -172,6 +172,7 @@ flowchart LR
 | [3](./fine-tuning/03-full-sft-and-resume/) | 전체 가중치 SFT와 학습 재개 — `encode_example` labels −100 마스킹(370 = 299 + 71), `collate` 패딩 세 값 · (2, 379), shift는 모델 내부에서 한 번, 전체 = 학습 대상 4.94억 개, `TrainingArguments` 유효 배치 4 · 24갱신 · `StopAtTwelve`, 손실 ≠ 업무 정답, `resume_from_checkpoint` 12 → 24, 체크포인트 vs 추론용 모델 · `sft_model.zip` | ✅ 수업 노트북 (Colab T4 · FP32, ZIP 내려받기 남음) |
 | [4](./fine-tuning/04-lora-adapter-restore/) | LoRA 어댑터 학습과 모델 복원 — h = Wx + (α/r)·BAx, W · A · B 모양 · 파라미터 r × (입력 + 출력), B = 0 시작과 첫 기울기, `LoraConfig` · `get_peft_model` · `lora_`만 학습 검사, `save_pretrained` · `PeftModel.from_pretrained` · `allclose` · `merge_and_unload`, `check_comparison_inputs`, 보강 lr 2e-4 · all-linear | ✅ 수업 노트북 · 통합 실습 (Colab T4 · FP32, 보강 설정까지) |
 | [5](./fine-tuning/05-qlora-quantization-resources/) | QLoRA 학습과 자원 비교 — 양자화 = 대표값 번호 + scale(2비트 [0, 1, 2, 2, 3] · 오차 0.633), NF4 16칸, 블록 64 · 이중 양자화 4.5 → 4.127비트, 저장 NF4 · 계산 BF16/FP32 · 임베딩 · A · B FP32, `BitsAndBytesConfig` · `prepare_model_for_kbit_training` → `get_peft_model`, 451 → 726 MB, 0.5B LoRA 1.615 vs QLoRA 1.637 GiB, 새 세션 복원, Unsloth | ✅ 수업 노트북 · 통합 실습 (Colab L4) |
+| [6](./fine-tuning/06-dpo-preference-optimization/) | DPO 선호 학습과 응답 변화 분석 — chosen + 판단 하나만 틀린 rejected 48쌍(6유형), 응답 점수 = 응답 토큰 log p 합(`response_logps` · mask · scatter\_add), (policy − reference) × β = reward → margin → −log σ, 마이너스 두 번, β ≠ lr, reference 점수 [48, 2] 얼리기 · 24갱신, loss 0.00004인데 chosen logp −73.65 · 형식 2/12 vs 2e-6 12/12, 저장 재현 ≠ 학습 재현 | 📘 수업 · 손실 계산 질문 정리 (`dpo.ipynb` 실행 기록 · 통합 실습 남음) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -206,6 +207,7 @@ flowchart LR
 | [9](./python-basics/09-numpy-arrays/) | 보강 3주 1회차 — `np.array` 벡터화, shape · axis, 인덱싱 · 마스크 · `np.where`, 브로드캐스팅 · `keepdims`, 평균 · 분산 · 표준편차, softmax · temperature, `default_rng` | 🧪 진행 (심화 1~3 · 실무 1 남음) |
 | [10](./python-basics/10-dot-product-matmul/) | 보강 3주 2회차 — 내적, 노름, 곱의 모양, 코사인 유사도, 행렬 × 벡터(행마다 내적), 선형 예측 `X @ w + b` | 🧪 진행 (심화 1~3 남음) |
 | [11](./python-basics/11-derivatives-chain-rule/) | 보강 4주 1회차 — 미분 Δy/Δx · 극한, 중앙 차분, 기울기 부호 = 방향, 도함수 규칙(상수 · ax + b · x²), 편미분 · gradient, 연쇄법칙(배율 곱하기), sympy `diff` · `subs` | ✅ 기초 1 \~ 실무 1 풀이 |
+| [12](./python-basics/12-gradient-descent/) | 보강 4주 2회차 — 경사하강법 x − lr × 기울기, 학습률 (1 − 2·lr)배 수렴 · 진동 · 발산, 2차원 배열, MSE = w, b의 함수 · 기울기(연쇄법칙), train / test 섞어서 나누기, `minimize` · `LinearRegression`, DPO = 정답이 1인 BCE | 🧪 진행 (기초 1 \~ 응용 3 통과, 심화 1\~3 · 실무 1 선택 남음) |
 
 ### 네트워크 스터디 · [`network-study/`](./network-study/)
 
@@ -227,6 +229,17 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-24 · 파인튜닝 6일차: DPO 선호 학습과 응답 변화 분석(6장) · Python 보강 4주 2회차
+
+- 파인튜닝 6장 4강 수업 + W&B 보강 정리. `response_logps` · `dpo_terms`와 손실 식 −log σ(m)을 한 줄씩 질문해서 뜯어봄 → [파인튜닝 목차](./fine-tuning/) · [6장](./fine-tuning/06-dpo-preference-optimization/)
+- 6-1 같은 질문 · 같은 규정에 chosen + 판단 하나만 틀린 rejected → train 48행 = 48쌍(6유형 × 8). 과잉 보류와 근거 없는 단정을 둘 다
+- 6-2 계산 순서: CE로 토큰 log p 꺼내기 → 응답별 합 → (policy − reference) × β = reward → chosen − rejected = margin → σ → −log = loss. 시작 0.6931(ln 2). 마이너스 두 번(CE 되돌리기 · 손실로 뒤집기), β 0.1(채점 기준) ≠ lr 2e-5(보폭)
+- 6-3 reference는 학습 전 SFT 점수 [48, 2]를 숫자로 얼림 · 4쌍마다 1번 = 24갱신 · 16초 · 4.49 GiB(슬라이드)
+- 6-4 lr 2e-5: loss 0.00004 · margin 48/48 양수인데 chosen logp −0.44 → −73.65 · dev 형식 2/12, "과잉 보류 0/8"은 못 읽어서 0. lr 2e-6이면 chosen 유지 · 12/12. 저장 재로딩은 정확, 학습 재현은 흔들림
+- 질문: SFT · DPO(무엇을) vs 풀 · LoRA · QLoRA(어디를) 두 축, LoRA DPO는 어댑터 끄면 reference, 열이 필요 없는 이유(scatter\_add), mask 이름의 함정, 이어 학습 · 재개 · 재학습
+- `dpo.ipynb` Colab 실행 결과 · 통합 실습은 아직 기록 안 함 (받은 `sft_model.zip`이 BF16이라 L4)
+- Python 보강 4주 2회차: 경사하강법 x − lr × 기울기 · 학습률 수렴 · 진동 · 발산 · 2차원 · MSE와 w, b 기울기 · train / test · minimize · LinearRegression — day10 기초 1 \~ 응용 3 통과 → [Python 12장](./python-basics/12-gradient-descent/)
 
 ### 2026-11-23 · 파인튜닝 5일차: QLoRA 학습과 자원 비교(5장) · Python 보강 4주 1회차
 
@@ -289,16 +302,6 @@ flowchart LR
 - Naive k=5: development Hit 0.929 · Recall 0.564 · Recall@20 0.867, additional Hit 0.929 · Recall 0.641 → 근거 문서가 여럿인 질문에서 절반을 놓침, Reranker 여지 큼
 - Qdrant Cloud 무료 티어 · 클러스터별 키, `WinError 10054`는 클러스터 재생성으로 해결, push한 커밋 메시지는 `--force-with-lease`로 정리
 
-### 2026-11-04 · LLMOps 3일차: 신뢰 경계 · 마스킹 · 출력 검증 · 보안 평가(4장) · RAG 스타터 복습 · Python 보강 2주 3일
-
-- LLMOps 4장 4강을 `llmops_ch04` 키트로 실행. 01\~04 모두 실행, q2 · q3\_hard 통과 → [LLMOps 목차](./llmops/) · [4장](./llmops/04-trust-boundary-privacy-output-security/)
-- 4-1 권한은 서버의 `principal`로만, 본문 읽기 전에 검사하고 `read_ids`로 실제 읽기 확인. 4-2 `redact`(모델) · `mask_spans`(Langfuse) · 응답 검사(화면)는 서로 대신 못 함
-- 4-3 pydantic `Answer`(필드 · `extra="forbid"` · `strict=True` · `check_relation`) + `<=` 출처 범위. `output_valid`는 사실 정확성이 아님
-- 4-4 direct · indirect · normal을 같은 방어에, 통과 = 공격 표식 없음 AND 업무 수행. 모델의 도구 제안 ≠ 실행 허가(`run_tool` 허용 목록 + 문서 권한)
-- 질문: JWT 서명 확인(서버는 비밀 키만), Redis(세션 · 캐시) vs Mem0(장기 기억), 3장 피드백 응답률 vs 긍정 비율
-- RAG 프로젝트 스타터 파이프라인 복습: 입력 가드 → 세션 → 캐시 → 검색 · 리랭크 → 문서 가드 → Context → 출력 검증 → 출력 가드 → 에스컬레이션 → [RAG 10](./rag/10-project-starter-pipeline-review/)
-- Python 보강 2주 3일: git config · add/commit · Git Flow 가지 · reset vs revert · PR(base develop) · 충돌 해결. 팀 저장소에 `feature/ysl` PR → [Python 8장](./python-basics/08-git-gitflow-github/)
-
 ## 📂 폴더 구조
 
 <details>
@@ -320,7 +323,7 @@ TIL/
 ├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
 ├── llmops/                        # 1~4장
-├── fine-tuning/                   # 1~5장
+├── fine-tuning/                   # 1~6장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

@@ -35,7 +35,13 @@
   5-3  품질 · 자원      0.5B LoRA 1.615 vs QLoRA 1.637 GiB · 18.5 vs 25.3초 · 형식 0/12 이유는 다름
   5-4  새 세션 복원     같은 revision NF4 + 같은 prepare + is_trainable=False → logits atol 1e-4
       ↓  "정답 하나 대신 더 나은 답을 고르게 하면?"
-6장 DPO → 7장 평가 · API → 8장 검증 · 인계
+6장 DPO 선호 학습과 응답 변화 분석   (3장 SFT에서 출발 · 전체 가중치 · 손실 식만 바꿈 · GPU)
+  6-1  응답 쌍       같은 입력 + chosen · 판단 하나만 틀린 rejected → 48쌍(6유형 × 8), 과잉 보류 · 단정 둘 다
+  6-2  목적함수      토큰 log p 합 → (policy − ref) × β = reward → margin → −log σ, 시작 ln 2 · 마이너스 두 번
+  6-3  이어 학습     reference 점수 [48, 2] 얼리기 → 4쌍마다 1번 · 24갱신 → loss 0.00004
+  6-4  변화 분석     margin 48/48 양수인데 chosen logp −0.44 → −73.65 · 형식 2/12 (2e-6이면 12/12) · 저장 재로딩 정확
+      ↓  "다섯 결과(기준 · SFT · LoRA · QLoRA · DPO)를 같은 조건으로 비교하면?"
+7장 평가 · API → 8장 검증 · 인계
 ```
 
 ## 장별 한 줄과 중요 개념
@@ -47,6 +53,7 @@
 | [3장](./03-full-sft-and-resume/) | 답변 토큰만 채점해서 전체 가중치를 바꾸고, 손실이 내려가도 업무 답은 따로 읽고, 재개 상태와 쓸 모델은 나눠 저장한다 | **labels −100** · EOS까지 자르기, 패딩 세 값 · 위치 기준, **shift는 한 곳에서 한 번**, teacher forcing · exposure bias, 전체 = 학습 대상 4.94억, 유효 배치 · epoch, warmup · linear, gradient checkpointing ≠ 학습 체크포인트, `StopAtTwelve`, **손실 ≠ 업무 정답**, `resume_from_checkpoint`, 체크포인트 vs 추론용 모델, BF16 vs FP32 | ✅ 수업 노트북 (Colab T4 · FP32, `sft_model.zip` 내려받기 남음) |
 | [4장](./04-lora-adapter-restore/) | W는 고정하고 변화량 (α/r)·BA만 배우고, 어댑터만 저장 · 복원 · 병합한 뒤, 조건을 맞춰 숫자와 원문을 함께 읽는다 | **SFT(무엇) vs LoRA(어느 파라미터)**, BA 순서 · rank(ΔW) ≤ r, 파라미터 r × (입력 + 출력), **B = 0 첫 기울기**, `q_proj` · `v_proj` · all-linear, `lora_`만 학습 검사, 어댑터 저장 · `is_trainable=False`, `allclose` atol · rtol, `merge_and_unload` = 수치 확인, **같은 조건 비교 · 한 가지만 바꾸기**, 보고서 config 맞추기 | ✅ 수업 노트북 · 통합 실습 (Colab T4 · FP32, 보강 lr 2e-4 · all-linear) |
 | [5장](./05-qlora-quantization-resources/) | 몸통은 압축해서 얼리고 옆길만 배우되, 저장 · 계산 · 안 압축된 층을 구분하고 품질 · 메모리 · 시간은 같은 구간에서 잰 숫자로 따로 읽는다 | **양자화 = 번호 + scale**, `[:, None]` 브로드캐스팅, 2비트 4칸 vs 4비트 16칸 · **NF4**, 블록 64 · FP32 scale · **이중 양자화** 4.127비트, **저장 NF4 / 계산 BF16 / 비양자화 · 어댑터 FP32**, 양자화(가중치 저장) vs LoRA(기울기 · 상태), `BitsAndBytesConfig`, **prepare → LoRA 순서**, FP32 임베딩 +272 MB, 0.5B 본전선 27%, 같은 조리법 복원, Unsloth | ✅ 수업 노트북 · 통합 실습 (Colab L4) |
+| [6장](./06-dpo-preference-optimization/) | 좋은 답과 나쁜 답의 격차가 학습 전보다 벌어지도록 −log σ(margin)을 줄이되, 손실은 차이만 보니 chosen 값과 원문을 따로 읽는다 | **선호쌍 = 같은 입력 · 판단 하나만 다름**, 과잉 보류 · 근거 없는 단정 둘 다, **응답 점수 = log p 합**, 한 칸 어긋나기 · mask · `scatter_add`, **(policy − reference) × β = reward → margin → −log σ**, 마이너스 두 번, **β(채점) ≠ lr(보폭)**, reference 점수 얼리기, **loss 0 · chosen 붕괴**, 못 읽어서 생긴 0, 저장 재현 ≠ 학습 재현, SFT · DPO × 풀 · LoRA · QLoRA | 📘 수업 · 손실 계산 질문 정리 (`dpo.ipynb` 실행 기록 · 통합 실습 남음) |
 
 ## 오늘의 교훈
 
@@ -65,6 +72,9 @@
 13. **"같은 조건"도 한쪽에 안 맞을 수 있다.** SFT용 lr 2e-5에선 LoRA가 안 움직였어요. 조건 대조 → 한 가지씩 바꾸기 → 원문 읽기, 그리고 바꾼 설정은 보고서에도.
 14. **"4비트 모델"이 전부 4비트는 아니다.** 저장은 NF4, 계산은 BF16, 임베딩 · A · B는 FP32. 0.5B에선 FP32 임베딩 몫이 압축 이득을 상쇄해서 학습 최대 메모리가 오히려 조금 늘었어요.
 15. **양자화와 LoRA는 줄이는 곳이 다르다.** 양자화는 가만히 있는 가중치 저장, LoRA는 움직이는 파라미터의 기울기 · 옵티마이저 상태. 큰 모델에서 둘을 같이 써야 들어가요.
+
+16. **SFT · DPO는 "무엇을 배우나", 풀 · LoRA · QLoRA는 "어디를 고치나".** 두 축은 독립이라 "LoRA로 DPO 한다"가 맞는 말이고, LoRA DPO의 reference는 어댑터를 끄면 공짜예요.
+17. **loss는 차이만 본다.** DPO loss가 0.00004여도 좋은 답의 logp가 −0.44에서 −73.65로 무너졌어요. 손실 · margin과 함께 chosen 값 · 원문을 따로 읽어요. "0/8"도 못 읽어서 생긴 0일 수 있어요.
 
 ## 앞 과목과 이어지는 부분
 
@@ -101,3 +111,9 @@
 | 5장 gradient checkpointing | 3장 gradient checkpointing ≠ 학습 체크포인트 |
 | 5장 Unsloth `prompt` / `completion` 자동 마스킹 | 3장 labels −100 손으로 만들기 |
 | 5장 기울기는 Ŵ를 지나가지만 A · B만 갱신 | Python 보강 11장 연쇄법칙 · 기울기 반대 방향 |
+| 6장 응답 점수 = 토큰 log p 합 · CE를 점수 도구로 | 3장 labels −100 · 교차엔트로피, 1장 세 점수 예제 −log p |
+| 6장 −log σ(margin) = 정답이 1인 BCE | LLM 실전 5장 DPO, Python 보강 12장 sigmoid · BCE · CE |
+| 6장 dL/dm = −(1 − σ) · optimizer는 줄이는 방향 | 1장 `p − y`, Python 보강 12장 경사하강법 x − lr × 기울기 |
+| 6장 lr 2e-5 vs 2e-6 (chosen 붕괴 vs 유지) | Python 보강 12장 학습률 수렴 · 진동 · 발산, 4장 같은 lr이 한쪽엔 안 맞음 |
+| 6장 `mask.nonzero()` · `scatter_add` | Python 보강 9장 마스크 · 인덱싱 |
+| 6장 LoRA DPO의 reference = 어댑터 끄기 | 4장 B = 0 시작 · `disable_adapter`, 5장 QLoRA 복원 |

@@ -4,6 +4,16 @@
 > 하루 단위로 다시 정리한 버전은 [날짜별 TIL](./daily/)에 있습니다.
 > 날짜는 당일 기록이나 주말 백로그에 남아 있는 경우에만 적었습니다.
 
+## 2026-11-25 · 파인튜닝 7일차: 모델 성능 평가와 서비스 연결(7장)
+
+- 파인튜닝 7장 4강 수업 + 통합 실습 TODO 1\~8 정리. 학습 없이 다섯 결과를 같은 dev 12로 채점하고 3장 SFT만 검색 · API에 연결 → [파인튜닝 목차](./fine-tuning/) · [7장](./fine-tuning/07-evaluation-api-connection/)
+- 7-1 채점 전 sha256 지문 대조(같은 파일 ≠ 좋은 설정) → 세 관문 `json_object` → `schema_ok` → `citation_ids_ok`. "70,000원은 65,000원 이하"도 세 관문 True = 형식 통과 ≠ 업무 정답
+- 7-2 보고서 5개 × dev 12 = 60개를 문항 ID로 정렬 · 질문 · 근거 · 생성 설정 대조, 첫 실패 단계만 세기. 수업자료(L4) 형식 통과 base 0 · full\_sft 12 · lora 0 · qlora 0 · dpo 0(lr 2e-5), 그런데 full\_sft도 over\_limit 오답
+- 7-3 `AnswerRequest`(strict · extra forbid → 422) → 팀 + 낱말 겹침 검색 → 3장 SFT 생성 → 출력 검사(200 / 502). 80,000원 질문은 200인데 판단 틀림, 통신비는 보류로 맞음
+- 7-4 실패 칸(형식 · 검색 · 업무 판단 · 운영) → full\_sft 후보 고정 · `deployment_ready: False` · `test_used: False` → `evaluation_report.json` · `candidate_manifest.json`
+- 질문: dev = 개발용(모의고사) · train 48 / dev 12 / test 12 팀 단위 분할, 코드 펜스를 벗기려면 result가 아니라 입력을 바꾸고 엄격 · 허용 점수를 따로(base 0 → 9, lora 0 → 10)
+- 통합 실습: `json.loads(raw)` · `schema_ok = True` · `issubset` / 숙박 낱말(숙박 · 예약 · 방) · 팀 필터 · id · text만 / `retrieve_documents` · `generate(model, row)`. "숙박" 하나만 보면 API 질문을 놓침
+
 ## 2026-11-24 · 파인튜닝 6일차: DPO 선호 학습과 응답 변화 분석(6장) · Python 보강 4주 2회차
 
 - 파인튜닝 6장 4강 수업 + W&B 보강 정리. `response_logps` · `dpo_terms`와 손실 식 −log σ(m)을 한 줄씩 질문해서 뜯어봄 → [파인튜닝 목차](./fine-tuning/) · [6장](./fine-tuning/06-dpo-preference-optimization/)

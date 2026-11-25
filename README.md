@@ -15,9 +15,9 @@
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | 파인튜닝 — 6장 DPO 수업 · 손실 계산 순서 정리 → 7장 평가 · API |
-| 최근 학습 | **2026-11-24** · [파인튜닝 6장](./fine-tuning/06-dpo-preference-optimization/) 선호쌍 48 · log p 합 → reward → margin → −log σ · 마이너스 두 번 · β ≠ lr · loss 0인데 chosen 붕괴(2e-5) vs 유지(2e-6) · SFT · DPO × 풀 · LoRA · QLoRA · [Python 12장](./python-basics/12-gradient-descent/) 경사하강법 |
-| 다음 할 일 | 파인튜닝 6장 `dpo.ipynb` L4 실행 · `dpo_report.json` · `dpo_model.zip` 내려받기 · lr 2e-6 비교 · 6장 통합 실습 · 7장 평가 · API · 보강 4주 2회차 심화 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
+| 현재 단계 | 파인튜닝 — 7장 평가 · API 수업 · 통합 실습 정리 → 8장 검증 · 인계 |
+| 최근 학습 | **2026-11-25** · [파인튜닝 7장](./fine-tuning/07-evaluation-api-connection/) 지문 대조 · 세 관문(JSON · 계약 · 인용 ID) · 형식 통과 ≠ 업무 정답 · 다섯 결과 × dev 12 · 첫 실패 단계 · 검색 → SFT → `/answer` 422 · 200 · 502 · full\_sft 후보 고정(배포 False) · dev vs test · 코드 펜스 엄격 vs 허용 |
+| 다음 할 일 | 파인튜닝 6장 `dpo.ipynb` L4 실행 · `dpo_report.json` · `dpo_model.zip` 내려받기 · lr 2e-6 비교 · 6장 통합 실습 · 8장 검증 · 인계 · 보강 4주 2회차 심화 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
 | 목표 | 평가와 운영까지 고려하는 LLM 엔지니어 |
@@ -173,6 +173,7 @@ flowchart LR
 | [4](./fine-tuning/04-lora-adapter-restore/) | LoRA 어댑터 학습과 모델 복원 — h = Wx + (α/r)·BAx, W · A · B 모양 · 파라미터 r × (입력 + 출력), B = 0 시작과 첫 기울기, `LoraConfig` · `get_peft_model` · `lora_`만 학습 검사, `save_pretrained` · `PeftModel.from_pretrained` · `allclose` · `merge_and_unload`, `check_comparison_inputs`, 보강 lr 2e-4 · all-linear | ✅ 수업 노트북 · 통합 실습 (Colab T4 · FP32, 보강 설정까지) |
 | [5](./fine-tuning/05-qlora-quantization-resources/) | QLoRA 학습과 자원 비교 — 양자화 = 대표값 번호 + scale(2비트 [0, 1, 2, 2, 3] · 오차 0.633), NF4 16칸, 블록 64 · 이중 양자화 4.5 → 4.127비트, 저장 NF4 · 계산 BF16/FP32 · 임베딩 · A · B FP32, `BitsAndBytesConfig` · `prepare_model_for_kbit_training` → `get_peft_model`, 451 → 726 MB, 0.5B LoRA 1.615 vs QLoRA 1.637 GiB, 새 세션 복원, Unsloth | ✅ 수업 노트북 · 통합 실습 (Colab L4) |
 | [6](./fine-tuning/06-dpo-preference-optimization/) | DPO 선호 학습과 응답 변화 분석 — chosen + 판단 하나만 틀린 rejected 48쌍(6유형), 응답 점수 = 응답 토큰 log p 합(`response_logps` · mask · scatter\_add), (policy − reference) × β = reward → margin → −log σ, 마이너스 두 번, β ≠ lr, reference 점수 [48, 2] 얼리기 · 24갱신, loss 0.00004인데 chosen logp −73.65 · 형식 2/12 vs 2e-6 12/12, 저장 재현 ≠ 학습 재현 | 📘 수업 · 손실 계산 질문 정리 (`dpo.ipynb` 실행 기록 · 통합 실습 남음) |
+| [7](./fine-tuning/07-evaluation-api-connection/) | 모델 성능 평가와 서비스 연결 — 학습 없이 sha256 지문 대조, `inspect_response` 세 관문(`json_object` · `schema_ok` · `citation_ids_ok`) · 형식이 완벽한 오답, 다섯 결과 × dev 12 = 60개 · 첫 실패 단계(SFT만 12/12), 원문 읽기 `criteria_by_type`, 팀 + 낱말 겹침 검색 · 3장 SFT 복원 · `AnswerRequest` 422 · `/answer` 200/502 · 200인데 판단 틀림, 실패 칸 4개 · full\_sft 후보 고정 · `deployment_ready: False`, dev vs test, 코드 펜스 엄격 vs 허용 | ✅ 수업 · 통합 실습 (TODO 1\~8) |
 
 ### 프로젝트 전 복습 · [`private-llm-review/`](./private-llm-review/)
 
@@ -229,6 +230,16 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-25 · 파인튜닝 7일차: 모델 성능 평가와 서비스 연결(7장)
+
+- 파인튜닝 7장 4강 수업 + 통합 실습 TODO 1\~8 정리. 학습 없이 다섯 결과를 같은 dev 12로 채점하고 3장 SFT만 검색 · API에 연결 → [파인튜닝 목차](./fine-tuning/) · [7장](./fine-tuning/07-evaluation-api-connection/)
+- 7-1 채점 전 sha256 지문 대조(같은 파일 ≠ 좋은 설정) → 세 관문 `json_object` → `schema_ok` → `citation_ids_ok`. "70,000원은 65,000원 이하"도 세 관문 True = 형식 통과 ≠ 업무 정답
+- 7-2 보고서 5개 × dev 12 = 60개를 문항 ID로 정렬 · 질문 · 근거 · 생성 설정 대조, 첫 실패 단계만 세기. 수업자료(L4) 형식 통과 base 0 · full\_sft 12 · lora 0 · qlora 0 · dpo 0(lr 2e-5), 그런데 full\_sft도 over\_limit 오답
+- 7-3 `AnswerRequest`(strict · extra forbid → 422) → 팀 + 낱말 겹침 검색 → 3장 SFT 생성 → 출력 검사(200 / 502). 80,000원 질문은 200인데 판단 틀림, 통신비는 보류로 맞음
+- 7-4 실패 칸(형식 · 검색 · 업무 판단 · 운영) → full\_sft 후보 고정 · `deployment_ready: False` · `test_used: False` → `evaluation_report.json` · `candidate_manifest.json`
+- 질문: dev = 개발용(모의고사) · train 48 / dev 12 / test 12 팀 단위 분할, 코드 펜스를 벗기려면 result가 아니라 입력을 바꾸고 엄격 · 허용 점수를 따로(base 0 → 9, lora 0 → 10)
+- 통합 실습: `json.loads(raw)` · `schema_ok = True` · `issubset` / 숙박 낱말(숙박 · 예약 · 방) · 팀 필터 · id · text만 / `retrieve_documents` · `generate(model, row)`. "숙박" 하나만 보면 API 질문을 놓침
 
 ### 2026-11-24 · 파인튜닝 6일차: DPO 선호 학습과 응답 변화 분석(6장) · Python 보강 4주 2회차
 
@@ -293,15 +304,6 @@ flowchart LR
 - 직접 구현: BPE("숙박비 지원 한도" 1토큰 · "통신비" 9바이트), 템플릿, `train_step` 손실 2.178 → 0.371, greedy "이하 → 승인 필요"(손실이 낮다 ≠ 업무 판단이 맞다)
 - Python 보강 3주 1회차: NumPy 벡터화 · shape · axis · 마스크 · 브로드캐스팅 · 분산 · softmax — 기초 1\~3 · 응용 1\~3 통과 → [Python 9장](./python-basics/09-numpy-arrays/)
 
-### 2026-11-05 · RAG 프로젝트(3) 1일차: 데이터 분석 · 해운 Basic 색인 · Naive 검색
-
-- 발제 확인: RAG 3종(Naive / Hybrid / Hybrid + Reranker) 비교, FastAPI + LangChain + Langfuse, 문서명 · 페이지 표시, clarify · abstain → [RAG 프로젝트(3)](./projects/03-rag-qa-service/)
-- 팀 ADEN에서 A 데이터 · 검색 담당. `feat/basic-data-search` 브랜치로 PDF 추출 → 문단 800자 청킹 → E5 임베딩 → Qdrant Cloud 색인 → Naive `retrieve()` (PR #2)
-- 청킹 비교(정답 인용 258개): 페이지 통째는 106쪽이 512토큰 초과, 글자 500/overlap 100은 84.1%, 문단 800자 98.1% → 360쪽 · 청크 620개
-- `PageDocument` → `Chunk` → `RetrievedChunk` dataclass 계약, `frozen=True`, `asdict` / `Chunk(**payload)`
-- Naive k=5: development Hit 0.929 · Recall 0.564 · Recall@20 0.867, additional Hit 0.929 · Recall 0.641 → 근거 문서가 여럿인 질문에서 절반을 놓침, Reranker 여지 큼
-- Qdrant Cloud 무료 티어 · 클러스터별 키, `WinError 10054`는 클러스터 재생성으로 해결, push한 커밋 메시지는 `--force-with-lease`로 정리
-
 ## 📂 폴더 구조
 
 <details>
@@ -323,7 +325,7 @@ TIL/
 ├── rag/                           # 1~9장 + 10 프로젝트 대비 복습
 ├── context-engineering/           # 1~4장
 ├── llmops/                        # 1~4장
-├── fine-tuning/                   # 1~6장
+├── fine-tuning/                   # 1~7장
 ├── private-llm-review/            # 프로젝트 전 복습 (일차별)
 ├── projects/                      # 팀 프로젝트 회고
 ├── python-basics/                 # Python 보강

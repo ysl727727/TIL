@@ -41,7 +41,13 @@
   6-3  이어 학습     reference 점수 [48, 2] 얼리기 → 4쌍마다 1번 · 24갱신 → loss 0.00004
   6-4  변화 분석     margin 48/48 양수인데 chosen logp −0.44 → −73.65 · 형식 2/12 (2e-6이면 12/12) · 저장 재로딩 정확
       ↓  "다섯 결과(기준 · SFT · LoRA · QLoRA · DPO)를 같은 조건으로 비교하면?"
-7장 평가 · API → 8장 검증 · 인계
+7장 모델 성능 평가와 서비스 연결   (학습 안 함 · 보고서 재채점 · 3장 SFT만 연결 · 7-3부터 GPU)
+  7-1  형식 · 의미   sha256 지문 대조 → json_object · schema_ok · citation_ids_ok, 세 관문 True인 오답
+  7-2  같은 입력     보고서 5개 × dev 12 = 60개 · 문항 ID 정렬 · 첫 실패 단계, SFT만 12/12 · over_limit 오답
+  7-3  검색 · API    팀 + 낱말 겹침 검색 → SFT 복원 → /answer 422 · 200 · 502, 200인데 판단 틀림
+  7-4  실패 · 후보   형식 · 검색 · 업무 판단 · 운영 → full_sft 고정 · deployment_ready False · test는 아직
+      ↓  "고정한 후보를 처음 보는 test로 확인하면?"
+8장 검증 · 인계
 ```
 
 ## 장별 한 줄과 중요 개념
@@ -54,6 +60,7 @@
 | [4장](./04-lora-adapter-restore/) | W는 고정하고 변화량 (α/r)·BA만 배우고, 어댑터만 저장 · 복원 · 병합한 뒤, 조건을 맞춰 숫자와 원문을 함께 읽는다 | **SFT(무엇) vs LoRA(어느 파라미터)**, BA 순서 · rank(ΔW) ≤ r, 파라미터 r × (입력 + 출력), **B = 0 첫 기울기**, `q_proj` · `v_proj` · all-linear, `lora_`만 학습 검사, 어댑터 저장 · `is_trainable=False`, `allclose` atol · rtol, `merge_and_unload` = 수치 확인, **같은 조건 비교 · 한 가지만 바꾸기**, 보고서 config 맞추기 | ✅ 수업 노트북 · 통합 실습 (Colab T4 · FP32, 보강 lr 2e-4 · all-linear) |
 | [5장](./05-qlora-quantization-resources/) | 몸통은 압축해서 얼리고 옆길만 배우되, 저장 · 계산 · 안 압축된 층을 구분하고 품질 · 메모리 · 시간은 같은 구간에서 잰 숫자로 따로 읽는다 | **양자화 = 번호 + scale**, `[:, None]` 브로드캐스팅, 2비트 4칸 vs 4비트 16칸 · **NF4**, 블록 64 · FP32 scale · **이중 양자화** 4.127비트, **저장 NF4 / 계산 BF16 / 비양자화 · 어댑터 FP32**, 양자화(가중치 저장) vs LoRA(기울기 · 상태), `BitsAndBytesConfig`, **prepare → LoRA 순서**, FP32 임베딩 +272 MB, 0.5B 본전선 27%, 같은 조리법 복원, Unsloth | ✅ 수업 노트북 · 통합 실습 (Colab L4) |
 | [6장](./06-dpo-preference-optimization/) | 좋은 답과 나쁜 답의 격차가 학습 전보다 벌어지도록 −log σ(margin)을 줄이되, 손실은 차이만 보니 chosen 값과 원문을 따로 읽는다 | **선호쌍 = 같은 입력 · 판단 하나만 다름**, 과잉 보류 · 근거 없는 단정 둘 다, **응답 점수 = log p 합**, 한 칸 어긋나기 · mask · `scatter_add`, **(policy − reference) × β = reward → margin → −log σ**, 마이너스 두 번, **β(채점) ≠ lr(보폭)**, reference 점수 얼리기, **loss 0 · chosen 붕괴**, 못 읽어서 생긴 0, 저장 재현 ≠ 학습 재현, SFT · DPO × 풀 · LoRA · QLoRA | 📘 수업 · 손실 계산 질문 정리 (`dpo.ipynb` 실행 기록 · 통합 실습 남음) |
+| [7장](./07-evaluation-api-connection/) | 학습하지 않고 같은 파일 · 같은 문항 · 같은 설정으로 다섯 결과를 채점하고, 형식 통과와 업무 정답을 나눠 읽고, 후보는 고정하되 배포 승인으로 바꾸지 않는다 | **sha256 지문 = 같은 파일**, `inspect_response` **세 관문** · 펜스 안 벗김, **형식이 완벽한 오답**, 형식 · 업무 의미 · 참조 일치, 60개 · 문항 ID 정렬 · **첫 실패 단계만**, `criteria_by_type`, **dev(모의고사) vs test(수능)**, 낱말 겹침 검색 · 동의어 한계, ZIP 경로 검사 · 어휘 · 템플릿 대조, `AnswerRequest` strict · extra forbid, **422 · 200 · 502** · `review_required`, 실패 칸 4개, `known_bad` 같은 원문만 재사용, `deployment_ready: False` | ✅ 수업 · 통합 실습 (TODO 1\~8) |
 
 ## 오늘의 교훈
 
@@ -75,6 +82,8 @@
 
 16. **SFT · DPO는 "무엇을 배우나", 풀 · LoRA · QLoRA는 "어디를 고치나".** 두 축은 독립이라 "LoRA로 DPO 한다"가 맞는 말이고, LoRA DPO의 reference는 어댑터를 끄면 공짜예요.
 17. **loss는 차이만 본다.** DPO loss가 0.00004여도 좋은 답의 logp가 −0.44에서 −73.65로 무너졌어요. 손실 · margin과 함께 chosen 값 · 원문을 따로 읽어요. "0/8"도 못 읽어서 생긴 0일 수 있어요.
+18. **숫자 앞에는 출처, 뒤에는 원문.** 비교 전에 같은 파일(sha256) · 같은 문항(ID) · 같은 생성 설정부터 맞추고, 점수를 말할 땐 검사 이름과 분모를 같이 말한다.
+19. **형식 통과 · HTTP 200 ≠ 업무 정답.** full\_sft는 형식 12/12 · API 200인데 70,000원 · 80,000원을 한도 이하라고 했다. 실패를 형식 · 검색 · 업무 판단 · 운영 칸으로 나눠야 고칠 곳이 보이고, 고른 dev 점수는 일반화 성능이 아니라 test는 후보를 고정한 뒤에 연다.
 
 ## 앞 과목과 이어지는 부분
 
@@ -117,3 +126,9 @@
 | 6장 lr 2e-5 vs 2e-6 (chosen 붕괴 vs 유지) | Python 보강 12장 학습률 수렴 · 진동 · 발산, 4장 같은 lr이 한쪽엔 안 맞음 |
 | 6장 `mask.nonzero()` · `scatter_add` | Python 보강 9장 마스크 · 인덱싱 |
 | 6장 LoRA DPO의 reference = 어댑터 끄기 | 4장 B = 0 시작 · `disable_adapter`, 5장 QLoRA 복원 |
+| 7장 세 관문 `inspect_response` · 형식 ≠ 의미 | 1장 `json_object` → `schema_ok` → `citation_ids_ok`, 6장 `inspect_response` · `summarize_behavior` |
+| 7장 sha256 지문 대조 | 2장 SHA-256 · `dataset_info`, 6장 `input_sha256` |
+| 7장 dev 선택 · test는 마지막 한 번 | 2장 그룹 단위 분할 48/12/12, LLMOps 2장 dev · holdout, Python 보강 12장 train / test |
+| 7장 낱말 겹침 검색 · 동의어 한계 | RAG 7장 BM25 · 조사 하나 차이, RAG 8장 검색 평가 |
+| 7장 `AnswerRequest` strict · extra forbid · 422 | LLMOps 4장 pydantic `Answer`, LangChain 구조화 출력 |
+| 7장 `review_required` · 200 ≠ 업무 승인 | LLMOps 3장 지표마다 분모가 다름, RAG 6장 `validate_answer` |

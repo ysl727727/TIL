@@ -16,7 +16,7 @@
 | 항목 | 내용 |
 | --- | --- |
 | 현재 단계 | 파인튜닝 — 7장 평가 · API 수업 · 통합 실습 정리 → 8장 검증 · 인계 |
-| 최근 학습 | **2026-11-25** · [파인튜닝 7장](./fine-tuning/07-evaluation-api-connection/) 지문 대조 · 세 관문(JSON · 계약 · 인용 ID) · 형식 통과 ≠ 업무 정답 · 다섯 결과 × dev 12 · 첫 실패 단계 · 검색 → SFT → `/answer` 422 · 200 · 502 · full\_sft 후보 고정(배포 False) · dev vs test · 코드 펜스 엄격 vs 허용 |
+| 최근 학습 | **2026-11-26** · [개인과제 복습 · 파인튜닝 복습 질문](./daily/261126.md) RRF 순위 합치기 · 별칭 질문 변환 · 토큰 예산 창 · 멱등성 · 마스킹 정규식 한계 · 평가 단계 · 1-2 범위 · 12그룹 × 6유형 · 두 번 토큰화 299 / 376 → 77 · DPO 인덱스 · −100 마스킹 SFT · DPO 공통 |
 | 다음 할 일 | 파인튜닝 6장 `dpo.ipynb` L4 실행 · `dpo_report.json` · `dpo_model.zip` 내려받기 · lr 2e-6 비교 · 6장 통합 실습 · 8장 검증 · 인계 · 보강 4주 2회차 심화 · 3장 `sft_model.zip` 내려받기 · 1장 `manual_reviews` 채우기 · 보강 심화(NumPy 심화 1\~3 · 실무 1, 내적 심화 1\~3) · RAG 프로젝트 Hybrid · Reranker · 3종 비교 · CE 마무리 과제 · RAG 남은 q\_hard(7-4 · 8-4 · 9-2 · 9-3 · 9-4) · Python 보강 q 문제 |
 | 밀린 실습 | [주말 실습 백로그](./WEEKEND_PRACTICE_BACKLOG.md)에서 관리 |
 | 날짜별 TIL | [`daily/`](./daily/) — 같은 내용을 하루 단위(오늘 배운 것 · 왜 중요한가 · 코드 · 헷갈린 점 · 내일 할 것)로 정리 |
@@ -230,6 +230,14 @@ flowchart LR
 ## 📝 최근 학습 기록
 
 > 전체 기록은 [LEARNING_LOG.md](./LEARNING_LOG.md)에 날짜순으로 모아 두었습니다.
+
+### 2026-11-26 · 개인과제 복습(RAG · CE · LLMOps) · 파인튜닝 복습 질문
+
+- KANT NEXT 개인과제 3개(RAG · Context Engineering · LLMOps)를 다시 보며 생긴 질문 + 파인튜닝 1\~7장 복습 질문 정리 → [날짜별 TIL](./daily/261126.md)
+- RAG: RRF는 점수 대신 순위(Σ 1 / (60 + 순위))라 BM25 없이 단어 세기 순위와도 합칠 수 있음. 별칭은 검색용 질문만 정식 명칭으로 바꾸고 생성엔 원래 질문 + 별칭 사전. 점수 0.79 → 0.94지만 Recall은 전후 1.0이라 품질 개선은 미확인
+- CE: 창은 턴 수가 아니라 토큰 예산(limit − 384 − 128), 최근 턴부터 붙이다 `break`. `merge_summary`는 `processed_ids`로 멱등, `memory_action` 단기 · 장기 메모리 CRUD
+- LLMOps: 마스킹 정규식에 안 맞는 연락처(하이픈 없는 번호 · 국제번호 · 유선)는 모든 기록에 원문 그대로. 평가는 규칙 → LLM-as-judge → 사람 → 운영 피드백, `status="ok"` ≠ `passed`
+- 파인튜닝: 1-2 토큰은 전 과정 공통 · p − y는 SFT 손실(DPO는 log p까지만 공유), 72 = 12그룹(팀 규정) × 6유형, 메타데이터 / messages 역할 구분, 두 번 토큰화 299 / 376 → 답변 77, `rewards[0]` = chosen · `[1]` = rejected, −100 마스킹은 SFT · DPO 공통
 
 ### 2026-11-25 · 파인튜닝 7일차: 모델 성능 평가와 서비스 연결(7장)
 
